@@ -4,6 +4,10 @@
         "mktsimpleerrorhandling.h": "c",
         "stdlib.h": "c",
         "stdio.h": "c",
-        "main.h": "c"
+        "main.h": "c",
+        "ios": "c",
+        "mktappengine.h": "c",
+        "any": "c",
+        "filesystem": "c"
     }
 }

@@ -4,7 +4,7 @@
             "name": "Win32",
             "includePath": [
                 "${default}",
-                "c:/sdk/"
+                "c:/sdk/include"
             ],
             "defines": [
                 "_DEBUG",
