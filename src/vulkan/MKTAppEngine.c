@@ -4,6 +4,8 @@
 #include <SDL/SDL.h>
 #include <SDL/SDL_vulkan.h>
 
+#define VK_CHECK(x) do{VkResult err = x;if (err){std::cout <<"Detected Vulkan error: " << err << std::endl;abort();}} while (0)
+
 #include "types.h"
 #include "init.h"
 
@@ -22,7 +24,14 @@ void _MKTAE_init()
         window_flags
     );
 
+    init_vulkan();
+
     _isInitialized = true;
+}
+
+void init_vulkan()
+{
+    vkb::InstanceBuilder builder;
 }
 
 void _MKTAE_cleanup()

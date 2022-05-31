@@ -1,1 +1,2 @@
-./src/vulkan/vkb/**
+/src/vulkan/vkb/**
+/vscode/
