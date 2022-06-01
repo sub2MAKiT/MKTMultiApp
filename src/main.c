@@ -2,11 +2,11 @@
 
 int main(int argc, char* argv[])
 {
-	_MKTAE_init();
+	_MKTGE_init();
 
-	_MKTAE_run();
+	_MKTGE_run();
 
-	_MKTAE_cleanup();
+	_MKTGE_cleanup();
 
 	return 0;
 }
