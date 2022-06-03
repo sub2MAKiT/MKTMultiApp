@@ -65,28 +65,15 @@ void _MKTGE_init() {
 void _MKTGE_cleanup() {
     if (_isInitialized) {
 
-        vkDestroyCommandPool(_device, _commandPool, NULL);
+        vkWaitForFences(_device, 1, &_renderFence, true, 1000000000);
 
-        vkDestroySwapchainKHR(_device, _swapchain, NULL);
+        _mainDeletionQueue.flush();
 
-        vkDestroyRenderPass(_device, _renderPass, NULL);
-
-        for (int i = 0; i < _framebuffers.size(); i++)
-        {
-            vkDestroyFramebuffer(_device, _framebuffers[i], NULL);
-
-            vkDestroyImageView(_device,_swapchainImageViews[i], NULL);
-        }
-
-        for (int i = 0; i < _swapchainImageViews.size(); i++) {
-
-            vkDestroyImageView(_device, _swapchainImageViews[i], NULL);
-        }
-
-        vkDestroyDevice(_device,NULL);
         vkDestroySurfaceKHR(_instance, _surface, NULL);
-        vkb::destroy_debug_utils_messenger(_instance, _debug_messenger);
+
+        vkDestroyDevice(_device, NULL);
         vkDestroyInstance(_instance, NULL);
+
         SDL_DestroyWindow(_window);
         DEBUG("III cleaned up III");
     }
@@ -134,7 +121,7 @@ void _MKTGE_draw() {
 //#00ff00
 //#00ff00
 
-vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _trianglePipeline);
+vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, (_selectedShader==1)?_CtrianglePipeline:_trianglePipeline);
 
 vkCmdDraw(cmd, 3, 1, 0, 0);
 
@@ -189,7 +176,13 @@ void _MKTGE_run() {
          _MKTGE_draw();
         while (SDL_PollEvent(&e) != 0)
         {
-                if (e.type == SDL_QUIT) bQuit = true;
+            if (e.type == SDL_QUIT)
+                bQuit = true;
+            else if(e.type == SDL_KEYDOWN)
+                if(e.key.keysym.sym == SDLK_SPACE)
+                {
+                    _selectedShader += 1 - _selectedShader*2;
+                }
         }
     }
     DEBUG("III ran III");
@@ -252,6 +245,10 @@ void _MKTGE_init_swapchain() //#0000ff
 
         _swapchainImageFormat = vkbSwapchain.image_format;
 
+        _mainDeletionQueue.push_function([=]() {
+		vkDestroySwapchainKHR(_device, _swapchain, nullptr);
+	    });
+
     DEBUG("II init:swapchain II");
 }
 
@@ -264,6 +261,10 @@ void _MKTGE_init_commands()
     VkCommandBufferAllocateInfo cmdAllocInfo = command_buffer_allocate_info(_commandPool,1,VK_COMMAND_BUFFER_LEVEL_PRIMARY);
 
     VK_CHECK(vkAllocateCommandBuffers(_device, &cmdAllocInfo, &_mainCommandBuffer));
+
+    _mainDeletionQueue.push_function([=]() {
+		vkDestroyCommandPool(_device, _commandPool, nullptr);
+	});
 
     DEBUG("II init:commands II");
 }
@@ -298,6 +299,10 @@ void _MKTGE_init_default_renderpass()
 
     VK_CHECK(vkCreateRenderPass(_device, &render_pass_info, NULL, &_renderPass));
 
+    _mainDeletionQueue.push_function([=]() {
+		vkDestroyRenderPass(_device, _renderPass, nullptr);
+    });
+
     DEBUG("II init:renderPass II");
 }
 
@@ -323,6 +328,10 @@ void _MKTGE_init_framebuffers()
         {
 		    VK_CHECK(vkCreateFramebuffer(_device, &fb_info, NULL, &_framebuffers[i]));
         }
+        _mainDeletionQueue.push_function([=]() {
+			vkDestroyFramebuffer(_device, _framebuffers[i], nullptr);
+			vkDestroyImageView(_device, _swapchainImageViews[i], nullptr);
+    	});
 	}
 }
 
@@ -342,6 +351,12 @@ void _MKTGE_init_sync_structures()
 
     VK_CHECK(vkCreateSemaphore(_device, &semaphoreCreateInfo, NULL, &_presentSemaphore));
     VK_CHECK(vkCreateSemaphore(_device, &semaphoreCreateInfo, NULL, &_renderSemaphore));
+
+    _mainDeletionQueue.push_function([=]() {
+        vkDestroyFence(_device, _renderFence, NULL);
+        vkDestroySemaphore(_device, _presentSemaphore, NULL);
+        vkDestroySemaphore(_device, _renderSemaphore, NULL);
+    });
 
     DEBUG("II init:sync structures II");
 }
@@ -383,6 +398,24 @@ bool _MKTGE_load_shader_module(const char* filePath, VkShaderModule* outShaderMo
 }
 
 void _MKTGE_init_pipelines() {
+    VkShaderModule CtriangleFragShader;
+    if (!_MKTGE_load_shader_module("./build/shaders/Ctriangle.frag.spv", &CtriangleFragShader))
+    {
+        DEBUG("triangle frag error");
+    }
+    else {
+        DEBUG("triangle frag loaded");
+    }
+
+    VkShaderModule CtriangleVertexShader;
+    if (!_MKTGE_load_shader_module("./build/shaders/Ctriangle.vert.spv", &CtriangleVertexShader))
+    {
+        DEBUG("triangle vert error");
+    }
+    else {
+        DEBUG("triangle vert loaded");
+    }
+
     VkShaderModule triangleFragShader;
     if (!_MKTGE_load_shader_module("./build/shaders/triangle.frag.spv", &triangleFragShader))
     {
@@ -436,6 +469,30 @@ void _MKTGE_init_pipelines() {
     _pipelineLayout = _trianglePipelineLayout;
 
     _trianglePipeline = build_pipeline(_device, _renderPass);
+
+    _shaderStages.clear();
+
+    _shaderStages.push_back(
+        pipeline_shader_stage_create_info(VK_SHADER_STAGE_VERTEX_BIT, CtriangleVertexShader)
+    );
+
+    _shaderStages.push_back(
+        pipeline_shader_stage_create_info(VK_SHADER_STAGE_FRAGMENT_BIT, CtriangleFragShader)
+    );
+
+    _CtrianglePipeline = build_pipeline(_device, _renderPass);
+
+    vkDestroyShaderModule(_device, CtriangleVertexShader, nullptr);
+	vkDestroyShaderModule(_device, CtriangleFragShader, nullptr);
+	vkDestroyShaderModule(_device, triangleFragShader, nullptr);
+	vkDestroyShaderModule(_device, triangleVertexShader, nullptr);
+
+ 	_mainDeletionQueue.push_function([=]() {
+		vkDestroyPipeline(_device, _CtrianglePipeline, nullptr);
+        vkDestroyPipeline(_device, _trianglePipeline, nullptr);
+
+		vkDestroyPipelineLayout(_device, _trianglePipelineLayout, nullptr);
+    });
 }
 //----------------------------------------------------------------------------------------------------------------------------------------
 
@@ -600,3 +657,21 @@ VkPipelineLayoutCreateInfo pipeline_layout_create_info()
         info.pPushConstantRanges = NULL;
         return info;
     }
+
+VkFenceCreateInfo fence_create_info(VkFenceCreateFlags flags)
+{
+    VkFenceCreateInfo fenceCreateInfo = {};
+    fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    fenceCreateInfo.pNext = nullptr;
+    fenceCreateInfo.flags = flags;
+    return fenceCreateInfo;
+}
+
+VkSemaphoreCreateInfo semaphore_create_info(VkSemaphoreCreateFlags flags)
+{
+    VkSemaphoreCreateInfo semCreateInfo = {};
+    semCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+    semCreateInfo.pNext = nullptr;
+    semCreateInfo.flags = flags;
+    return semCreateInfo;
+}
