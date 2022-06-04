@@ -1,0 +1,1 @@
+C:\VulkanSDK\1.2.198.1\Bin\\glslc.exe .\src\vulkan\shaders\Ptriangle\PMtriangle.vert -o .\build\shaders\PMtriangle.vert.spv

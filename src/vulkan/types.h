@@ -19,3 +19,15 @@ struct AllocatedBuffer {
 };
 
 typedef struct AllocatedBuffer allocatedBuffer;
+
+struct MKTVID {
+
+	const VkVertexInputBindingDescription * bindings;
+	const VkVertexInputAttributeDescription * attributes;
+    size_t sizeOfArrayB;
+    size_t sizeOfArrayA;
+
+	VkPipelineVertexInputStateCreateFlags flags = 0;
+};
+
+typedef struct MKTVID VertexInputDescription;
