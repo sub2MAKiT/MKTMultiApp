@@ -1,5 +1,7 @@
 #pragma once
 #include "types.h"
+#include "MKTArrayGraphics.h"
+#include "MKTMesh.h"
 #include <vector>
 #include <cstdio>
 #include <deque>
@@ -81,6 +83,10 @@ MKTAEEXTERN void _MKTGE_init_default_renderpass();
 MKTAEEXTERN void _MKTGE_init_framebuffers();
 MKTAEEXTERN void _MKTGE_init_sync_structures();
 MKTAEEXTERN void _MKTGE_init_pipelines();
+MKTAEEXTERN void _MKTGE_load_meshes();
+MKTAEEXTERN void _MKTGE_load_AG();
+MKTAEEXTERN void _MKTGE_upload_mesh(Mesh * mesh);
+MKTAEEXTERN void _MKTGE_upload_AG(arrayGraphic * AG);
 MKTAEEXTERN bool _MKTGE_load_shader_module(const char* filePath, VkShaderModule* outShaderModule);
 MKTAEEXTERN std::vector<VkPipelineShaderStageCreateInfo> _shaderStages;
 MKTAEEXTERN VkPipelineVertexInputStateCreateInfo _vertexInputInfo;
@@ -103,3 +109,8 @@ MKTAEEXTERN VkPipelineColorBlendAttachmentState color_blend_attachment_state();
 MKTAEEXTERN VkPipelineLayoutCreateInfo pipeline_layout_create_info();
 MKTAEEXTERN VkFenceCreateInfo fence_create_info(VkFenceCreateFlags flags = 0);
 MKTAEEXTERN VkSemaphoreCreateInfo semaphore_create_info(VkSemaphoreCreateFlags flags = 0);
+MKTAEEXTERN VmaAllocator _allocator;
+MKTAEEXTERN VkPipeline _meshPipeline;
+MKTAEEXTERN VkPipeline _arrayGraphicsPipeline;
+MKTAEEXTERN Mesh _triangleMesh;
+MKTAEEXTERN arrayGraphic _CtriangleMesh;

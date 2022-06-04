@@ -103,6 +103,7 @@
         "xtr1common": "c",
         "xtree": "c",
         "xutility": "c",
-        "sdl_vulkan.h": "c"
+        "sdl_vulkan.h": "c",
+        "string_view": "c"
     }
 }
