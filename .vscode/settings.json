@@ -106,6 +106,8 @@
         "sdl_vulkan.h": "c",
         "string_view": "c",
         "*.tcc": "c",
-        "memory_resource": "c"
+        "memory_resource": "c",
+        "vk_platform.h": "c",
+        "mktmath.h": "c"
     }
 }

@@ -25,7 +25,7 @@ do                                                              \
 #ifdef MKT_DEBUG
 int step = 0;
 #define DEBUG(x)              \
-printf_s("\033[%d;40m[%d]" x "\033[0;40m\n",int((rand() % 6) + 1 + MKTfloor(float(((rand() % 2) + 1)*1.5)) * 30),step);step++
+printf_s("\033[%d;40m[%d]" x "\033[0;40m\n",int((step % 6) + 1 + MKTfloor(float(((step % 2) + 1)*1.5)) * 30),step);step++
 #else
 #define DEBUG(x)                                                \
 0
@@ -90,7 +90,7 @@ void _MKTGE_draw() {
     VK_CHECK(vkResetFences(_device, 1, &_renderFence));
 
     uint32_t swapchainImageIndex;
-    VK_CHECK(vkAcquireNextImageKHR(_device, _swapchain, 1000000000, _presentSemaphore, NULL, &swapchainImageIndex));
+    VK_CHECK(vkAcquireNextImageKHR(_device, _swapchain, 1000000000, _presentSemaphore, nullptr, &swapchainImageIndex));
 
     VK_CHECK(vkResetCommandBuffer(_mainCommandBuffer, 0));
 
@@ -98,9 +98,9 @@ void _MKTGE_draw() {
 
     VkCommandBufferBeginInfo cmdBeginInfo = {};
     cmdBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    cmdBeginInfo.pNext = NULL;
+    cmdBeginInfo.pNext = nullptr;
 
-    cmdBeginInfo.pInheritanceInfo = NULL;
+    cmdBeginInfo.pInheritanceInfo = nullptr;
     cmdBeginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
 
     VK_CHECK(vkBeginCommandBuffer(cmd, &cmdBeginInfo));
@@ -110,7 +110,7 @@ void _MKTGE_draw() {
 
     VkRenderPassBeginInfo rpInfo = {};
     rpInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-    rpInfo.pNext = NULL;
+    rpInfo.pNext = nullptr;
 
     rpInfo.renderPass = _renderPass;
     rpInfo.renderArea.offset.x = 0;
@@ -121,17 +121,58 @@ void _MKTGE_draw() {
     rpInfo.clearValueCount = 1;
     rpInfo.pClearValues = &clearValue;
 
-    vkCmdBeginRenderPass(cmd, &rpInfo, VK_SUBPASS_CONTENTS_INLINE); //#00ff00
+    vkCmdBeginRenderPass(cmd, &rpInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 //#00ff00
 //#00ff00
 
-vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _meshPipeline);
+    vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _meshPipeline);
 
-VkDeviceSize offset = 0;
-vkCmdBindVertexBuffers(cmd,0,1,&_triangleMesh._vertexBuffer._buffer,&offset);
+    VkDeviceSize offset = 0;
+    vkCmdBindVertexBuffers(cmd, 0, 1, &_triangleMesh._vertexBuffer._buffer, &offset);
 
-vkCmdDraw(cmd, _triangleMesh.sizeOfArray, 1, 0, 0);
+    // for(int i = 0; i < 216/sizeof(MKTDOUBLE);i++)
+    //     printf("\nlet's see: %f, %f, %d",*((MKTDOUBLE*)__P+i),*((MKTDOUBLE*)__PP+i),((*((MKTDOUBLE*)__P+i))==(*((MKTDOUBLE*)__PP+i)))?0:999999);
+
+    // printf("\n");
+    // for(int i = 0; i < 27;i++)
+    //     printf("\n:%f:%d ",*((MKTDOUBLE*)&_triangleMesh._vertexBuffer._buffer+i),i);
+    // printf("size %d ",_triangleMesh.sizeOfArray);
+    // // while(1)
+    //     // printf("%c",7);
+    // int * temp = (int*)&_triangleMesh._vertexBuffer._buffer;
+    // temp[0] = 26;
+    // temp[1] =-1784601344;
+    // temp[2] =-631678984;
+    // temp[3] =667;
+    // temp[4] =0;
+    // temp[5] =667;
+    // temp[6] =-656578016;
+    // temp[7] =667;
+    // temp[8] =8;
+    // temp[9] =0;
+    // temp[10]= -656577136;
+    // temp[11]= 667;
+    // temp[12]= -656577136;
+    // temp[13]= 667;
+    // temp[14]= -656576624;
+    // temp[15]= 667;
+    // temp[16]= -656577992;
+    // temp[17]= 667;
+    // temp[18]= -656576848;
+    // temp[19]= 667;
+    // temp[20]= -656577136;
+    // temp[21]= 667;
+    // temp[22]= -656576624;
+    // temp[23]= 667;
+    // temp[24]= -656577992;
+    // temp[25]= 667;
+    // temp[26]= -656559224;
+    //     for(int i = 0; i < 27;i++)
+    //     printf("\n:%f:%d ",*((MKTDOUBLE*)&_triangleMesh._vertexBuffer._buffer+i),i);
+
+    vkCmdDraw(cmd, _triangleMesh.sizeOfArray, 1, 0, 0);
+
 
 //#00ff00
 //#00ff00
@@ -142,7 +183,7 @@ vkCmdDraw(cmd, _triangleMesh.sizeOfArray, 1, 0, 0);
 
     VkSubmitInfo submit = {};
     submit.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submit.pNext = NULL;
+    submit.pNext = nullptr;
 
     VkPipelineStageFlags waitStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
 
@@ -555,6 +596,7 @@ void _MKTGE_load_meshes()
         printf("%d times %d should be equal to %d\n",sizeof(MKTDOUBLE),9*numberOfV,sizeof(MKTGraphics3)*numberOfV);
 
 	_triangleMesh._verticies = (MKTGraphics3*)malloc(sizeof(MKTGraphics3)*numberOfV);
+
     // for(long long i = 0; i < numberOfV; i++)
     
 
@@ -582,17 +624,17 @@ void _MKTGE_load_meshes()
     _triangleMesh._verticies[2].colour.value[1] = 1.f;
     _triangleMesh._verticies[2].colour.value[2] = 0.0f;
     
-	_triangleMesh._verticies[0].normals.value[0] = 0.f;
-	_triangleMesh._verticies[0].normals.value[1] = 0.f;
-	_triangleMesh._verticies[0].normals.value[2] = 0.f;
+	// _triangleMesh._verticies[0].normals.value[0] = 1.f;
+	// _triangleMesh._verticies[0].normals.value[1] = 0.f;
+	// _triangleMesh._verticies[0].normals.value[2] = 1.f;
 
-	_triangleMesh._verticies[1].normals.value[0] = 0.f;
-	_triangleMesh._verticies[1].normals.value[1] = 0.f;
-	_triangleMesh._verticies[1].normals.value[2] = 0.f;
+	// _triangleMesh._verticies[1].normals.value[0] = 1.f;
+	// _triangleMesh._verticies[1].normals.value[1] = 0.f;
+	// _triangleMesh._verticies[1].normals.value[2] = 1.f;
 
-	_triangleMesh._verticies[2].normals.value[0] = 0.f;
-	_triangleMesh._verticies[2].normals.value[1] = 0.f;
-	_triangleMesh._verticies[2].normals.value[2] = 0.f;
+	// _triangleMesh._verticies[2].normals.value[0] = 1.f;
+	// _triangleMesh._verticies[2].normals.value[1] = 0.f;
+	// _triangleMesh._verticies[2].normals.value[2] = 1.f;
 
     _triangleMesh.sizeOfArray = numberOfV;
 
@@ -658,10 +700,11 @@ void _MKTGE_upload_mesh(Mesh * mesh)
 
     vmaMapMemory(_allocator, mesh[0]._vertexBuffer._allocation, &data);
 
-    data = malloc(mesh[0].sizeOfArray * sizeof(MKTGraphics3)); // this may not be the best solution, but (insert something smart here)
-    void * pointerHack = mesh[0]._verticies; // step 1, a cool reference
-    for(long long i = 0; i < mesh[0].sizeOfArray * sizeof(MKTGraphics3);i++) // step 2, loop
-        *(char*)((char*)data + i) = *(char*)((char*)pointerHack + i); // wtf even is this?
+    // void * pointerHack = mesh[0]._verticies; // step 1, a cool reference
+    // for(long long i = 0; i < mesh[0].sizeOfArray * sizeof(MKTGraphics3);i++) // step 2, loop
+    //     *(char*)((char*)data + i) = *(char*)((char*)pointerHack + i); // wtf even is this?
+
+    memcpy(data, mesh[0]._verticies, mesh[0].sizeOfArray * sizeof(MKTGraphics3));
 
 	vmaUnmapMemory(_allocator, mesh[0]._vertexBuffer._allocation); // step 3 done
 

@@ -5,10 +5,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define MTDOUBLE double
+#define MKTDOUBLE float
 
 struct MKTvec3 {
-    MTDOUBLE value[3];
+    MKTDOUBLE value[3];
 };
 
 typedef struct MKTvec3 MKTV3;
