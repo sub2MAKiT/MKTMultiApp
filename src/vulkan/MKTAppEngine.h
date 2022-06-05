@@ -116,5 +116,3 @@ MKTAEEXTERN Mesh _triangleMesh;
 MKTAEEXTERN arrayGraphic _CtriangleMesh;
 MKTAEEXTERN VertexInputDescription get_vertex_description();
 MKTAEEXTERN VertexInputDescription get_AGvertex_description();
-MKTAEEXTERN void * __P;
-MKTAEEXTERN void * __PP;

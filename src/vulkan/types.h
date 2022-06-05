@@ -27,7 +27,7 @@ struct MKTVID {
     size_t sizeOfArrayB;
     size_t sizeOfArrayA;
 
-	VkPipelineVertexInputStateCreateFlags flags = 0;
+	VkPipelineVertexInputStateCreateFlags flags = 1;
 };
 
 typedef struct MKTVID VertexInputDescription;

@@ -106,7 +106,7 @@ void _MKTGE_draw() {
     VK_CHECK(vkBeginCommandBuffer(cmd, &cmdBeginInfo));
 
     VkClearValue clearValue;
-    clearValue.color = {{0.0f, 0.0f, 1.0f, 1.0f}};
+    clearValue.color = {{0.0f, 0.0f, 0.0f, 1.0f}};
 
     VkRenderPassBeginInfo rpInfo = {};
     rpInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -130,46 +130,6 @@ void _MKTGE_draw() {
 
     VkDeviceSize offset = 0;
     vkCmdBindVertexBuffers(cmd, 0, 1, &_triangleMesh._vertexBuffer._buffer, &offset);
-
-    // for(int i = 0; i < 216/sizeof(MKTDOUBLE);i++)
-    //     printf("\nlet's see: %f, %f, %d",*((MKTDOUBLE*)__P+i),*((MKTDOUBLE*)__PP+i),((*((MKTDOUBLE*)__P+i))==(*((MKTDOUBLE*)__PP+i)))?0:999999);
-
-    // printf("\n");
-    // for(int i = 0; i < 27;i++)
-    //     printf("\n:%f:%d ",*((MKTDOUBLE*)&_triangleMesh._vertexBuffer._buffer+i),i);
-    // printf("size %d ",_triangleMesh.sizeOfArray);
-    // // while(1)
-    //     // printf("%c",7);
-    // int * temp = (int*)&_triangleMesh._vertexBuffer._buffer;
-    // temp[0] = 26;
-    // temp[1] =-1784601344;
-    // temp[2] =-631678984;
-    // temp[3] =667;
-    // temp[4] =0;
-    // temp[5] =667;
-    // temp[6] =-656578016;
-    // temp[7] =667;
-    // temp[8] =8;
-    // temp[9] =0;
-    // temp[10]= -656577136;
-    // temp[11]= 667;
-    // temp[12]= -656577136;
-    // temp[13]= 667;
-    // temp[14]= -656576624;
-    // temp[15]= 667;
-    // temp[16]= -656577992;
-    // temp[17]= 667;
-    // temp[18]= -656576848;
-    // temp[19]= 667;
-    // temp[20]= -656577136;
-    // temp[21]= 667;
-    // temp[22]= -656576624;
-    // temp[23]= 667;
-    // temp[24]= -656577992;
-    // temp[25]= 667;
-    // temp[26]= -656559224;
-    //     for(int i = 0; i < 27;i++)
-    //     printf("\n:%f:%d ",*((MKTDOUBLE*)&_triangleMesh._vertexBuffer._buffer+i),i);
 
     vkCmdDraw(cmd, _triangleMesh.sizeOfArray, 1, 0, 0);
 
@@ -612,17 +572,17 @@ void _MKTGE_load_meshes()
     _triangleMesh._verticies[2].position.value[1] = -1.f;
     _triangleMesh._verticies[2].position.value[2] = 0.0f;
 
-	_triangleMesh._verticies[0].colour.value[0] = 0.f;
-	_triangleMesh._verticies[0].colour.value[1] = 1.f;
-	_triangleMesh._verticies[0].colour.value[2] = 0.0f;
+	_triangleMesh._verticies[0].colour.value[0] = 1.0;
+	_triangleMesh._verticies[0].colour.value[1] = 1.0;
+	_triangleMesh._verticies[0].colour.value[2] = 1.0;
 
-	_triangleMesh._verticies[1].colour.value[0] = 0.f;
-	_triangleMesh._verticies[1].colour.value[1] = 1.f;
-	_triangleMesh._verticies[1].colour.value[2] = 0.0f;
+	_triangleMesh._verticies[1].colour.value[0] = 1.0;
+	_triangleMesh._verticies[1].colour.value[1] = 1.0;
+	_triangleMesh._verticies[1].colour.value[2] = 1.0;
 	
-    _triangleMesh._verticies[2].colour.value[0] = 0.f;
-    _triangleMesh._verticies[2].colour.value[1] = 1.f;
-    _triangleMesh._verticies[2].colour.value[2] = 0.0f;
+    _triangleMesh._verticies[2].colour.value[0] = 1.0;
+    _triangleMesh._verticies[2].colour.value[1] = 1.0;
+    _triangleMesh._verticies[2].colour.value[2] = 1.0;
     
 	// _triangleMesh._verticies[0].normals.value[0] = 1.f;
 	// _triangleMesh._verticies[0].normals.value[1] = 0.f;
@@ -688,8 +648,8 @@ void _MKTGE_upload_mesh(Mesh * mesh)
 	vmaallocInfo.usage = VMA_MEMORY_USAGE_CPU_TO_GPU;
 
 	VK_CHECK(vmaCreateBuffer(_allocator, &bufferInfo, &vmaallocInfo,
-		&mesh->_vertexBuffer._buffer,
-		&mesh->_vertexBuffer._allocation,
+		&mesh[0]._vertexBuffer._buffer,
+		&mesh[0]._vertexBuffer._allocation,
 		nullptr));
 
 	_mainDeletionQueue.push_function([=]() {
@@ -698,16 +658,23 @@ void _MKTGE_upload_mesh(Mesh * mesh)
 
     void* data;
 
+
+
     vmaMapMemory(_allocator, mesh[0]._vertexBuffer._allocation, &data);
 
-    // void * pointerHack = mesh[0]._verticies; // step 1, a cool reference
-    // for(long long i = 0; i < mesh[0].sizeOfArray * sizeof(MKTGraphics3);i++) // step 2, loop
-    //     *(char*)((char*)data + i) = *(char*)((char*)pointerHack + i); // wtf even is this?
+    void * pointerHack = mesh[0]._verticies; // step 1, a cool reference
+    for(long long i = 0; i < mesh[0].sizeOfArray * sizeof(MKTGraphics3);i++) // step 2, loop
+        *(char*)((char*)data + i) = *(char*)((char*)pointerHack + i); // wtf even is this?
 
-    memcpy(data, mesh[0]._verticies, mesh[0].sizeOfArray * sizeof(MKTGraphics3));
+    // memcpy(data, mesh[0]._verticies, mesh[0].sizeOfArray * sizeof(MKTGraphics3));
 
 	vmaUnmapMemory(_allocator, mesh[0]._vertexBuffer._allocation); // step 3 done
 
+    // printf("\ndebug: %c %c",*((char*)));
+
+	_mainDeletionQueue.push_function([=]() {
+        vmaDestroyAllocator(_allocator);
+    });
     return;
 }
 
@@ -733,7 +700,6 @@ void _MKTGE_upload_AG(arrayGraphic * AG)
     void* data;
 
     vmaMapMemory(_allocator, AG[0]._vertexBuffer._allocation, &data);
-
     data = malloc(AG[0].sizeOfArray * sizeof(MKTGraphics2)); // this may not be the best solution, but (insert something smart here)
     void * pointerHack = AG[0]._verticies; // step 1, a cool reference
     for(long long i = 0; i < AG[0].sizeOfArray * sizeof(MKTGraphics2);i++) // step 2, loop

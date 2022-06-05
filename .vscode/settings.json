@@ -108,6 +108,8 @@
         "*.tcc": "c",
         "memory_resource": "c",
         "vk_platform.h": "c",
-        "mktmath.h": "c"
+        "mktmath.h": "c",
+        "vkbootstrap.h": "c",
+        "vkbootstrapdispatch.h": "c"
     }
 }
