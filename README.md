@@ -5,3 +5,4 @@
 4. Upgraded shaders loading
 5. Added pointer based Meshes and AGs
 6. Fixed a rate garbage value problem
+7. Fixed every single init and runtime error (but it's not working)

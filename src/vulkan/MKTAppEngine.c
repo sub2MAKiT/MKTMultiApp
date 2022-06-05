@@ -25,10 +25,10 @@ do                                                              \
 #ifdef MKT_DEBUG
 int step = 0;
 #define DEBUG(x)              \
-printf_s("\033[%d;40m[%d]" x "\033[0;40m\n",int((rand() % 6) + 1 + MKTfloor(float(((rand() % 2) + 1)*1.5)) * 30),step);step++;
+printf_s("\033[%d;40m[%d]" x "\033[0;40m\n",int((rand() % 6) + 1 + MKTfloor(float(((rand() % 2) + 1)*1.5)) * 30),step);step++
 #else
 #define DEBUG(x)                                                \
-0;
+0
 #endif
 
 void _MKTGE_init() {
@@ -126,9 +126,12 @@ void _MKTGE_draw() {
 //#00ff00
 //#00ff00
 
-vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, (_selectedShader==1)?_CtrianglePipeline:_trianglePipeline);
+vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _meshPipeline);
 
-vkCmdDraw(cmd, 3, 1, 0, 0);
+VkDeviceSize offset = 0;
+vkCmdBindVertexBuffers(cmd,0,1,&_triangleMesh._vertexBuffer._buffer,&offset);
+
+vkCmdDraw(cmd, _triangleMesh.sizeOfArray, 1, 0, 0);
 
 //#00ff00
 //#00ff00
@@ -409,6 +412,17 @@ bool _MKTGE_load_shader_module(const char* filePath, VkShaderModule* outShaderMo
 }
 
 void _MKTGE_init_pipelines() {
+  
+    DEBUG("got vertex descriptions");
+
+    VertexInputDescription vertexDescription = get_vertex_description();
+
+    _vertexInputInfo.pVertexBindingDescriptions = vertexDescription.bindings;
+    _vertexInputInfo.pVertexAttributeDescriptions = vertexDescription.attributes;
+
+	_vertexInputInfo.vertexAttributeDescriptionCount = vertexDescription.sizeOfArrayA;
+	_vertexInputInfo.vertexBindingDescriptionCount = vertexDescription.sizeOfArrayB;
+
     VkShaderModule CtriangleFragShader;
     if (!_MKTGE_load_shader_module("./build/shaders/Ctriangle.frag.spv", &CtriangleFragShader))
     {
@@ -493,45 +507,13 @@ void _MKTGE_init_pipelines() {
 
     _CtrianglePipeline = build_pipeline(_device, _renderPass);
 
-    VertexInputDescription vertexDescription = get_vertex_description();
-
-
-    // _vertexInputInfo.pVertexAttributeDescriptions = (VkVertexInputAttributeDescription*)malloc(vertexDescription.sizeOfArrayA);
-    // _vertexInputInfo.pVertexBindingDescriptions = (VkVertexInputBindingDescription*)malloc(vertexDescription.sizeOfArrayB);
-
-    // for(long long i = 0; i < vertexDescription.sizeOfArrayA;i++)
-    //     *(char*)(_vertexInputInfo.pVertexAttributeDescriptions + i)= *(char*)(vertexDescription.attributes + i);
-
-    // DEBUG("got vertex descriptions");
-
-    // for(long long i = 0; i < vertexDescription.sizeOfArrayB;i++)
-	//    *(char*)(_vertexInputInfo.pVertexBindingDescriptions + i) = *(char*)(vertexDescription.bindings +i);
+	_shaderStages.clear();
 
     _vertexInputInfo.pVertexBindingDescriptions = vertexDescription.bindings;
     _vertexInputInfo.pVertexAttributeDescriptions = vertexDescription.attributes;
 
-    // for(int i = 0; i < vertexDescription.sizeOfArrayA/sizeof(VkVertexInputBindingDescription);i++)
-    // {
-    //     whyPointer[i].binding = vertexDescription.bindings[i].binding;
-    //     whyPointer[i].stride = vertexDescription.bindings[i].stride;
-    //     whyPointer[i].inputRate = vertexDescription.bindings[i].inputRate;
-    // }
-    // for(int i = 0; i < vertexDescription.sizeOfArrayA/sizeof(VkVertexInputAttributeDescription);i++)
-    // {
-    //     IAMSLOWLYGOINGINSANEPointer[i].location = vertexDescription.attributes[i].location;
-    //     IAMSLOWLYGOINGINSANEPointer[i].binding = vertexDescription.attributes[i].binding;
-    //     IAMSLOWLYGOINGINSANEPointer[i].format = vertexDescription.attributes[i].format;
-    //     IAMSLOWLYGOINGINSANEPointer[i].offset = vertexDescription.attributes[i].offset;
-    // }
-
-    printf("\nthe value: %d, %d, %d\n",_vertexInputInfo.pVertexBindingDescriptions[0].inputRate,vertexDescription.bindings[0].inputRate);
-
 	_vertexInputInfo.vertexAttributeDescriptionCount = vertexDescription.sizeOfArrayA;
 	_vertexInputInfo.vertexBindingDescriptionCount = vertexDescription.sizeOfArrayB;
-  
-    DEBUG("got vertex descriptions");
-
-	_shaderStages.clear();
 
 	VkShaderModule meshVertShader;
 	if(!_MKTGE_load_shader_module("./build/shaders/PMtriangle.vert.spv", &meshVertShader))
@@ -545,7 +527,7 @@ void _MKTGE_init_pipelines() {
 		pipeline_shader_stage_create_info(VK_SHADER_STAGE_VERTEX_BIT, meshVertShader));
 
 	_shaderStages.push_back(
-		pipeline_shader_stage_create_info(VK_SHADER_STAGE_FRAGMENT_BIT, triangleFragShader));
+		pipeline_shader_stage_create_info(VK_SHADER_STAGE_FRAGMENT_BIT, CtriangleFragShader));
 
 	_meshPipeline = build_pipeline(_device, _renderPass);
 
@@ -568,7 +550,9 @@ void _MKTGE_load_meshes()
 {
     int numberOfV = 3;
 
-    printf("\n%d times %d should be equal to %d\n",sizeof(MKTDOUBLE),9*numberOfV,sizeof(MKTGraphics3)*numberOfV);
+
+    if(DEBUG("check:"))
+        printf("%d times %d should be equal to %d\n",sizeof(MKTDOUBLE),9*numberOfV,sizeof(MKTGraphics3)*numberOfV);
 
 	_triangleMesh._verticies = (MKTGraphics3*)malloc(sizeof(MKTGraphics3)*numberOfV);
     // for(long long i = 0; i < numberOfV; i++)
@@ -758,8 +742,8 @@ VkPipeline build_pipeline(VkDevice device, VkRenderPass pass)
 
     VkPipeline newPipeline;
     if (vkCreateGraphicsPipelines( //#ff0000
-        device, VK_NULL_HANDLE, 1, &pipelineInfo , NULL, &newPipeline) != VK_SUCCESS) {
-            std::cout << "failed to create pipeline\n";
+        _device, VK_NULL_HANDLE, 1, &pipelineInfo , NULL, &newPipeline) != VK_SUCCESS) {
+            DEBUG("failed to create pipeline\n");
             return VK_NULL_HANDLE;
         }
         else {
@@ -907,8 +891,8 @@ VertexInputDescription get_vertex_description()
 	mainBinding.stride = sizeof(MKTGraphics3);
 	mainBinding.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
-    size_t sizeOfArrayB = sizeof(VkVertexInputBindingDescription);
-    VkVertexInputBindingDescription * tempBindPoint = (VkVertexInputBindingDescription*)malloc(sizeOfArrayB);
+    size_t sizeOfArrayB = 1;
+    VkVertexInputBindingDescription * tempBindPoint = (VkVertexInputBindingDescription*)malloc(sizeof(VkVertexInputBindingDescription)*sizeOfArrayB);
     tempBindPoint[0] = mainBinding;
 
 	VkVertexInputAttributeDescription positionAttribute = {};
@@ -929,8 +913,8 @@ VertexInputDescription get_vertex_description()
 	colorAttribute.format = VK_FORMAT_R32G32B32_SFLOAT;
 	colorAttribute.offset = offsetof(MKTGraphics3, colour);
 
-    size_t sizeOfArrayA = sizeof(VkVertexInputAttributeDescription)*3;
-    VkVertexInputAttributeDescription * tempAttrPoint = (VkVertexInputAttributeDescription*)malloc(sizeOfArrayA);
+    size_t sizeOfArrayA = 3;
+    VkVertexInputAttributeDescription * tempAttrPoint = (VkVertexInputAttributeDescription*)malloc(sizeof(VkVertexInputAttributeDescription)*sizeOfArrayA);
     tempAttrPoint[0] = positionAttribute;
     tempAttrPoint[1] = normalAttribute;
 	tempAttrPoint[2] = colorAttribute;
@@ -947,8 +931,8 @@ VertexInputDescription get_AGvertex_description()
 	mainBinding.stride = sizeof(MKTGraphics2);
 	mainBinding.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
-    size_t sizeOfArrayB = sizeof(VkVertexInputBindingDescription);
-    VkVertexInputBindingDescription * tempBindPoint = (VkVertexInputBindingDescription*)malloc(sizeOfArrayB);
+    size_t sizeOfArrayB = 1;
+    VkVertexInputBindingDescription * tempBindPoint = (VkVertexInputBindingDescription*)malloc(sizeof(VkVertexInputBindingDescription)*sizeOfArrayB);
     tempBindPoint[0] = mainBinding;
 
 
@@ -964,8 +948,8 @@ VertexInputDescription get_AGvertex_description()
 	colorAttribute.format = VK_FORMAT_R32G32B32_SFLOAT;
 	colorAttribute.offset = offsetof(MKTGraphics2, colour);
 
-    size_t sizeOfArrayA = sizeof(VkVertexInputAttributeDescription)*2;
-    VkVertexInputAttributeDescription * tempAttrPoint = (VkVertexInputAttributeDescription*)malloc(sizeOfArrayA);
+    size_t sizeOfArrayA = 2;
+    VkVertexInputAttributeDescription * tempAttrPoint = (VkVertexInputAttributeDescription*)malloc(sizeof(VkVertexInputAttributeDescription)*sizeOfArrayA);
     tempAttrPoint[0] = positionAttribute;
 	tempAttrPoint[1] = colorAttribute;
 
