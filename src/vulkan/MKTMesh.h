@@ -1,18 +1,29 @@
 #pragma once
 #include "types.h"
+#include <vector>
+#include <glm/vec3.hpp>
 
-struct MKTGraphicsMesh {
-    MKTV3 colour;
-    MKTV3 position;
-    MKTV3 normals;
+struct VertexInputDescription {
+    std::vector<VkVertexInputBindingDescription> bindings;
+    std::vector<VkVertexInputAttributeDescription> attributes;
+
+    VkPipelineVertexInputStateCreateFlags flags = 0;
 };
 
-typedef struct MKTGraphicsMesh MKTGraphics3;
+struct Vertex {
 
-struct MKTMesh {
-    MKTGraphics3 * _verticies;
-    size_t sizeOfArray;
+    glm::vec3 position;
+    glm::vec3 normal;
+    glm::vec3 color;
+
+    static VertexInputDescription get_vertex_description();
+};
+
+struct Mesh {
+
+    std::vector<Vertex> _vertices;
+
     AllocatedBuffer _vertexBuffer;
-};
 
-typedef struct MKTMesh Mesh;
+    bool load_from_obj(const char* filename);
+};

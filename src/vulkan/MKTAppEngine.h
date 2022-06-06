@@ -1,118 +1,214 @@
 #pragma once
 #include "types.h"
-#include "MKTArrayGraphics.h"
-#include "MKTMesh.h"
 #include <vector>
 #include <cstdio>
 #include <deque>
 #include <functional>
+#include <iostream>
 
-struct DeletionQueue {
-	std::deque<std::function<void()>> deletors;
+#include <SDL/SDL.h>
+#include <SDL/SDL_vulkan.h>
 
-	void push_function(std::function<void()>&& function) {
-		deletors.push_back(function);
-	}
+#include "init.h"
+#include <CMath>
+#include <fstream>
 
-	void flush() {
-		for (auto it = deletors.rbegin(); it != deletors.rend(); it++) {
-			(*it)();
-		}
+#include <vk-bootstrap/src/VkBootstrap.h>
 
-		deletors.clear();
-	}
+#include "MKTmesh.h"
+#include <glm/glm.hpp>
+#include <glm/gtx/transform.hpp>
+
+#include <unordered_map>
+
+constexpr unsigned int FRAME_OVERLAP = 2;
+
+struct MeshPushConstants {
+    glm::vec4 data;
+    glm::mat4 render_matrix;
 };
 
-typedef struct DeletionQueue MainDeletionQueue;
+struct DeletionQueue
+{
+    std::deque<std::function<void()>> deletors;
 
-#ifdef MAIN_MKT_APP_ENGINE_INCLUDE
-#define MKTAEEXTERN
-bool _isInitialized{false};
-int _frameNumber {0};
+    void push_function(std::function<void()>&& function) {
+        deletors.push_back(function);
+    }
 
-VkExtent2D _windowExtent {1000, 700};
-int _selectedShader{0};
+    void flush() {
+        for (auto it = deletors.rbegin(); it != deletors.rend(); it++) {
+            (*it)();
+        }
+        deletors.clear();
+    }
+};
 
-struct SDL_Window* _window{NULL};
-#else
-#define MKTAEEXTERN extern
-MKTAEEXTERN bool _isInitialized;
-MKTAEEXTERN int _frameNumber;
+struct Material {
+	VkPipeline pipeline;
+	VkPipelineLayout pipelineLayout;
+};
 
-MKTAEEXTERN VkExtent2D _windowExtent;
+struct RenderObject {
+	Mesh* mesh;
 
-MKTAEEXTERN int _selectedShader;
+	Material* material;
 
-MKTAEEXTERN struct SDL_Window* _window;
-#endif
+	glm::mat4 transformMatrix;
+};
 
-MKTAEEXTERN MainDeletionQueue _mainDeletionQueue;
+struct GPUCameraData{
+	glm::mat4 view;
+	glm::mat4 proj;
+	glm::mat4 viewproj;
+};
 
-MKTAEEXTERN void _MKTGE_init();
+struct FrameData {
+	VkSemaphore _presentSemaphore, _renderSemaphore;
+	VkFence _renderFence;	
 
-MKTAEEXTERN void _MKTGE_cleanup();
+	VkCommandPool _commandPool;
+	VkCommandBuffer _mainCommandBuffer;
 
-MKTAEEXTERN void _MKTGE_draw();
+    AllocatedBuffer cameraBuffer;
 
-MKTAEEXTERN void _MKTGE_run();
+    VkDescriptorSet globalDescriptor;
+};
 
-MKTAEEXTERN VkInstance _instance;
-MKTAEEXTERN VkDebugUtilsMessengerEXT _debug_messenger;
-MKTAEEXTERN VkPhysicalDevice _chosenGPU;
-MKTAEEXTERN VkDevice _device;
-MKTAEEXTERN VkSurfaceKHR _surface;
-MKTAEEXTERN VkSwapchainKHR _swapchain;
-MKTAEEXTERN VkFormat _swapchainImageFormat;
-MKTAEEXTERN std::vector<VkImage> _swapchainImages;
-MKTAEEXTERN std::vector<VkImageView> _swapchainImageViews;
-MKTAEEXTERN VkQueue _graphicsQueue;
-MKTAEEXTERN uint32_t _graphicsQueueFamily;
-MKTAEEXTERN VkCommandPool _commandPool;
-MKTAEEXTERN VkCommandBuffer _mainCommandBuffer;
-MKTAEEXTERN VkRenderPass _renderPass;
-MKTAEEXTERN std::vector<VkFramebuffer> _framebuffers;
-MKTAEEXTERN VkSemaphore _presentSemaphore, _renderSemaphore;
-MKTAEEXTERN VkFence _renderFence;
-MKTAEEXTERN VkPipelineLayout _trianglePipelineLayout;
-MKTAEEXTERN VkPipeline _trianglePipeline;
-MKTAEEXTERN VkPipeline _CtrianglePipeline;
-MKTAEEXTERN void _MKTGE_init_vulkan();
-MKTAEEXTERN void _MKTGE_init_swapchain();
-MKTAEEXTERN void _MKTGE_init_commands();
-MKTAEEXTERN void _MKTGE_init_default_renderpass();
-MKTAEEXTERN void _MKTGE_init_framebuffers();
-MKTAEEXTERN void _MKTGE_init_sync_structures();
-MKTAEEXTERN void _MKTGE_init_pipelines();
-MKTAEEXTERN void _MKTGE_load_meshes();
-MKTAEEXTERN void _MKTGE_load_AG();
-MKTAEEXTERN void _MKTGE_upload_mesh(Mesh * mesh);
-MKTAEEXTERN void _MKTGE_upload_AG(arrayGraphic * AG);
-MKTAEEXTERN bool _MKTGE_load_shader_module(const char* filePath, VkShaderModule* outShaderModule);
-MKTAEEXTERN std::vector<VkPipelineShaderStageCreateInfo> _shaderStages;
-MKTAEEXTERN VkPipelineVertexInputStateCreateInfo _vertexInputInfo;
-MKTAEEXTERN VkPipelineInputAssemblyStateCreateInfo _inputAssembly;
-MKTAEEXTERN VkViewport _viewport;
-MKTAEEXTERN VkRect2D _scissor;
-MKTAEEXTERN VkPipelineRasterizationStateCreateInfo _rasterizer;
-MKTAEEXTERN VkPipelineColorBlendAttachmentState _colorBlendAttachment;
-MKTAEEXTERN VkPipelineMultisampleStateCreateInfo _multisampling;
-MKTAEEXTERN VkPipelineLayout _pipelineLayout;
-MKTAEEXTERN VkPipeline build_pipeline(VkDevice device, VkRenderPass pass);
-MKTAEEXTERN VkCommandPoolCreateInfo command_pool_create_info(uint32_t queueFamilyIndex, VkCommandPoolCreateFlags flags);
-MKTAEEXTERN VkCommandBufferAllocateInfo command_buffer_allocate_info(VkCommandPool pool, uint32_t count, VkCommandBufferLevel level);
-MKTAEEXTERN VkPipelineShaderStageCreateInfo pipeline_shader_stage_create_info(VkShaderStageFlagBits stage, VkShaderModule shaderModule);
-MKTAEEXTERN VkPipelineVertexInputStateCreateInfo vertex_input_state_create_info();
-MKTAEEXTERN VkPipelineInputAssemblyStateCreateInfo input_assembly_create_info(VkPrimitiveTopology topology);
-MKTAEEXTERN VkPipelineRasterizationStateCreateInfo rasterization_state_create_info(VkPolygonMode polygonMode);
-MKTAEEXTERN VkPipelineMultisampleStateCreateInfo multisampling_state_create_info();
-MKTAEEXTERN VkPipelineColorBlendAttachmentState color_blend_attachment_state();
-MKTAEEXTERN VkPipelineLayoutCreateInfo pipeline_layout_create_info();
-MKTAEEXTERN VkFenceCreateInfo fence_create_info(VkFenceCreateFlags flags = 0);
-MKTAEEXTERN VkSemaphoreCreateInfo semaphore_create_info(VkSemaphoreCreateFlags flags = 0);
-MKTAEEXTERN VmaAllocator _allocator;
-MKTAEEXTERN VkPipeline _meshPipeline;
-MKTAEEXTERN VkPipeline _arrayGraphicsPipeline;
-MKTAEEXTERN Mesh _triangleMesh;
-MKTAEEXTERN arrayGraphic _CtriangleMesh;
-MKTAEEXTERN VertexInputDescription get_vertex_description();
-MKTAEEXTERN VertexInputDescription get_AGvertex_description();
+struct UploadContext {
+	VkFence _uploadFence;
+	VkCommandPool _commandPool;
+	VkCommandBuffer _commandBuffer;
+};
+
+class VentumEngine {
+public:
+
+    bool _isInitialized{false};
+    int _frameNumber {0};
+
+    VkExtent2D _windowExtent {1920, 1080};
+
+    struct SDL_Window* _window{nullptr};
+
+    void init();
+
+    void cleanup();
+
+    void draw();
+
+    void run();
+
+    VkInstance _instance;
+    VkDebugUtilsMessengerEXT _debug_messenger;
+    VkPhysicalDevice _chosenGPU;
+    VkDevice _device;
+    VkSurfaceKHR _surface;
+
+    VkSwapchainKHR _swapchain;
+
+    VkFormat _swapchainImageFormat;
+
+    std::vector<VkImage> _swapchainImages;
+
+    std::vector<VkImageView> _swapchainImageViews;
+
+    VkQueue _graphicsQueue;
+    uint32_t _graphicsQueueFamily;
+
+    VkRenderPass _renderPass;
+
+    std::vector<VkFramebuffer> _framebuffers;
+
+    VkPipelineLayout _trianglePipelineLayout;
+
+    VkPipeline _trianglePipeline;
+    VkPipeline _pinkTrianglePipeline;
+    VkPipeline _meshPipeline;
+    Mesh _triangleMesh;
+
+    int _selectedShader{0};
+
+    DeletionQueue _mainDeletionQueue;
+
+    VmaAllocator _allocator;
+
+    VkPipelineLayout _meshPipelineLayout;
+
+    Mesh _DUCKMesh;
+
+    VkImageView _depthImageView;
+	AllocatedImage _depthImage;
+
+    VkFormat _depthFormat;
+
+    std::vector<RenderObject> _renderables;
+
+    std::unordered_map<std::string,Material> _materials;
+    std::unordered_map<std::string,Mesh> _meshes;
+
+    Material* create_material(VkPipeline pipeline, VkPipelineLayout layout,const std::string& name);
+
+    Material* get_material(const std::string& name);
+
+    Mesh* get_mesh(const std::string& name);
+
+    void draw_objects(VkCommandBuffer cmd,RenderObject* first, int count);
+
+    FrameData _frames[FRAME_OVERLAP];
+
+    FrameData& get_current_frame();
+
+    AllocatedBuffer create_buffer(size_t allocSize, VkBufferUsageFlags usage, VmaMemoryUsage memoryUsage);
+
+    VkDescriptorSetLayout _globalSetLayout;
+    VkDescriptorPool _descriptorPool;
+
+    UploadContext _uploadContext;
+
+private:
+
+    void init_vulkan();
+
+    void init_swapchain();
+
+    void init_commands();
+
+    void init_default_renderpass();
+
+    void init_framebuffers();
+
+    void init_sync_structures();
+
+    void init_pipelines();
+
+    bool load_shader_module(const char* filePath, VkShaderModule* outShaderModule);
+
+    void load_meshes();
+
+    void upload_mesh(Mesh& mesh);
+
+    void init_scene();
+
+	void init_descriptors();
+
+    void immediate_submit(std::function<void(VkCommandBuffer cmd)>&& function);
+};
+
+class PipelineBuilder {
+public:
+    
+    std::vector<VkPipelineShaderStageCreateInfo> _shaderStages;
+    VkPipelineVertexInputStateCreateInfo _vertexInputInfo;
+    VkPipelineInputAssemblyStateCreateInfo _inputAssembly;
+    VkViewport _viewport;
+    VkRect2D _scissor;
+    VkPipelineRasterizationStateCreateInfo _rasterizer;
+    VkPipelineColorBlendAttachmentState _colorBlendAttachment;
+    VkPipelineMultisampleStateCreateInfo _multisampling;
+    VkPipelineLayout _pipelineLayout;
+
+    VkPipeline build_pipeline(VkDevice device, VkRenderPass pass);
+
+    VkPipelineDepthStencilStateCreateInfo _depthStencil;
+};

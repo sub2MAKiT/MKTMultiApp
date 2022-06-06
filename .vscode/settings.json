@@ -110,6 +110,8 @@
         "vk_platform.h": "c",
         "mktmath.h": "c",
         "vkbootstrap.h": "c",
-        "vkbootstrapdispatch.h": "c"
+        "vkbootstrapdispatch.h": "c",
+        "*.idl": "c",
+        "mktmesh.h": "c"
     }
 }

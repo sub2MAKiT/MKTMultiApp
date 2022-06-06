@@ -1,12 +1,16 @@
-#include "vulkan/MKTAppEngine.h"
+#include "./vulkan/MKTAppEngine.h"
 
 int main(int argc, char* argv[])
 {
-	_MKTGE_init();
+    VentumEngine engine;
 
-	_MKTGE_run();
+    engine.init();
 
-	_MKTGE_cleanup();
+    engine.run();
 
-	return 0;
+    printf("everything went fine");
+
+    engine.cleanup();
+
+    return 0;
 }
