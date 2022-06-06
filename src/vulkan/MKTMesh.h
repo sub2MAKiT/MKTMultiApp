@@ -17,6 +17,7 @@ struct Vertex {
     glm::vec3 color;
 
     static VertexInputDescription get_vertex_description();
+    static VertexInputDescription getAG_vertex_description();
 };
 
 struct Mesh {
@@ -27,3 +28,13 @@ struct Mesh {
 
     bool load_from_obj(const char* filename);
 };
+
+typedef struct MKTAGA2 {
+    glm::vec3 position;
+    glm::vec3 color;
+} MKTAGA;
+
+typedef struct arrayGraphic{ 
+    std::vector<MKTAGA> _vertices;
+    AllocatedBuffer _vertexBuffer;
+} MKTAG;

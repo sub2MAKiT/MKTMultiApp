@@ -87,7 +87,7 @@ public:
     bool _isInitialized{false};
     int _frameNumber {0};
 
-    VkExtent2D _windowExtent {1920, 1080};
+    VkExtent2D _windowExtent {700, 700};
 
     struct SDL_Window* _window{nullptr};
 
@@ -122,9 +122,12 @@ public:
 
     VkPipelineLayout _trianglePipelineLayout;
 
+    VkPipelineLayout _AGPipelineLayout;
+
     VkPipeline _trianglePipeline;
     VkPipeline _pinkTrianglePipeline;
     VkPipeline _meshPipeline;
+    VkPipeline _AGPipeline;
     Mesh _triangleMesh;
 
     int _selectedShader{0};

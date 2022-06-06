@@ -571,6 +571,61 @@ void VentumEngine::init_pipelines() {
 
     _trianglePipeline = pipelineBuilder.build_pipeline(_device, _renderPass);
 
+    //     //--------------------------------------
+    // //--------------------------------------
+    // //--------------------------------------
+    // //--------------------------------------
+    // //--------------------------------------
+
+    VkPipelineLayoutCreateInfo AG_pipeline_layout_info = vkinit::pipeline_layout_create_info();
+
+    VK_CHECK(vkCreatePipelineLayout(_device, &AG_pipeline_layout_info, nullptr, &_AGPipelineLayout));
+
+    VertexInputDescription AGvertexDescription = Vertex::getAG_vertex_description();
+
+	pipelineBuilder._vertexInputInfo.pVertexAttributeDescriptions = AGvertexDescription.attributes.data();
+	pipelineBuilder._vertexInputInfo.vertexAttributeDescriptionCount = AGvertexDescription.attributes.size();
+
+	pipelineBuilder._vertexInputInfo.pVertexBindingDescriptions = AGvertexDescription.bindings.data();
+	pipelineBuilder._vertexInputInfo.vertexBindingDescriptionCount = AGvertexDescription.bindings.size();
+
+	pipelineBuilder._shaderStages.clear();
+
+    VkShaderModule AGFragShader;
+    if (!load_shader_module("./build/shaders/DS.frag.spv", &AGFragShader))
+    {
+        std::cout << std::endl << "AG frag error" << std::endl;
+    }
+    else {
+        std::cout << std::endl << "AG frag loaded" << std::endl;
+    }
+
+    VkShaderModule AGVertShader;
+	if (!load_shader_module("./build/shaders/DS.vert.spv", &AGVertShader))
+	{
+		std::cout << "Error when building the AG vertex shader module" << std::endl;
+	}
+	else {
+		std::cout << "AG vertex shader successfully loaded" << std::endl;
+	}
+
+	pipelineBuilder._shaderStages.push_back(
+		vkinit::pipeline_shader_stage_create_info(VK_SHADER_STAGE_VERTEX_BIT, AGVertShader));
+
+	pipelineBuilder._shaderStages.push_back(
+		vkinit::pipeline_shader_stage_create_info(VK_SHADER_STAGE_FRAGMENT_BIT, AGFragShader));
+
+    pipelineBuilder._pipelineLayout = _AGPipelineLayout;
+
+	_AGPipeline = pipelineBuilder.build_pipeline(_device, _renderPass);
+
+
+    // //--------------------------------------
+    // //--------------------------------------
+    // //--------------------------------------
+    // //--------------------------------------
+    // //--------------------------------------
+
     VkPipelineLayoutCreateInfo mesh_pipeline_layout_info = vkinit::pipeline_layout_create_info();
 
     VkPushConstantRange push_constant;
@@ -582,9 +637,6 @@ void VentumEngine::init_pipelines() {
 
     mesh_pipeline_layout_info.setLayoutCount = 1;
     mesh_pipeline_layout_info.pSetLayouts = &_globalSetLayout;
-
-    VkPipelineLayout meshPipLayout;
-    VK_CHECK(vkCreatePipelineLayout(_device, &mesh_pipeline_layout_info, nullptr, &meshPipLayout));
 
     VK_CHECK(vkCreatePipelineLayout(_device, &mesh_pipeline_layout_info, nullptr, &_meshPipelineLayout));
 
@@ -630,9 +682,11 @@ void VentumEngine::init_pipelines() {
         vkDestroyPipeline(_device, _pinkTrianglePipeline, nullptr);
         vkDestroyPipeline(_device, _trianglePipeline, nullptr);
         vkDestroyPipeline(_device, _meshPipeline, nullptr);
+        vkDestroyPipeline(_device, _AGPipeline, nullptr);
 
         vkDestroyPipelineLayout(_device, _meshPipelineLayout, nullptr);
         vkDestroyPipelineLayout(_device, _trianglePipelineLayout, nullptr);
+        vkDestroyPipelineLayout(_device, _AGPipelineLayout, nullptr);
     });
 }
 
@@ -882,10 +936,6 @@ void VentumEngine::upload_mesh(Mesh& mesh)
 		&mesh._vertexBuffer._buffer,
 		&mesh._vertexBuffer._allocation,
 		nullptr));
-	_mainDeletionQueue.push_function([=]() {
-
-		vmaDestroyBuffer(_allocator, mesh._vertexBuffer._buffer, mesh._vertexBuffer._allocation);
-	});
 
 	immediate_submit([=](VkCommandBuffer cmd) {
 		VkBufferCopy copy;
@@ -893,6 +943,10 @@ void VentumEngine::upload_mesh(Mesh& mesh)
 		copy.srcOffset = 0;
 		copy.size = bufferSize;
 		vkCmdCopyBuffer(cmd, stagingBuffer._buffer, mesh._vertexBuffer._buffer, 1, & copy);
+	});
+
+    _mainDeletionQueue.push_function([=]() {
+		vmaDestroyBuffer(_allocator, mesh._vertexBuffer._buffer, mesh._vertexBuffer._allocation);
 	});
 
 	vmaDestroyBuffer(_allocator, stagingBuffer._buffer, stagingBuffer._allocation);
