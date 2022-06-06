@@ -54,6 +54,8 @@ void VentumEngine::init() {
 
     load_meshes(); //#0000ff
 
+    load_AG(); //#0000ff
+
     init_scene(); //#0000ff
 
     _isInitialized = true;
@@ -123,8 +125,10 @@ void VentumEngine::draw() {
 
 //#00ff00
 //#00ff00
-
-	draw_objects(cmd, _renderables.data(), _renderables.size());
+    if(_selectedShader%2==0)
+	    draw_objects(cmd, _renderables.data(), _renderables.size());
+    else
+	    draw_AG(cmd,  _AGA.data(),  _AGA.size());
 
 //#00ff00
 //#00ff00
@@ -619,7 +623,6 @@ void VentumEngine::init_pipelines() {
 
 	_AGPipeline = pipelineBuilder.build_pipeline(_device, _renderPass);
 
-
     // //--------------------------------------
     // //--------------------------------------
     // //--------------------------------------
@@ -713,6 +716,21 @@ void VentumEngine::load_meshes()
 	_meshes["triangle"] = _triangleMesh;
 }
 
+void VentumEngine::load_AG()
+{
+    _HexAg._vertices.resize(3);
+
+	_HexAg._vertices[0].position = { 1.f,1.f, 0.5f };
+	_HexAg._vertices[1].position = { -1.f,1.f, 0.5f };
+	_HexAg._vertices[2].position = { 0.f,-1.f, 0.5f };
+
+	_HexAg._vertices[0].color = { 0.f,1.f, 0.0f };
+	_HexAg._vertices[1].color = { 0.f,1.f, 0.0f }; 
+	_HexAg._vertices[2].color = { 0.f,1.f, 0.0f };
+
+    upload_AG(_HexAg);
+}
+
 void VentumEngine::init_scene()
 {
     RenderObject DUCK;
@@ -721,6 +739,7 @@ void VentumEngine::init_scene()
 	DUCK.transformMatrix = glm::mat4{ 1.0f };
 
 	_renderables.push_back(DUCK);
+    _AGA.push_back(_HexAg);
 
 	for (int x = -20; x <= 20; x++) {
 		for (int y = -20; y <= 20; y++) {
@@ -896,6 +915,62 @@ VkPipeline PipelineBuilder::build_pipeline(VkDevice device, VkRenderPass pass)
         }
 }
 
+void VentumEngine::upload_AG(MKTAG& AG)
+{
+    const size_t bufferSize= AG._vertices.size() * sizeof(MKTAGA);
+	VkBufferCreateInfo stagingBufferInfo = {};
+	stagingBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+	stagingBufferInfo.pNext = nullptr;
+	stagingBufferInfo.size = bufferSize;
+	stagingBufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+
+
+	VmaAllocationCreateInfo vmaallocInfo = {};
+	vmaallocInfo.usage = VMA_MEMORY_USAGE_CPU_ONLY;
+
+	AllocatedBuffer stagingBuffer;
+
+	VK_CHECK(vmaCreateBuffer(_allocator, &stagingBufferInfo, &vmaallocInfo,
+		&stagingBuffer._buffer,
+		&stagingBuffer._allocation,
+		nullptr));	
+
+	void* data;
+	vmaMapMemory(_allocator, stagingBuffer._allocation, &data);
+
+	memcpy(data, AG._vertices.data(), AG._vertices.size() * sizeof(MKTAGA));
+
+	vmaUnmapMemory(_allocator, stagingBuffer._allocation);
+
+
+	VkBufferCreateInfo vertexBufferInfo = {};
+	vertexBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+	vertexBufferInfo.pNext = nullptr;
+	vertexBufferInfo.size = bufferSize;
+	vertexBufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+
+	vmaallocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
+
+	VK_CHECK(vmaCreateBuffer(_allocator, &vertexBufferInfo, &vmaallocInfo,
+		&AG._vertexBuffer._buffer,
+		&AG._vertexBuffer._allocation,
+		nullptr));
+
+	immediate_submit([=](VkCommandBuffer cmd) {
+		VkBufferCopy copy;
+		copy.dstOffset = 0;
+		copy.srcOffset = 0;
+		copy.size = bufferSize;
+		vkCmdCopyBuffer(cmd, stagingBuffer._buffer, AG._vertexBuffer._buffer, 1, & copy);
+	});
+
+    _mainDeletionQueue.push_function([=]() {
+		vmaDestroyBuffer(_allocator, AG._vertexBuffer._buffer, AG._vertexBuffer._allocation);
+	});
+
+	vmaDestroyBuffer(_allocator, stagingBuffer._buffer, stagingBuffer._allocation);
+}
+
 void VentumEngine::upload_mesh(Mesh& mesh)
 {
     const size_t bufferSize= mesh._vertices.size() * sizeof(Vertex);
@@ -984,6 +1059,23 @@ Mesh* VentumEngine::get_mesh(const std::string& name)
 	}
 }
 
+void VentumEngine::draw_AG(VkCommandBuffer cmd,MKTAG* first, int count)
+{
+
+	Mesh* lastAG = nullptr;
+	for (int i = 0; i < count; i++)
+	{
+		MKTAG * object = &first[i];
+
+        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _AGPipeline);
+
+        VkDeviceSize offset = 0;
+        vkCmdBindVertexBuffers(cmd, 0, 1, &object->_vertexBuffer._buffer, &offset);
+
+
+		vkCmdDraw(cmd, object->_vertices.size(), 1, 0, 0);
+	}
+}
 
 void VentumEngine::draw_objects(VkCommandBuffer cmd,RenderObject* first, int count)
 {
@@ -1016,7 +1108,7 @@ void VentumEngine::draw_objects(VkCommandBuffer cmd,RenderObject* first, int cou
 			vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, object.material->pipeline);
             lastMaterial = object.material;
             vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, object.material->pipelineLayout, 0, 1, &get_current_frame().globalDescriptor, 0, nullptr);
-}
+        }   
 
 
 		glm::mat4 model = object.transformMatrix;

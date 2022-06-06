@@ -129,6 +129,7 @@ public:
     VkPipeline _meshPipeline;
     VkPipeline _AGPipeline;
     Mesh _triangleMesh;
+    MKTAG _HexAg;
 
     int _selectedShader{0};
 
@@ -147,6 +148,8 @@ public:
 
     std::vector<RenderObject> _renderables;
 
+    std::vector<MKTAG> _AGA;
+
     std::unordered_map<std::string,Material> _materials;
     std::unordered_map<std::string,Mesh> _meshes;
 
@@ -158,6 +161,7 @@ public:
 
     void draw_objects(VkCommandBuffer cmd,RenderObject* first, int count);
 
+    void draw_AG(VkCommandBuffer cmd,MKTAG* first, int count);
     FrameData _frames[FRAME_OVERLAP];
 
     FrameData& get_current_frame();
@@ -189,7 +193,11 @@ private:
 
     void load_meshes();
 
+    void load_AG();
+
     void upload_mesh(Mesh& mesh);
+
+    void upload_AG(MKTAG& AG);
 
     void init_scene();
 
