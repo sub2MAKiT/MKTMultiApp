@@ -1,15 +1,14 @@
-#include "libraryLoader.h"
 #define MKT_DLL_LOADING
+#include "libraryLoader.h"
+
+long Shmodules = 0;
+FUNHANDLE * hmodules = NULL;
 
 #ifdef _WIN32
-
-long Shmodules;
-HMODULE * hmodules;
 
 char * windowsDLLLoading()
 {
     char librariesPath[15] = "./lib/windows/";
-    Shmodules = 0;
     hmodules = (HMODULE*)malloc(sizeof(HMODULE));
     FILE *MKTFILE;
     char * notLoaded = (char*)malloc(1);
@@ -41,7 +40,7 @@ char * windowsDLLLoading()
                     FFP[a+librariesPathLength] = charArray[i+a];
                 FFP[librariesPathLength+sizeOfFP] = 0;
 
-                HMODULE hLib = LoadLibrary(FFP);
+                FUNHANDLE hLib = LoadLibrary(FFP);
                 DEBUG("loaded");
                 if (hLib == NULL) { // not 100% sure if this errorHandling works, so :D
                     DEBUG("error");
@@ -51,7 +50,7 @@ char * windowsDLLLoading()
                         notLoaded[sizeOfNotLoaded-(librariesPathLength+sizeOfFP)+a-1] = FFP[a];
                 } else {
                     Shmodules++;
-                    hmodules = (HMODULE*)realloc(hmodules,sizeof(HMODULE) * Shmodules);
+                    hmodules = (FUNHANDLE*)realloc(hmodules,sizeof(FUNHANDLE) * Shmodules);
                     hmodules[Shmodules-1] = hLib;
                 }
             }
@@ -62,9 +61,16 @@ char * windowsDLLLoading()
     return notLoaded;
 }
 
-void * getEntryAddress(HMODULE libraryToLoad)
+void * getEntryAddress(FUNHANDLE libraryToLoad)
 {
     return (void*)GetProcAddress(libraryToLoad, "entry");
+}
+
+#elif __gnu_linux__
+
+void * getEntryAddress(FUNHANDLE * libraryToLoad)
+{
+    return NULL;
 }
 
 #endif

@@ -1,4 +1,4 @@
-#include "../vulkan/MKTmesh.h"
+#include "../vulkan/MKTMesh.h"
 #include <stdio.h>
 
 MKTAG arrayGraphicsReader(char * filePath);

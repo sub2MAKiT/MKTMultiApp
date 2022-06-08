@@ -1,5 +1,7 @@
 #include "MKTarrayGraphics.h"
-
+#ifdef __gnu_linux__
+#include <cstdlib>
+#endif
 MKTAG arrayGraphicsReader(char * filePath)
 {
 	FILE *MKTFILE = fopen(filePath, "rb" );

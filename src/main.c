@@ -1,4 +1,7 @@
 #include "./vulkan/MKTAppEngine.h"
+#ifdef __gnu_linux__
+#include <cstdlib>
+#endif
 #define MKTGNUBASEDLIBRARY
 #define MKT_DEBUG_GUARD
 #include "libraryLoader.h"
@@ -12,9 +15,10 @@ int main(int argc, char* argv[])
     char * notLoaded = loadLibaries;
     for(int i = 0; i < Shmodules;i++)
     {
-        void (*funPtr)() = (void(*)(void))getEntryAddress(hmodules[i]); // so much fun!!!
+        void (*funPtr)() = (void(*)(void))getEntryAddress(((char*)hmodules)+i); // so much fun!!!
         (*funPtr)();
     }
+
     if(cmdMode == 0)
     {
         VentumEngine engine;

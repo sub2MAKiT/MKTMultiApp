@@ -10,12 +10,11 @@
 #include <SDL/SDL_vulkan.h>
 
 #include "init.h"
-#include <CMath>
 #include <fstream>
 
 #include <vk-bootstrap/src/VkBootstrap.h>
 
-#include "MKTmesh.h"
+#include "MKTMesh.h"
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
 

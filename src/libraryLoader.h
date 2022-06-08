@@ -6,30 +6,30 @@
 #define MKTDYNAMICLIBRARYLOADING
 #ifdef __gnu_linux__
 // for linux
+#define FUNHANDLE char
+
+void * getEntryAddress(FUNHANDLE * libraryToLoad);
 
 #define loadLibaries 0;
 #define getEntryInLibrary(x) 0;
+#define unloadLibraries 0;
 
 #elif _WIN32
 // for windows
+#define FUNHANDLE HMODULE
 #include <windows.h>
 #define WIN32_LEAN_AND_MEAN
 
 char * windowsDLLLoading();
 
-#ifndef MKT_DLL_LOADING
-extern HMODULE * hmodules;
-extern long Shmodules;
-#endif
-
 #define unloadLibraries for(int i = 0; i < Shmodules;i++)FreeLibrary(hmodules[i]);
-void * getEntryAddress(HMODULE libraryToLoad);
+void * getEntryAddress(FUNHANDLE libraryToLoad);
 
 #define loadLibaries windowsDLLLoading()
 
 #define librariesPathLength 14
 //--------------
-#define libraryStartingPoint(x) BOOL APIENTRY DllMain( HMODULE hModule, \
+#define libraryStartingPoint(x) BOOL APIENTRY DllMain( FUNHANDLE hModule, \
                        DWORD  ul_reason_for_call,\
                        LPVOID lpReserved\
                      )\
@@ -60,6 +60,12 @@ void * getEntryAddress(HMODULE libraryToLoad);
 
 #define loadLibaries 0;
 #define getEntryInLibrary(x) 0;
+#define unloadLibraries 0;
 
 #endif // OS
 #endif // MKTDYNAMICLIBRARYLOADING
+
+#ifndef MKT_DLL_LOADING
+extern long Shmodules;
+extern FUNHANDLE hmodules;
+#endif
