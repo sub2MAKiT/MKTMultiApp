@@ -112,6 +112,10 @@
         "vkbootstrap.h": "c",
         "vkbootstrapdispatch.h": "c",
         "*.idl": "c",
-        "mktmesh.h": "c"
+        "mktmesh.h": "c",
+        "libraryloader.h": "c",
+        "windows.h": "c",
+        "libloaderapi.h": "c",
+        "debug.h": "c"
     }
 }

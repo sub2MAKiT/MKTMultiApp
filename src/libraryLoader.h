@@ -8,6 +8,7 @@
 // for linux
 
 #define loadLibaries 0;
+#define getEntryInLibrary(x) 0;
 
 #elif _WIN32
 // for windows
@@ -16,7 +17,17 @@
 
 char * windowsDLLLoading();
 
+#ifndef MKT_DLL_LOADING
+extern HMODULE * hmodules;
+extern long Shmodules;
+#endif
+
+#define unloadLibraries for(int i = 0; i < Shmodules;i++)FreeLibrary(hmodules[i]);
+void * getEntryAddress(HMODULE libraryToLoad);
+
 #define loadLibaries windowsDLLLoading()
+
+#define librariesPathLength 14
 //--------------
 #define libraryStartingPoint(x) BOOL APIENTRY DllMain( HMODULE hModule, \
                        DWORD  ul_reason_for_call,\
@@ -41,11 +52,14 @@ char * windowsDLLLoading();
     }\
     return TRUE;\
 }
+
+
 //--------------
 #elif __APPLE__
 // for, you guessed it, apple
 
 #define loadLibaries 0;
+#define getEntryInLibrary(x) 0;
 
 #endif // OS
 #endif // MKTDYNAMICLIBRARYLOADING

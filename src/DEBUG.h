@@ -1,10 +1,13 @@
-#ifndef MKT_DEBUG_GUARD
-#define MKT_DEBUG_GUARD
+#ifdef MKT_DEBUG_GUARD
+int step = 0;
+#else
+extern int step;
+#endif
 #ifdef MKT_DEBUG
-#define DEBUG(x)                                                \
-printf("\n\033[%dm[%d]" x "\033[0m\n",int((rand() % 6) + 1 + floor(float(((rand() % 2) + 1)*1.5)) * 30),int((rand() % 6) + 1 + floor(float(((rand() % 2) + 1)*1.5)) * 30));
+#include <MKTmisc/MKTGNUbasedHeaders/MKTmath.h>
+#define DEBUG(x)              \
+printf_s("\033[%d;40m[%d]" x "\033[0;40m\n",int((step % 6) + 1 + MKTfloor(float(((step % 2) + 1)*1.5)) * 30),step);step++
 #else
 #define DEBUG(x)                                                \
-0;
-#endif
+0
 #endif

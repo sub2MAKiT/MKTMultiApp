@@ -22,7 +22,7 @@ void VentumEngine::init() {
     SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_VULKAN);
 
     _window = SDL_CreateWindow(
-        "Ventum engine", //#aaaa00
+        "MKTMultiApp", //#aaaa00
         SDL_WINDOWPOS_UNDEFINED, //#aaaa00
         SDL_WINDOWPOS_UNDEFINED, //#aaaa00
         _windowExtent.width, //#aaaa00
@@ -494,7 +494,7 @@ bool VentumEngine::load_shader_module(const char* filePath, VkShaderModule* outS
 
 void VentumEngine::init_pipelines() {
     VkShaderModule triangleFragShader;
-    if (!load_shader_module("./build/shaders/triangle.frag.spv", &triangleFragShader))
+    if (!load_shader_module("./shaders/triangle.frag.spv", &triangleFragShader))
     {
         std::cout << std::endl << "triangle frag error" << std::endl;
     }
@@ -503,7 +503,7 @@ void VentumEngine::init_pipelines() {
     }
 
     VkShaderModule triangleVertexShader;
-    if (!load_shader_module("./build/shaders/triangle.vert.spv", &triangleVertexShader))
+    if (!load_shader_module("./shaders/triangle.vert.spv", &triangleVertexShader))
     {
         std::cout << std::endl << "triangle vert error" << std::endl;
     }
@@ -512,7 +512,7 @@ void VentumEngine::init_pipelines() {
     }
 
     VkShaderModule pinkTriangleFragShader;
-    if (!load_shader_module("./build/shaders/Ctriangle.frag.spv", &pinkTriangleFragShader))
+    if (!load_shader_module("./shaders/Ctriangle.frag.spv", &pinkTriangleFragShader))
     {
         std::cout << std::endl << "triangle frag error" << std::endl;
     }
@@ -521,7 +521,7 @@ void VentumEngine::init_pipelines() {
     }
 
     VkShaderModule pinkTriangleVertexShader;
-    if (!load_shader_module("./build/shaders/Ctriangle.vert.spv", &pinkTriangleVertexShader))
+    if (!load_shader_module("./shaders/Ctriangle.vert.spv", &pinkTriangleVertexShader))
     {
         std::cout << std::endl << "triangle vert error" << std::endl;
     }
@@ -591,7 +591,7 @@ void VentumEngine::init_pipelines() {
 	pipelineBuilder._shaderStages.clear();
 
     VkShaderModule AGFragShader;
-    if (!load_shader_module("./build/shaders/DS.frag.spv", &AGFragShader))
+    if (!load_shader_module("./shaders/DS.frag.spv", &AGFragShader))
     {
         std::cout << std::endl << "AG frag error" << std::endl;
     }
@@ -600,7 +600,7 @@ void VentumEngine::init_pipelines() {
     }
 
     VkShaderModule AGVertShader;
-	if (!load_shader_module("./build/shaders/DS.vert.spv", &AGVertShader))
+	if (!load_shader_module("./shaders/DS.vert.spv", &AGVertShader))
 	{
 		std::cout << "Error when building the AG vertex shader module" << std::endl;
 	}
@@ -649,7 +649,7 @@ void VentumEngine::init_pipelines() {
 	pipelineBuilder._shaderStages.clear();
 
     VkShaderModule meshVertShader;
-	if (!load_shader_module("./build/shaders/PMtriangle.vert.spv", &meshVertShader))
+	if (!load_shader_module("./shaders/PMtriangle.vert.spv", &meshVertShader))
 	{
 		std::cout << "Error when building the triangle vertex shader module" << std::endl;
 	}
@@ -701,7 +701,7 @@ void VentumEngine::load_meshes()
 	_triangleMesh._vertices[2].color = { 0.f,1.f, 0.0f };
 
 
-	_DUCKMesh.load_from_obj("./src/vulkan/models/DUCK.obj");
+	_DUCKMesh.load_from_obj("./graphics/models/DUCK.obj");
 
 
     upload_mesh(_triangleMesh);

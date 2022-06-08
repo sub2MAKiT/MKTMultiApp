@@ -6,4 +6,5 @@
 5. Added pointer based Meshes and AGs
 6. Fixed a rate garbage value problem
 7. Fixed every single init and runtime error (but it's not working)
-8. Added basic dll loading
+8. Basic dll loading
+9. Advanced dll loading
