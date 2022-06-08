@@ -713,13 +713,17 @@ void VentumEngine::load_meshes()
 
 void VentumEngine::load_AG()
 {
-    _HexAg = arrayGraphicsReader(NULL);
-
-
+    DEBUG("started loading AG");
+    char filePath[48] = "./graphics/ArrayGraphics/menuArrayGraphic.MKTAG";
+    _HexAg = arrayGraphicsReader(filePath);
+    _TAGA.push_back(_HexAg);
+    char filePathLine[36] = "./graphics/ArrayGraphics/line.MKTAG";
+    _HexAg = arrayGraphicsReader(filePathLine);
     _TAGA.push_back(_HexAg);
 
     for(int i = 0; i < _TAGA.size();i++)
         upload_AG(_TAGA[i]);
+    DEBUG("finished loading AG");
 
 }
 

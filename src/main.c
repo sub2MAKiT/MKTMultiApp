@@ -2,25 +2,32 @@
 #define MKTGNUBASEDLIBRARY
 #define MKT_DEBUG_GUARD
 #include "libraryLoader.h"
+#include "cmdMode.h"
 
 int main(int argc, char* argv[])
 {
+    // char cmdMode = checkForCmdMode(argc,argv);
+    char cmdMode = 0;
+
     char * notLoaded = loadLibaries;
-    printf("\ntest dlls %d",Shmodules);
     for(int i = 0; i < Shmodules;i++)
     {
         void (*funPtr)() = (void(*)(void))getEntryAddress(hmodules[i]); // so much fun!!!
         (*funPtr)();
     }
-    VentumEngine engine;
+    if(cmdMode == 0)
+    {
+        VentumEngine engine;
 
-    engine.init();
+        engine.init();
 
-    engine.run();
+        engine.run();
 
-    printf("everything went fine");
-
-    engine.cleanup();
+        engine.cleanup();
+    } else if(cmdMode == 1)
+        printf("\nCmd mode coming soon!!!");
+    else if(cmdMode == 2)
+        0;
 
     unloadLibraries
 
