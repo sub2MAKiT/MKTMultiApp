@@ -1,9 +1,7 @@
 #include <stdio.h>
 
-extern void entry();
-
-void entry()
+void entry(void * ptr)
 {
-    printf("\nDUCK (loaded a dll)\n");
+    printf("\nDUCK (loaded a dll) %x\n",ptr);
     return;
 }
