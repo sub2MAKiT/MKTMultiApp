@@ -149,6 +149,7 @@ public:
     std::vector<RenderObject> _renderables;
 
     std::vector<MKTAG> _AGA;
+    std::vector<MKTAG> _TAGA;
 
     std::unordered_map<std::string,Material> _materials;
     std::unordered_map<std::string,Mesh> _meshes;

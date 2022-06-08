@@ -1,7 +1,10 @@
 #include "./vulkan/MKTAppEngine.h"
+#include "libraryLoader.h"
 
 int main(int argc, char* argv[])
 {
+    char * notLoaded = loadLibaries;
+
     VentumEngine engine;
 
     engine.init();

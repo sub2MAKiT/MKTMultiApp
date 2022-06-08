@@ -1,6 +1,8 @@
 #include "MKTAppEngine.h"
+#include "../fileManagment/MKTarrayGraphics.h"
 #define VMA_IMPLEMENTATION
 #include <VulkanMA/vk_mem_alloc.h>
+#include "../DEBUG.h"
 
 #define VK_CHECK(x)                                             \
 do                                                              \
@@ -12,14 +14,6 @@ do                                                              \
         abort();                                                \
     }                                                           \
 } while (0)
-
-#ifdef DEBUG
-#define DEBUG(x)                                                \
-printf_s("\n\033[%dm[%d]" x "\033[0m\n",int((rand() % 6) + 1 + floor(float(((rand() % 2) + 1)*1.5)) * 30),int((rand() % 6) + 1 + floor(float(((rand() % 2) + 1)*1.5)) * 30));
-#else
-#define DEBUG(x)                                                \
-if (1 == 2)printf(x);
-#endif
 
 void VentumEngine::init() {
 
@@ -125,7 +119,8 @@ void VentumEngine::draw() {
 
 //#00ff00
 //#00ff00
-    if(_selectedShader%2==0)
+
+    if(_selectedShader%2==1)
 	    draw_objects(cmd, _renderables.data(), _renderables.size());
     else
 	    draw_AG(cmd,  _AGA.data(),  _AGA.size());
@@ -718,17 +713,14 @@ void VentumEngine::load_meshes()
 
 void VentumEngine::load_AG()
 {
-    _HexAg._vertices.resize(3);
+    _HexAg = arrayGraphicsReader(NULL);
 
-	_HexAg._vertices[0].position = { 1.f,1.f, 0.5f };
-	_HexAg._vertices[1].position = { -1.f,1.f, 0.5f };
-	_HexAg._vertices[2].position = { 0.f,-1.f, 0.5f };
 
-	_HexAg._vertices[0].color = { 0.f,1.f, 0.0f };
-	_HexAg._vertices[1].color = { 0.f,1.f, 0.0f }; 
-	_HexAg._vertices[2].color = { 0.f,1.f, 0.0f };
+    _TAGA.push_back(_HexAg);
 
-    upload_AG(_HexAg);
+    for(int i = 0; i < _TAGA.size();i++)
+        upload_AG(_TAGA[i]);
+
 }
 
 void VentumEngine::init_scene()
@@ -739,7 +731,9 @@ void VentumEngine::init_scene()
 	DUCK.transformMatrix = glm::mat4{ 1.0f };
 
 	_renderables.push_back(DUCK);
-    _AGA.push_back(_HexAg);
+
+    for(int i = 0; i < _TAGA.size();i++)
+        _AGA.push_back(_TAGA[i]);
 
 	for (int x = -20; x <= 20; x++) {
 		for (int y = -20; y <= 20; y++) {
