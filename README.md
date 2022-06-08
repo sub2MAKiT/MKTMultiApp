@@ -9,3 +9,4 @@
 8. Basic dll loading
 9. Advanced dll loading
 10. Implemented MKTAG
+11. 00.00.01 - cmdMode

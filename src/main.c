@@ -1,7 +1,4 @@
 #include "./vulkan/MKTAppEngine.h"
-#ifdef __gnu_linux__
-#include <cstdlib>
-#endif
 #define MKTGNUBASEDLIBRARY
 #define MKT_DEBUG_GUARD
 #include "libraryLoader.h"
@@ -9,13 +6,13 @@
 
 int main(int argc, char* argv[])
 {
-    // char cmdMode = checkForCmdMode(argc,argv);
-    char cmdMode = 0;
+    printf("\nboot: %d",argc);
+    char cmdMode = checkForCmdMode(argc,argv);
 
     char * notLoaded = loadLibaries;
     for(int i = 0; i < Shmodules;i++)
     {
-        void (*funPtr)() = (void(*)(void))getEntryAddress(((char*)hmodules)+i); // so much fun!!!
+        void (*funPtr)() = (void(*)(void))getEntryAddress(hmodules[i]); // so much fun!!!
         (*funPtr)();
     }
 
@@ -29,7 +26,9 @@ int main(int argc, char* argv[])
 
         engine.cleanup();
     } else if(cmdMode == 1)
-        printf("\nCmd mode coming soon!!!");
+    {
+        MKTMAcmdMode();
+    }
     else if(cmdMode == 2)
         0;
 

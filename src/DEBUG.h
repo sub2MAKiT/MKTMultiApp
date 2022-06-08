@@ -1,3 +1,5 @@
+#ifndef MKT_DEBUG_THIRD_GUARD
+#define MKT_DEBUG_THIRD_GUARD
 #ifdef MKT_DEBUG_GUARD
 int step = 0;
 #else
@@ -10,4 +12,5 @@ printf_s("\033[%d;40m[%d]" x "\033[0;40m\n",int((step % 6) + 1 + MKTfloor(float(
 #else
 #define DEBUG(x)                                                \
 0
+#endif
 #endif
