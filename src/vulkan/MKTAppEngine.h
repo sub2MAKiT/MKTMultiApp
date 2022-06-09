@@ -27,6 +27,16 @@ struct MeshPushConstants {
     glm::mat4 render_matrix;
 };
 
+struct AGPushConstants {
+    glm::mat4 colourModification;
+    glm::mat4 transformation;
+};
+
+typedef struct finalToRender{
+    MKTAG AG;
+    AGPushConstants AGPC;
+} sub2MAKiT;
+
 struct DeletionQueue
 {
     std::deque<std::function<void()>> deletors;
@@ -147,7 +157,7 @@ public:
 
     std::vector<RenderObject> _renderables;
 
-    std::vector<MKTAG> _AGA;
+    std::vector<sub2MAKiT> _AGA;
     std::vector<MKTAG> _TAGA;
 
     std::unordered_map<std::string,Material> _materials;
@@ -161,7 +171,7 @@ public:
 
     void draw_objects(VkCommandBuffer cmd,RenderObject* first, int count);
 
-    void draw_AG(VkCommandBuffer cmd,MKTAG* first, int count);
+    void draw_AG(VkCommandBuffer cmd,sub2MAKiT* first, int count);
     FrameData _frames[FRAME_OVERLAP];
 
     FrameData& get_current_frame();

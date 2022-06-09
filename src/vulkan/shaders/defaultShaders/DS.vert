@@ -3,10 +3,16 @@
 layout (location = 0) in vec3 vPosition;
 layout (location = 1) in vec3 vColor;
 
-layout (location = 0) out vec3 outColor;
+layout (location = 0) out vec4 outColor;
+
+layout( push_constant ) uniform constants
+{
+	mat4 colourModification;
+	mat4 transformation;
+} PushConstants;
 
 void main()
 {
-	gl_Position = vec4(vPosition, 1.0f);
-	outColor = vColor;
+	gl_Position = PushConstants.transformation * vec4(vPosition, 1.0f);
+	outColor = PushConstants.colourModification * vec4(vColor,1.0f);
 }

@@ -579,6 +579,14 @@ void VentumEngine::init_pipelines() {
 
     VkPipelineLayoutCreateInfo AG_pipeline_layout_info = vkinit::pipeline_layout_create_info();
 
+    VkPushConstantRange AGpush_constant;
+	AGpush_constant.offset = 0;
+	AGpush_constant.size = sizeof(AGPushConstants);
+	AGpush_constant.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+
+	AG_pipeline_layout_info.pPushConstantRanges = &AGpush_constant;
+	AG_pipeline_layout_info.pushConstantRangeCount = 1;
+
     VK_CHECK(vkCreatePipelineLayout(_device, &AG_pipeline_layout_info, nullptr, &_AGPipelineLayout));
 
     VertexInputDescription AGvertexDescription = Vertex::getAG_vertex_description();
@@ -740,8 +748,22 @@ void VentumEngine::init_scene()
 
 	_renderables.push_back(DUCK);
 
+    AGPushConstants AGconstants;
+
+    AGconstants.transformation = {1.0,0.0,0.0,0.0,
+                                0.0,1.0,0.0,0.0,
+                                0.0,0.0,1.0,0.0,
+                                0.0,0.0,0.0,1.0};
+
+    
+
+    AGconstants.colourModification = {1.0,0.0,0.0,0.0,
+                                    0.0,1.0,0.0,0.0,
+                                    0.0,0.0,1.0,0.0,
+                                    0.0,0.0,0.0,1.0};
+
     for(int i = 0; i < _TAGA.size();i++)
-        _AGA.push_back(_TAGA[i]);
+        _AGA.push_back({_TAGA[i],AGconstants});
 
 	for (int x = -20; x <= 20; x++) {
 		for (int y = -20; y <= 20; y++) {
@@ -1061,18 +1083,21 @@ Mesh* VentumEngine::get_mesh(const std::string& name)
 	}
 }
 
-void VentumEngine::draw_AG(VkCommandBuffer cmd,MKTAG* first, int count)
+void VentumEngine::draw_AG(VkCommandBuffer cmd,sub2MAKiT* first, int count)
 {
 
 	Mesh* lastAG = nullptr;
 	for (int i = 0; i < count; i++)
 	{
-		MKTAG * object = &first[i];
+        AGPushConstants constants = first[i].AGPC;
+		MKTAG * object = &first[i].AG;
 
         vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _AGPipeline);
 
         VkDeviceSize offset = 0;
         vkCmdBindVertexBuffers(cmd, 0, 1, &object->_vertexBuffer._buffer, &offset);
+
+        vkCmdPushConstants(cmd, _AGPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(AGPushConstants), &constants);
 
 		vkCmdDraw(cmd, object->_vertices.size(), 1, 0, 0);
 	}
