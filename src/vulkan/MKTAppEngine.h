@@ -82,7 +82,7 @@ struct UploadContext {
 
 class VentumEngine {
 public:
-
+    
     bool _isInitialized{false};
     int _frameNumber {0};
 

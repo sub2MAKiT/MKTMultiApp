@@ -197,11 +197,12 @@ void VentumEngine::run() {
 
 void VentumEngine::init_vulkan() //#0000ff
 {
+    printf("\ntest");
     vkb::InstanceBuilder builder;
 
-    auto inst_ret = builder.set_app_name("Ventum engine")
+    auto inst_ret = builder.set_app_name("MKTMultiApp")
         .request_validation_layers(true)//#aaaa00
-        .require_api_version(1, 3, 0)//#aaaa00
+        .require_api_version(1, 1, 0)//#aaaa00
         .use_default_debug_messenger()
 		.build();
 

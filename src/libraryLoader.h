@@ -6,7 +6,8 @@
 #define MKTDYNAMICLIBRARYLOADING
 #ifdef __gnu_linux__
 // for linux
-#define FUNHANDLE char
+#define FUNHANDLE void *
+#define librariesPathLength 12
 
 #elif _WIN32
 // for windows
@@ -26,6 +27,11 @@ extern long Shmodules;
 extern FUNHANDLE * hmodules;
 #ifdef __gnu_linux__
 // for linux
+
+void  *dlopen(const char *, int);
+void  *dlsym(void *, const char *);
+int    dlclose(void *);
+char  *dlerror(void);
 
 void * getEntryAddress(FUNHANDLE libraryToLoad);
 #define loadLibaries 0;
