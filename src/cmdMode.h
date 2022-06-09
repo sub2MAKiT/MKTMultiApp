@@ -2,8 +2,8 @@
 #include <cstdlib>
 #elif _WIN32
 #include <stdlib.h>
-#include <stdio.h>
 #endif
+#include <stdio.h>
 #include "DEBUG.h"
 
 #ifndef cmdModeDirectInclude

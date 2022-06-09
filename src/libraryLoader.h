@@ -27,7 +27,7 @@ extern FUNHANDLE * hmodules;
 #ifdef __gnu_linux__
 // for linux
 
-void * getEntryAddress(FUNHANDLE * libraryToLoad);
+void * getEntryAddress(FUNHANDLE libraryToLoad);
 #define loadLibaries 0;
 #define getEntryInLibrary(x) 0;
 #define unloadLibraries 0;
