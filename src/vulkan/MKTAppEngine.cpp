@@ -720,6 +720,9 @@ void VentumEngine::load_AG()
     char filePathLine[36] = "./graphics/ArrayGraphics/line.MKTAG";
     _HexAg = arrayGraphicsReader(filePathLine);
     _TAGA.push_back(_HexAg);
+    char filePathGenerated[41] = "./graphics/ArrayGraphics/generated.MKTAG";
+    _HexAg = arrayGraphicsReader(filePathGenerated);
+    _TAGA.push_back(_HexAg);
 
     for(int i = 0; i < _TAGA.size();i++)
         upload_AG(_TAGA[i]);
@@ -1070,7 +1073,6 @@ void VentumEngine::draw_AG(VkCommandBuffer cmd,MKTAG* first, int count)
         VkDeviceSize offset = 0;
         vkCmdBindVertexBuffers(cmd, 0, 1, &object->_vertexBuffer._buffer, &offset);
 
-
 		vkCmdDraw(cmd, object->_vertices.size(), 1, 0, 0);
 	}
 }
@@ -1106,7 +1108,7 @@ void VentumEngine::draw_objects(VkCommandBuffer cmd,RenderObject* first, int cou
 			vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, object.material->pipeline);
             lastMaterial = object.material;
             vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, object.material->pipelineLayout, 0, 1, &get_current_frame().globalDescriptor, 0, nullptr);
-        }   
+        }
 
 
 		glm::mat4 model = object.transformMatrix;

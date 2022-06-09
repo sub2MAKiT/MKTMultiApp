@@ -42,7 +42,9 @@ void MKTMAcmdMode(void (**funArray)(void*), long sizeOfFunArray)
             _MKTMACMD_help();
         else if( MKTcompStr(command,"version"))
             _MKTMACMD_version();
-        else{
+        else if(MKTcompStr(command, "cp"))
+            _MKTMACMD_copy(command);
+        else {
             for(int i = 0; i < sizeOfFunArray;i++)
                 funArray[i]((void*)command);
         }
@@ -51,9 +53,58 @@ void MKTMAcmdMode(void (**funArray)(void*), long sizeOfFunArray)
     return;
 }
 
+void _MKTMACMD_copy(char * command)
+{
+    if(!(command[3] == 0 || command[4] == 0 || command[5] == 0))
+    {
+        char * src = (char*)malloc(1);
+        char * dst = (char*)malloc(1);
+        int startingPoint;
+        for(int i = 3;command[i]!='|';i++)
+        {
+            src = (char*)realloc(src,i-1);
+            src[i-3] = command[i];
+            src[i-2] = 0;
+            startingPoint = i+1;
+            printf("\nA: %d",i);
+        }
+        for(int i = startingPoint+1;command[i]!=0;i++)
+        {
+            dst = (char*)realloc(dst,i-startingPoint+1);
+            dst[i-startingPoint-1] = command[i];
+            dst[i-startingPoint] = 0;
+            printf("\nB: %d",i);
+        }
+        FILE *SRCFILE;
+        FILE *DSTFILE;
+        SRCFILE = fopen(src, "rb" ); // ./graphics/cmdMode = comedy
+        DSTFILE = fopen(dst,"wb");
+        printf("\nC: %d ",startingPoint);
+        for(int i = 0; i < 10;i++)
+            printf("%c",src[i]);
+        printf("\nD: %d ",startingPoint);
+        for(int i = 0; i < 10;i++)
+            printf("%c",dst[i]);
+        if( SRCFILE != NULL && DSTFILE != NULL)
+        {
+            char *charArray;
+            fseek(SRCFILE, 0L, SEEK_END);
+            long sizeOfFile = ftell(SRCFILE);
+            rewind(SRCFILE);
+            charArray = (char*)malloc(sizeOfFile);
+            sizeOfFile = fread( charArray,1, sizeOfFile, SRCFILE );
+            fwrite(charArray,1,sizeOfFile,DSTFILE);
+            fclose( SRCFILE );
+            fclose( DSTFILE );
+        }
+    } else {
+        printf("\nERROR");
+    }
+    return;
+}
+
 char MKTcompStr(char * charArray, const char * string)
 {
-    char checkForEnd = 0;
     for(int i = 0; i < 100 && string[i] != 0; i++)
         if(string[i] != charArray[i])
             return 0;

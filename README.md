@@ -11,3 +11,4 @@
 10. Implemented MKTAG
 11. 00.00.01 - cmdMode
 12. 00.01.00 - fully working cmd, dlls
+13. 00.02.00 - cp option in the cmd mode

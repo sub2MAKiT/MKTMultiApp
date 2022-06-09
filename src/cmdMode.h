@@ -16,3 +16,4 @@ void _MKTMACMD_help();
 void _MKTMACMD_version();
 char MKTcompStr(char * charArray, const char * string);
 void handleCmdGrapics(char mode);
+void _MKTMACMD_copy(char * command);
