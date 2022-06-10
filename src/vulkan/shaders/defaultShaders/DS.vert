@@ -9,10 +9,11 @@ layout( push_constant ) uniform constants
 {
 	mat4 colourModification;
 	mat4 transformation;
+	vec3 movement;
 } PushConstants;
 
 void main()
 {
-	gl_Position = PushConstants.transformation * vec4(vPosition, 1.0f);
+	gl_Position = PushConstants.transformation * vec4(vPosition+PushConstants.movement, 1.0f);
 	outColor = PushConstants.colourModification * vec4(vColor,1.0f);
 }

@@ -30,12 +30,8 @@ struct MeshPushConstants {
 struct AGPushConstants {
     glm::mat4 colourModification;
     glm::mat4 transformation;
+    glm::vec3 movement;
 };
-
-typedef struct finalToRender{
-    MKTAG AG;
-    AGPushConstants AGPC;
-} sub2MAKiT;
 
 struct DeletionQueue
 {
@@ -71,6 +67,12 @@ struct GPUCameraData{
 	glm::mat4 proj;
 	glm::mat4 viewproj;
 };
+
+typedef struct finalToRender{
+    MKTAG AG;
+    AGPushConstants AGPC;
+    // Material* material;
+} sub2MAKiT;
 
 struct FrameData {
 	VkSemaphore _presentSemaphore, _renderSemaphore;
@@ -182,6 +184,8 @@ public:
     VkDescriptorPool _descriptorPool;
 
     UploadContext _uploadContext;
+
+    Material AGMaterial;
 
 private:
 

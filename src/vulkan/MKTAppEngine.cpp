@@ -123,7 +123,7 @@ void VentumEngine::draw() {
     if(_selectedShader%2==1)
 	    draw_objects(cmd, _renderables.data(), _renderables.size());
     else
-	    draw_AG(cmd,  _AGA.data(),  _AGA.size());
+        draw_AG(cmd,  _AGA.data(),  _AGA.size());
 
 //#00ff00
 //#00ff00
@@ -171,23 +171,42 @@ void VentumEngine::run() {
 
     DEBUG("III started running III");
 
+    float xSize = 0;
+    float ySize = 0;
+    float xMove = 0;
+    float yMove = 0;
+
     while (!bQuit)
     {
         draw();
         while (SDL_PollEvent(&e) != 0)
         {
-                if (e.type == SDL_QUIT) bQuit = true;
-                else if (e.type == SDL_KEYDOWN)
-                {
-                    if (e.key.keysym.sym == SDLK_SPACE)
-                    {
-                        _selectedShader += 1;
-                        if(_selectedShader > 1)
-                        {
-                            _selectedShader = 0;
-                        }
-                    }
-                }
+            if (e.type == SDL_QUIT) bQuit = true;
+            else if (e.type == SDL_KEYDOWN)
+            {
+                if (e.key.keysym.sym == SDLK_RIGHT)
+                    xSize += 0.01;
+                else if(e.key.keysym.sym == SDLK_LEFT)
+                    xSize -= 0.01;
+                else if(e.key.keysym.sym == SDLK_UP)
+                    ySize += 0.01;
+                else if(e.key.keysym.sym == SDLK_DOWN)
+                    ySize -= 0.01;
+                else if(e.key.keysym.sym == SDLK_s)
+                    yMove += 0.1;
+                else if(e.key.keysym.sym == SDLK_w)
+                    yMove -= 0.1;
+                else if(e.key.keysym.sym == SDLK_d)
+                    xMove += 0.1;
+                else if(e.key.keysym.sym == SDLK_a)
+                    xMove -= 0.1;
+                else if(e.key.keysym.sym == SDLK_SPACE)
+                    _selectedShader++;
+            }
+            _AGA[2].AGPC.transformation[0].x = xSize;
+            _AGA[2].AGPC.transformation[1].y = ySize;
+            _AGA[2].AGPC.movement.x = xMove;
+            _AGA[2].AGPC.movement.y = yMove;
         }
     }
     DEBUG("III ran III");
@@ -246,7 +265,7 @@ void VentumEngine::init_swapchain() //#0000ff
 
     vkb::Swapchain vkbSwapchain = swapchainBuilder
 		.use_default_format_selection()
-        .set_desired_present_mode(VK_PRESENT_MODE_MAILBOX_KHR)
+        .set_desired_present_mode(VK_PRESENT_MODE_FIFO_KHR)//VK_PRESENT_MODE_MAILBOX_KHR
         .set_desired_extent(_windowExtent.width, _windowExtent.height)
 		.build()
 		.value();
@@ -742,6 +761,7 @@ void VentumEngine::load_AG()
 void VentumEngine::init_scene()
 {
     RenderObject DUCK;
+    AGMaterial = {_AGPipeline,_AGPipelineLayout};
 	DUCK.mesh = get_mesh("DUCK");
 	DUCK.material = get_material("defaultmesh");
 	DUCK.transformMatrix = glm::mat4{ 1.0f };
@@ -762,8 +782,10 @@ void VentumEngine::init_scene()
                                     0.0,0.0,1.0,0.0,
                                     0.0,0.0,0.0,1.0};
 
+    AGconstants.movement = {0.0,0.0,0.0};
+
     for(int i = 0; i < _TAGA.size();i++)
-        _AGA.push_back({_TAGA[i],AGconstants});
+        _AGA.push_back({_TAGA[i],AGconstants});//,&AGMaterial
 
 	for (int x = -20; x <= 20; x++) {
 		for (int y = -20; y <= 20; y++) {
@@ -1092,7 +1114,11 @@ void VentumEngine::draw_AG(VkCommandBuffer cmd,sub2MAKiT* first, int count)
         AGPushConstants constants = first[i].AGPC;
 		MKTAG * object = &first[i].AG;
 
+        AGMaterial = {_AGPipeline,_AGPipelineLayout};
+
         vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _AGPipeline);
+
+        // vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, first[i].material->pipelineLayout, 0, 1, &get_current_frame().globalDescriptor, 0, nullptr);
 
         VkDeviceSize offset = 0;
         vkCmdBindVertexBuffers(cmd, 0, 1, &object->_vertexBuffer._buffer, &offset);
