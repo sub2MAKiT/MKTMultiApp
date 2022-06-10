@@ -26,7 +26,7 @@ char * windowsDLLLoading()
 
         for(long i = 1; i < sizeOfFile;i++)
         {
-            if(charArray[i-1] == '\n')
+            if(charArray[i-1] == '\n' && charArray[i-2] != '\n' && charArray[i] != '{')
             {
                 int sizeOfFP = 0;
                 for(int a = 0; charArray[i+a+1] != '\n' && a+i < sizeOfFile;a++)
@@ -38,6 +38,16 @@ char * windowsDLLLoading()
 
                 for(int a = 0; a < sizeOfFP; a++)
                     FFP[a+librariesPathLength] = charArray[i+a];
+
+                const char extension[5] = ".dll";
+
+                sizeOfFP += 4;
+
+                FFP = (char*)realloc(FFP,sizeOfFP);
+
+                for(int a = 0; a < 4;a++)
+                    FFP[librariesPathLength+sizeOfFP-4+a] = extension[a];
+                
                 FFP[librariesPathLength+sizeOfFP] = 0;
 
                 FUNHANDLE hLib = LoadLibrary(FFP);
@@ -102,6 +112,17 @@ void * getEntryAddress(FUNHANDLE libraryToLoad)
 
                 for(int a = 0; a < sizeOfFP; a++)
                     FFP[a+librariesPathLength] = charArray[i+a];
+
+                const char extension[4] = ".os";
+
+                sizeOfFP += 3;
+
+                FFP = (char*)realloc(FFP,sizeOfFP);
+
+
+                for(int a = 0; a < 3;a++)
+                    FFP[librariesPathLength+sizeOfFP-3+a] = extension[a];
+                
                 FFP[librariesPathLength+sizeOfFP] = 0;
 
                 FUNHANDLE hLib = dlopen(FFP,RTLD_NOW);

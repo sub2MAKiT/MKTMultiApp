@@ -4,6 +4,14 @@
 #include <VulkanMA/vk_mem_alloc.h>
 #include "../DEBUG.h"
 
+#define add_AG(x,y) \
+{\
+    _HexAg = arrayGraphicsReader("./graphics/ArrayGraphics/" x ".MKTAG");\
+    _TAGA.push_back(_HexAg);\
+    upload_AG(_TAGA[_TAGA.size()-1]);\
+    y = _TAGA.size()-1;\
+}
+
 #define VK_CHECK(x)                                             \
 do                                                              \
 {                                                               \
@@ -175,6 +183,8 @@ void VentumEngine::run() {
     float ySize = 0;
     float xMove = 0;
     float yMove = 0;
+    int currentObjectToDraw = 2;
+    char isVisible;
 
     while (!bQuit)
     {
@@ -202,11 +212,18 @@ void VentumEngine::run() {
                     xMove -= 0.1;
                 else if(e.key.keysym.sym == SDLK_SPACE)
                     _selectedShader++;
+                else if(e.key.keysym.sym == SDLK_q)
+                    currentObjectToDraw++;
+                else if(e.key.keysym.sym == SDLK_e)
+                    isVisible -= (isVisible*2-1);
             }
-            _AGA[2].AGPC.transformation[0].x = xSize;
-            _AGA[2].AGPC.transformation[1].y = ySize;
-            _AGA[2].AGPC.movement.x = xMove;
-            _AGA[2].AGPC.movement.y = yMove;
+            if(currentObjectToDraw > 2)
+                currentObjectToDraw = 0;
+            _AGA[currentObjectToDraw].AGPC.transformation[0].x = xSize;
+            _AGA[currentObjectToDraw].AGPC.transformation[1].y = ySize;
+            _AGA[currentObjectToDraw].AGPC.movement.x = xMove;
+            _AGA[currentObjectToDraw].AGPC.movement.y = yMove;
+            _AGA[currentObjectToDraw].isVisible = isVisible;
         }
     }
     DEBUG("III ran III");
@@ -516,37 +533,37 @@ void VentumEngine::init_pipelines() {
     VkShaderModule triangleFragShader;
     if (!load_shader_module("./shaders/triangle.frag.spv", &triangleFragShader))
     {
-        std::cout << std::endl << "triangle frag error" << std::endl;
+        DEBUG("triangle frag error");
     }
     else {
-        std::cout << std::endl << "triangle frag loaded" << std::endl;
+        DEBUG("triangle frag loaded");
     }
 
     VkShaderModule triangleVertexShader;
     if (!load_shader_module("./shaders/triangle.vert.spv", &triangleVertexShader))
     {
-        std::cout << std::endl << "triangle vert error" << std::endl;
+        DEBUG("triangle vert error");
     }
     else {
-        std::cout << std::endl << "triangle vert loaded" << std::endl;
+        DEBUG("triangle vert loaded");
     }
 
     VkShaderModule pinkTriangleFragShader;
     if (!load_shader_module("./shaders/Ctriangle.frag.spv", &pinkTriangleFragShader))
     {
-        std::cout << std::endl << "triangle frag error" << std::endl;
+        DEBUG("triangle frag error");
     }
     else {
-        std::cout << std::endl << "triangle frag loaded" << std::endl;
+        DEBUG("triangle frag loaded");
     }
 
     VkShaderModule pinkTriangleVertexShader;
     if (!load_shader_module("./shaders/Ctriangle.vert.spv", &pinkTriangleVertexShader))
     {
-        std::cout << std::endl << "triangle vert error" << std::endl;
+        DEBUG("triangle vert error");
     }
     else {
-        std::cout << std::endl << "triangle vert loaded" << std::endl;
+        DEBUG("triangle vert loaded");
     }
 
 
@@ -742,18 +759,15 @@ void VentumEngine::load_meshes()
 void VentumEngine::load_AG()
 {
     DEBUG("started loading AG");
-    char filePath[48] = "./graphics/ArrayGraphics/menuArrayGraphic.MKTAG";
-    _HexAg = arrayGraphicsReader(filePath);
-    _TAGA.push_back(_HexAg);
-    char filePathLine[36] = "./graphics/ArrayGraphics/line.MKTAG";
-    _HexAg = arrayGraphicsReader(filePathLine);
-    _TAGA.push_back(_HexAg);
-    char filePathGenerated[41] = "./graphics/ArrayGraphics/generated.MKTAG";
-    _HexAg = arrayGraphicsReader(filePathGenerated);
-    _TAGA.push_back(_HexAg);
 
-    for(int i = 0; i < _TAGA.size();i++)
-        upload_AG(_TAGA[i]);
+    add_AG("menuArrayGraphic",ID_AG_BACKGROUND);
+    
+    add_AG("line",ID_AG_LINE_BACKGROUND);
+
+    add_AG("generated",ID_AG_TESTING_SHAPE);
+
+    // add_AG("triangle");
+
     DEBUG("finished loading AG");
 
 }
@@ -770,9 +784,9 @@ void VentumEngine::init_scene()
 
     AGPushConstants AGconstants;
 
-    AGconstants.transformation = {1.0,0.0,0.0,0.0,
-                                0.0,1.0,0.0,0.0,
-                                0.0,0.0,1.0,0.0,
+    AGconstants.transformation = {2.0,0.0,0.0,0.0, // i screwed something up with the math, and now everything is 2 times smaller, :D
+                                0.0,2.0,0.0,0.0,
+                                0.0,0.0,2.0,0.0,
                                 0.0,0.0,0.0,1.0};
 
     
@@ -785,7 +799,7 @@ void VentumEngine::init_scene()
     AGconstants.movement = {0.0,0.0,0.0};
 
     for(int i = 0; i < _TAGA.size();i++)
-        _AGA.push_back({_TAGA[i],AGconstants});//,&AGMaterial
+        _AGA.push_back({_TAGA[i],AGconstants,1});//,&AGMaterial
 
 	for (int x = -20; x <= 20; x++) {
 		for (int y = -20; y <= 20; y++) {
@@ -1111,22 +1125,26 @@ void VentumEngine::draw_AG(VkCommandBuffer cmd,sub2MAKiT* first, int count)
 	Mesh* lastAG = nullptr;
 	for (int i = 0; i < count; i++)
 	{
-        AGPushConstants constants = first[i].AGPC;
-		MKTAG * object = &first[i].AG;
+        if(first[i].isVisible)
+        {
+            AGPushConstants constants = first[i].AGPC;
 
-        AGMaterial = {_AGPipeline,_AGPipelineLayout};
+            MKTAG * object = &first[i].AG;
 
-        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _AGPipeline);
+            AGMaterial = {_AGPipeline,_AGPipelineLayout};
 
-        // vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, first[i].material->pipelineLayout, 0, 1, &get_current_frame().globalDescriptor, 0, nullptr);
+            vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _AGPipeline);
 
-        VkDeviceSize offset = 0;
-        vkCmdBindVertexBuffers(cmd, 0, 1, &object->_vertexBuffer._buffer, &offset);
+            // vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, first[i].material->pipelineLayout, 0, 1, &get_current_frame().globalDescriptor, 0, nullptr);
 
-        vkCmdPushConstants(cmd, _AGPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(AGPushConstants), &constants);
+            VkDeviceSize offset = 0;
+            vkCmdBindVertexBuffers(cmd, 0, 1, &object->_vertexBuffer._buffer, &offset);
 
-		vkCmdDraw(cmd, object->_vertices.size(), 1, 0, 0);
-	}
+            vkCmdPushConstants(cmd, _AGPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(AGPushConstants), &constants);
+
+            vkCmdDraw(cmd, object->_vertices.size(), 1, 0, 0);
+        }
+    }
 }
 
 void VentumEngine::draw_objects(VkCommandBuffer cmd,RenderObject* first, int count)

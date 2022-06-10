@@ -2,7 +2,7 @@
 #ifdef __gnu_linux__
 #include <cstdlib>
 #endif
-MKTAG arrayGraphicsReader(char * filePath)
+MKTAG arrayGraphicsReader(const char * filePath)
 {
 	FILE *MKTFILE = fopen(filePath, "rb" );
 	float *list;

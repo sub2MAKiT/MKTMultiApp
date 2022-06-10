@@ -31,6 +31,7 @@ struct AGPushConstants {
     glm::mat4 colourModification;
     glm::mat4 transformation;
     glm::vec3 movement;
+    // glm::vec2 pivitPoint;
 };
 
 struct DeletionQueue
@@ -71,6 +72,7 @@ struct GPUCameraData{
 typedef struct finalToRender{
     MKTAG AG;
     AGPushConstants AGPC;
+    char isVisible;
     // Material* material;
 } sub2MAKiT;
 
@@ -186,6 +188,12 @@ public:
     UploadContext _uploadContext;
 
     Material AGMaterial;
+
+    // MAIN ARRAY GRAPHICS
+
+    int ID_AG_BACKGROUND;
+    int ID_AG_LINE_BACKGROUND;
+    int ID_AG_TESTING_SHAPE;
 
 private:
 
