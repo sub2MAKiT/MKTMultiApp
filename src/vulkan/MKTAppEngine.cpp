@@ -233,7 +233,6 @@ void VentumEngine::run() {
 
 void VentumEngine::init_vulkan() //#0000ff
 {
-    printf("\ntest");
     vkb::InstanceBuilder builder;
 
     auto inst_ret = builder.set_app_name("MKTMultiApp")
@@ -280,13 +279,15 @@ void VentumEngine::init_swapchain() //#0000ff
 {
     vkb::SwapchainBuilder swapchainBuilder{_chosenGPU,_device,_surface };
 
+    DEBUG("started building a swapchain");
     vkb::Swapchain vkbSwapchain = swapchainBuilder
 		.use_default_format_selection()
-        .set_desired_present_mode(VK_PRESENT_MODE_FIFO_KHR)//VK_PRESENT_MODE_MAILBOX_KHR
+        .set_desired_present_mode(VK_PRESENT_MODE_MAILBOX_KHR)//VK_PRESENT_MODE_FIFO_KHR
         .set_desired_extent(_windowExtent.width, _windowExtent.height)
 		.build()
 		.value();
 
+    DEBUG("swapchain built");
         _swapchain = vkbSwapchain.swapchain;
 	    _swapchainImages = vkbSwapchain.get_images().value();
 	    _swapchainImageViews = vkbSwapchain.get_image_views().value();
@@ -297,6 +298,7 @@ void VentumEngine::init_swapchain() //#0000ff
             vkDestroySwapchainKHR(_device, _swapchain, nullptr);
         });
 
+    DEBUG("swapchainImages sorted");
     VkExtent3D depthImageExtent = {
         _windowExtent.width,
         _windowExtent.height,
@@ -313,10 +315,12 @@ void VentumEngine::init_swapchain() //#0000ff
 
 	vmaCreateImage(_allocator, &dimg_info, &dimg_allocinfo, &_depthImage._image, &_depthImage._allocation, nullptr);
 
+    DEBUG("created an image");
 	VkImageViewCreateInfo dview_info = vkinit::imageview_create_info(_depthFormat, _depthImage._image, VK_IMAGE_ASPECT_DEPTH_BIT);
 
 	VK_CHECK(vkCreateImageView(_device, &dview_info, nullptr, &_depthImageView));
 
+    DEBUG("created an image view");
     _mainDeletionQueue.push_function([=]() {
 		vkDestroyImageView(_device, _depthImageView, nullptr);
 		vmaDestroyImage(_allocator, _depthImage._image, _depthImage._allocation);
@@ -362,58 +366,124 @@ void VentumEngine::init_commands()
 void VentumEngine::init_default_renderpass()
 {
     VkAttachmentDescription color_attachment = {};
-    color_attachment.format = _swapchainImageFormat;
-    color_attachment.samples = VK_SAMPLE_COUNT_1_BIT;
-    color_attachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-    color_attachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-    color_attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-    color_attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    color_attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    color_attachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+	color_attachment.format = _swapchainImageFormat;
+	color_attachment.samples = VK_SAMPLE_COUNT_1_BIT;
+	color_attachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+	color_attachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+	color_attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+	color_attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+	color_attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	color_attachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
 
-    VkAttachmentReference color_attachment_ref = {};
+	VkAttachmentReference color_attachment_ref = {};
+	color_attachment_ref.attachment = 0;
+	color_attachment_ref.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
-    color_attachment_ref.attachment = 0;
-    color_attachment_ref.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+	VkAttachmentDescription depth_attachment = {};
+	depth_attachment.flags = 0;
+	depth_attachment.format = _depthFormat;
+	depth_attachment.samples = VK_SAMPLE_COUNT_1_BIT;
+	depth_attachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+	depth_attachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+	depth_attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+	depth_attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+	depth_attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	depth_attachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
-    VkAttachmentDescription depth_attachment = {};
-    depth_attachment.flags = 0;
-    depth_attachment.format = _depthFormat;
-    depth_attachment.samples = VK_SAMPLE_COUNT_1_BIT;
-    depth_attachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-    depth_attachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-    depth_attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-    depth_attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    depth_attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    depth_attachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+	VkAttachmentReference depth_attachment_ref = {};
+	depth_attachment_ref.attachment = 1;
+	depth_attachment_ref.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
-    VkAttachmentReference depth_attachment_ref = {};
-    depth_attachment_ref.attachment = 1;
-    depth_attachment_ref.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+	VkSubpassDescription subpass = {};
+	subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+	subpass.colorAttachmentCount = 1;
+	subpass.pColorAttachments = &color_attachment_ref;
+	subpass.pDepthStencilAttachment = &depth_attachment_ref;
 
-    VkSubpassDependency depth_dependency = {};
-    depth_dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
-    depth_dependency.dstSubpass = 0;
-    depth_dependency.srcStageMask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
-    depth_dependency.srcAccessMask = 0;
-    depth_dependency.dstStageMask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
-    depth_dependency.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+	VkSubpassDependency dependency = {};
+	dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
+	dependency.dstSubpass = 0;
+	dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+	dependency.srcAccessMask = 0;
+	dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+	dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
 
-    VkSubpassDescription subpass = {};
-    subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-    subpass.colorAttachmentCount = 1;
-    subpass.pColorAttachments = &color_attachment_ref;
+	VkSubpassDependency depth_dependency = {};
+	depth_dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
+	depth_dependency.dstSubpass = 0;
+	depth_dependency.srcStageMask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+	depth_dependency.srcAccessMask = 0;
+	depth_dependency.dstStageMask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+	depth_dependency.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
 
-    subpass.pDepthStencilAttachment = &depth_attachment_ref;
+	VkSubpassDependency dependencies[2] = { dependency, depth_dependency };
 
-    VkAttachmentDescription attachments[2] = { color_attachment,depth_attachment };
+	VkAttachmentDescription attachments[2] = { color_attachment,depth_attachment };
 
-    VkRenderPassCreateInfo render_pass_info = {};
-    render_pass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-    render_pass_info.attachmentCount = 2;
+	VkRenderPassCreateInfo render_pass_info = {};
+	render_pass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+	render_pass_info.attachmentCount = 2;
 	render_pass_info.pAttachments = attachments;
-    render_pass_info.subpassCount = 1;
+	render_pass_info.subpassCount = 1;
 	render_pass_info.pSubpasses = &subpass;
+	render_pass_info.dependencyCount = 2;
+	render_pass_info.pDependencies = dependencies;
+
+    // 2D RENDER PASS ------------------------------
+
+    // VkAttachmentDescription AGcolor_attachment = {};
+    // AGcolor_attachment.format = _swapchainImageFormat;
+    // AGcolor_attachment.samples = VK_SAMPLE_COUNT_1_BIT;
+    // AGcolor_attachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    // AGcolor_attachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+    // AGcolor_attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    // AGcolor_attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    // AGcolor_attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    // AGcolor_attachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+
+    // VkAttachmentReference color_attachment_ref = {};
+
+    // color_attachment_ref.attachment = 0;
+    // color_attachment_ref.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+    // VkAttachmentDescription depth_attachment = {};
+    // depth_attachment.flags = 0;
+    // depth_attachment.format = _depthFormat;
+    // depth_attachment.samples = VK_SAMPLE_COUNT_1_BIT;
+    // depth_attachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    // depth_attachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+    // depth_attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    // depth_attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    // depth_attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    // depth_attachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+    // VkAttachmentReference depth_attachment_ref = {};
+    // depth_attachment_ref.attachment = 1;
+    // depth_attachment_ref.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+    // VkSubpassDependency depth_dependency = {};
+    // depth_dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
+    // depth_dependency.dstSubpass = 0;
+    // depth_dependency.srcStageMask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+    // depth_dependency.srcAccessMask = 0;
+    // depth_dependency.dstStageMask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+    // depth_dependency.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+
+    // VkSubpassDescription subpass = {};
+    // subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+    // subpass.colorAttachmentCount = 1;
+    // subpass.pColorAttachments = &color_attachment_ref;
+
+    // subpass.pDepthStencilAttachment = &depth_attachment_ref;
+
+    // VkAttachmentDescription attachments[2] = { color_attachment,depth_attachment };
+
+    // VkRenderPassCreateInfo render_pass_info = {};
+    // render_pass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+    // render_pass_info.attachmentCount = 2;
+	// render_pass_info.pAttachments = attachments;
+    // render_pass_info.subpassCount = 1;
+	// render_pass_info.pSubpasses = &subpass;
 
     VK_CHECK(vkCreateRenderPass(_device, &render_pass_info, nullptr, &_renderPass));
 
@@ -735,6 +805,7 @@ void VentumEngine::init_pipelines() {
 
 void VentumEngine::load_meshes()
 {
+    DEBUG("started loading meshes");
     _triangleMesh._vertices.resize(3);
 
 	_triangleMesh._vertices[0].position = { 1.f,1.f, 0.5f };
@@ -1071,7 +1142,7 @@ VkPipeline PipelineBuilder::build_pipeline(VkDevice device, VkRenderPass pass)
 
 void VentumEngine::upload_AG(MKTAG& AG)
 {
-    const size_t bufferSize= AG._vertices.size();
+    const size_t bufferSize= AG._vertices.size() * sizeof(MKTAGA);
 	VkBufferCreateInfo stagingBufferInfo = {};
 	stagingBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 	stagingBufferInfo.pNext = nullptr;
@@ -1266,94 +1337,99 @@ void VentumEngine::drawMenu(VkCommandBuffer cmd,GL * menuStuff, size_t sizeOfMen
 
 void VentumEngine::draw_AG(VkCommandBuffer cmd,sub2MAKiT* first, int count)
 {
-    #ifdef MKT_DEBUGA
+    // #ifdef MKT_DEBUG
    
-    MKTAG AG;AG._vertices[0].position=
-    {1.0,1.0,0.0};AG._vertices[0].color={1.0,1.0
-    ,0.0};AG._vertices[1].position={-1.0,//i do love me some square code
-    -1.0,0.0};AG._vertices[1].color={1.0,1.0,0.0};
-    AG._vertices[2].position={1.0,-1.0,0.0};
-    AG._vertices[2].color={1.0,1.0,0.0};
-    const size_t bufferSize= AG._vertices.size();
-	VkBufferCreateInfo stagingBufferInfo = {};
-	stagingBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-	stagingBufferInfo.pNext = nullptr;stagingBufferInfo.size = bufferSize;
-	stagingBufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
-	VmaAllocationCreateInfo vmaallocInfo = {};
-	vmaallocInfo.usage = VMA_MEMORY_USAGE_CPU_ONLY;
+    // MKTAG AG; AG._vertices.resize(3);
+    // AG._vertices[0].position=
+    // {0.4,0.4,0.5};AG._vertices[0].color={1.0,1.0
+    // ,0.0};AG._vertices[1].position={-0.4,//i do love me some square code
+    // -0.4,0.4};AG._vertices[1].color={1.0,1.0,0.0};
+    // AG._vertices[2].position={0.4,-0.4,0.5};
+    // AG._vertices[2].color={1.0,1.0,0.0};
+    // const size_t bufferSize= AG._vertices.size();
+	// VkBufferCreateInfo stagingBufferInfo = {};
+	// stagingBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+	// stagingBufferInfo.pNext = nullptr;stagingBufferInfo.size = bufferSize;
+	// stagingBufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+	// VmaAllocationCreateInfo vmaallocInfo = {};
+	// vmaallocInfo.usage = VMA_MEMORY_USAGE_CPU_ONLY;
 
-	AllocatedBuffer stagingBuffer;
-    DEBUG("test1");
+	// AllocatedBuffer stagingBuffer;
+    // DEBUG("test11");
 
-	VK_CHECK(vmaCreateBuffer(_allocator, &stagingBufferInfo, &vmaallocInfo,
-		&stagingBuffer._buffer,
-		&stagingBuffer._allocation,
-		nullptr));
+	// VK_CHECK(vmaCreateBuffer(_allocator, &stagingBufferInfo, &vmaallocInfo,
+	// 	&stagingBuffer._buffer,
+	// 	&stagingBuffer._allocation,
+	// 	nullptr));
 
-    DEBUG("test2");
-	void* data;
-	vmaMapMemory(_allocator, stagingBuffer._allocation, &data);
+    // DEBUG("test22");
+	// void* data;
+	// vmaMapMemory(_allocator, stagingBuffer._allocation, &data);
 
-	memcpy(data, AG._vertices.data(), AG._vertices.size() * sizeof(MKTAGA));
+	// memcpy(data, AG._vertices.data(), AG._vertices.size() * sizeof(MKTAGA));
 
-    DEBUG("test4");
+    // DEBUG("test33");
 
-	vmaUnmapMemory(_allocator, stagingBuffer._allocation);
+	// vmaUnmapMemory(_allocator, stagingBuffer._allocation);
 
 
-	VkBufferCreateInfo vertexBufferInfo = {};
-	vertexBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-	vertexBufferInfo.pNext = nullptr;
-	vertexBufferInfo.size = bufferSize;
-	vertexBufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+	// VkBufferCreateInfo vertexBufferInfo = {};
+	// vertexBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+	// vertexBufferInfo.pNext = nullptr;
+	// vertexBufferInfo.size = bufferSize;
+	// vertexBufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
 
-	vmaallocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
+	// vmaallocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
 
-	VK_CHECK(vmaCreateBuffer(_allocator, &vertexBufferInfo, &vmaallocInfo,
-		&AG._vertexBuffer._buffer,
-		&AG._vertexBuffer._allocation,
-		nullptr));
+    // DEBUG("test44");
+	// VK_CHECK(vmaCreateBuffer(_allocator, &vertexBufferInfo, &vmaallocInfo,
+	// 	&AG._vertexBuffer._buffer,
+	// 	&AG._vertexBuffer._allocation,
+	// 	nullptr));
 
-	immediate_submit([=](VkCommandBuffer cmd) {
-		VkBufferCopy copy;
-		copy.dstOffset = 0;
-		copy.srcOffset = 0;
-		copy.size = bufferSize;
-		vkCmdCopyBuffer(cmd, stagingBuffer._buffer, AG._vertexBuffer._buffer, 1, & copy);
-	});
+	// immediate_submit([=](VkCommandBuffer cmd) {
+	// 	VkBufferCopy copy;
+	// 	copy.dstOffset = 0;
+	// 	copy.srcOffset = 0;
+	// 	copy.size = bufferSize;
+	// 	vkCmdCopyBuffer(cmd, stagingBuffer._buffer, AG._vertexBuffer._buffer, 1, & copy);
+	// });
 
-    _mainDeletionQueue.push_function([=]() {
-		vmaDestroyBuffer(_allocator, AG._vertexBuffer._buffer, AG._vertexBuffer._allocation);
-	});
+    // DEBUG("test55");
+    // _mainDeletionQueue.push_function([=]() {
+	// 	vmaDestroyBuffer(_allocator, AG._vertexBuffer._buffer, AG._vertexBuffer._allocation);
+	// });
 
-	vmaDestroyBuffer(_allocator, stagingBuffer._buffer, stagingBuffer._allocation);
+	// vmaDestroyBuffer(_allocator, stagingBuffer._buffer, stagingBuffer._allocation);
 
-    AGPushConstants testConstants;
+    // AGPushConstants testConstants;
 
-            testConstants.colourModification = {1.0f,0.0f,0.0f,0.0f,0.0f,1.0f,0.0f,0.0f,0.0f,0.0f,1.0f,0.0f,0.0f,0.0f,0.0f,0.0f}; // black
-            testConstants.transformation = {1.0
-            ,0.0,0.0,0.0,0.0,
-                                        1.0
-            ,0.0,0.0,0.0,0.0,
-                                        1.0
-            ,0.0,0.0,0.0,0.0,
-                                        0.0
-            };
-            testConstants.movement = {0.0,0.0,0.0};
+    //         testConstants.colourModification = {1.0f,0.0f,0.0f,0.0f,0.0f,1.0f,0.0f,0.0f,0.0f,0.0f,1.0f,0.0f,0.0f,0.0f,0.0f,0.0f}; // black
+    //         testConstants.transformation = {1.0
+    //         ,0.0,0.0,0.0,0.0,
+    //                                     1.0
+    //         ,0.0,0.0,0.0,0.0,
+    //                                     1.0
+    //         ,0.0,0.0,0.0,0.0,
+    //                                     0.0
+    //         };
+    //         testConstants.movement = {0.0,0.0,0.0};
 
-            MKTAG * testObject = &AG;
+    //         MKTAG * testObject = &AG;
 
-            vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _AGPipeline);
+    // DEBUG("test66");
+    //         vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _AGPipeline);
 
-            VkDeviceSize offset = 0;
+    //         VkDeviceSize offset = 0;
 
-            vkCmdBindVertexBuffers(cmd, 0, 1, &testObject->_vertexBuffer._buffer, &offset);
+    //         vkCmdBindVertexBuffers(cmd, 0, 1, &testObject->_vertexBuffer._buffer, &offset);
 
-            vkCmdPushConstants(cmd, _AGPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(AGPushConstants), &testConstants);
+    // DEBUG("test77");
+    //         vkCmdPushConstants(cmd, _AGPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(AGPushConstants), &testConstants);
 
-            vkCmdDraw(cmd, testObject->_vertices.size(), 1, 0, 0);
+    //         vkCmdDraw(cmd, testObject->_vertices.size(), 1, 0, 0);
 
-    #endif
+    // #endif
 	for (int i = 0; i < count; i++)
 	{
         if(first[i].isVisible)
@@ -1367,9 +1443,9 @@ void VentumEngine::draw_AG(VkCommandBuffer cmd,sub2MAKiT* first, int count)
 
             VkDeviceSize offset = 0;
 
-            vkCmdBindVertexBuffers(cmd, 0, 1, &object->_vertexBuffer._buffer, &offset);
-
             vkCmdPushConstants(cmd, _AGPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(AGPushConstants), &constants);
+
+            vkCmdBindVertexBuffers(cmd, 0, 1, &object->_vertexBuffer._buffer, &offset);
 
             vkCmdDraw(cmd, object->_vertices.size(), 1, 0, 0);
         }
