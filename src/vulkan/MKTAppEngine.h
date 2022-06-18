@@ -115,7 +115,7 @@ public:
     bool _isInitialized{false};
     int _frameNumber {0};
 
-    VkExtent2D _windowExtent {1738, 972};
+    VkExtent2D _windowExtent {1700, 800};
 
     struct SDL_Window* _window{nullptr};
 
@@ -207,6 +207,8 @@ public:
     Material AGMaterial;
     
     void immediate_submit(std::function<void(VkCommandBuffer cmd)>&& function);
+
+    float CBT; // current bar transformation
 
 private:
 

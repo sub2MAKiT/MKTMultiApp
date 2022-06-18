@@ -127,13 +127,12 @@ void VentumEngine::draw() {
 
 //#00ff00
 //#00ff00
-    // drawMenu(cmd,Modules, sizeOfModules);
-
     if(_selectedShader%2==1)
 	    draw_objects(cmd, _renderables.data(), _renderables.size());
     else
         draw_AG(cmd,  _AGA.data(),  _AGA.size());
 
+    drawMenu(cmd,Modules, sizeOfModules);
 //#00ff00
 //#00ff00
 
@@ -214,12 +213,27 @@ void VentumEngine::run() {
                 else if(e.key.keysym.sym == SDLK_SPACE)
                     _selectedShader++;
                 else if(e.key.keysym.sym == SDLK_q)
-                    currentObjectToDraw++;
+                    CBT++;
                 else if(e.key.keysym.sym == SDLK_e)
                     isVisible -= (isVisible*2-1);
             }
+            else if(e.type == SDL_MOUSEWHEEL)
+                 if(e.wheel.y > 0)
+                {
+                     CBT += 0.01;
+                }
+                else if(e.wheel.y < 0)
+                {
+                     CBT -= 0.01;
+                }
+            else if(e.type == SDL_MOUSEBUTTONDOWN)
+                if(e.button.button == SDL_BUTTON_LEFT)
+                    printf("is it a float %f or an int %d",e.button.x,e.button.x);
+                
+
             if(currentObjectToDraw > 2)
                 currentObjectToDraw = 0;
+
             // for(int i = 0; i < _AGA.size();i++)
             // {
                 // printf("\nobject number %d, is visible %d, movement %f %f %f, size %f %f %f %f",_AGA[i].isVisible,_AGA[i].AGPC.movement[0],_AGA[i].AGPC.movement[1],_AGA[i].AGPC.movement[2],_AGA[i].AGPC.transformation[0],_AGA[i].AGPC.transformation.value,_AGA[i].AGPC.transformation[10],_AGA[i].AGPC.transformation[15]);
@@ -428,62 +442,6 @@ void VentumEngine::init_default_renderpass()
 	render_pass_info.pSubpasses = &subpass;
 	render_pass_info.dependencyCount = 2;
 	render_pass_info.pDependencies = dependencies;
-
-    // 2D RENDER PASS ------------------------------
-
-    // VkAttachmentDescription AGcolor_attachment = {};
-    // AGcolor_attachment.format = _swapchainImageFormat;
-    // AGcolor_attachment.samples = VK_SAMPLE_COUNT_1_BIT;
-    // AGcolor_attachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-    // AGcolor_attachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-    // AGcolor_attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-    // AGcolor_attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    // AGcolor_attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    // AGcolor_attachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-
-    // VkAttachmentReference color_attachment_ref = {};
-
-    // color_attachment_ref.attachment = 0;
-    // color_attachment_ref.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-
-    // VkAttachmentDescription depth_attachment = {};
-    // depth_attachment.flags = 0;
-    // depth_attachment.format = _depthFormat;
-    // depth_attachment.samples = VK_SAMPLE_COUNT_1_BIT;
-    // depth_attachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-    // depth_attachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-    // depth_attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-    // depth_attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    // depth_attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    // depth_attachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-
-    // VkAttachmentReference depth_attachment_ref = {};
-    // depth_attachment_ref.attachment = 1;
-    // depth_attachment_ref.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-
-    // VkSubpassDependency depth_dependency = {};
-    // depth_dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
-    // depth_dependency.dstSubpass = 0;
-    // depth_dependency.srcStageMask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
-    // depth_dependency.srcAccessMask = 0;
-    // depth_dependency.dstStageMask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
-    // depth_dependency.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-
-    // VkSubpassDescription subpass = {};
-    // subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-    // subpass.colorAttachmentCount = 1;
-    // subpass.pColorAttachments = &color_attachment_ref;
-
-    // subpass.pDepthStencilAttachment = &depth_attachment_ref;
-
-    // VkAttachmentDescription attachments[2] = { color_attachment,depth_attachment };
-
-    // VkRenderPassCreateInfo render_pass_info = {};
-    // render_pass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-    // render_pass_info.attachmentCount = 2;
-	// render_pass_info.pAttachments = attachments;
-    // render_pass_info.subpassCount = 1;
-	// render_pass_info.pSubpasses = &subpass;
 
     VK_CHECK(vkCreateRenderPass(_device, &render_pass_info, nullptr, &_renderPass));
 
@@ -885,6 +843,8 @@ void VentumEngine::loadMenuAG()
     // 16;
     // #endif
 
+    CBT = 0.0;
+
     FILE *MKTFILE;
     MKTFILE = fopen( "./lib/libraryList.MKTI", "rb" );
     char *charArray;
@@ -898,7 +858,7 @@ void VentumEngine::loadMenuAG()
         sizeOfFile = fread( charArray,1, sizeOfFile, MKTFILE );
         fclose( MKTFILE );
     } else {
-        // error file couldn't open
+        // error file couldn't openprintf
     }
     int moduleNumber = 0;
     DEBUG("Read the Icon AG2");
@@ -925,6 +885,24 @@ void VentumEngine::loadMenuAG()
                 MKTAGName[sizeOfName+12+a] = fileNames[a+12];
                 printf("\nlast: %s\n",MKTAGName);
             Modules[moduleNumber].icon.AG = arrayGraphicsReader(MKTAGName);
+            // for(int a = 0; a < 3;a++)
+                // Modules[moduleNumber].icon.AG._vertices[a].color = {1.0,1.0,1.0};
+            AGPushConstants DEFAULTconstants;
+            DEFAULTconstants.colourModification = {1.0f,0.0f,0.0f,0.0f,0.0f,1.0f,0.0f,0.0f,0.0f,0.0f,1.0f,0.0f,0.0f,0.0f,0.0f,1.0f}; // black
+            float ratio = _windowExtent.width;
+            ratio /= _windowExtent.height;
+            DEFAULTconstants.transformation = {0.05/ratio
+            ,0.0,0.0,0.0,0.0,
+                                        0.05
+            ,0.0,0.0,0.0,0.0,
+                                        0.0
+            ,0.0,0.0,0.0,0.0,
+                                        0.0
+            };
+
+            DEFAULTconstants.movement = {0.0-((_windowExtent.width*0.98)/_windowExtent.width),0.0-((_windowExtent.height*0.95)/_windowExtent.height),0.0};
+            Modules[moduleNumber].icon.isVisible = 1;
+            Modules[moduleNumber].icon.AGPC = DEFAULTconstants;
             moduleNumber++;
             free(MKTAGName);
         }
@@ -963,13 +941,33 @@ void VentumEngine::init_scene()
     AGconstants.movement = {0.0,0.0,0.0};
 
     // const char * defaultName = "defaultName";
+    AGPushConstants BLconstants;
+    float ratio = _windowExtent.width;
+    ratio /= _windowExtent.height;
+    BLconstants.transformation = {0.05/ratio
+            ,0.0,0.0,0.0,0.0,
+                                        0.004
+            ,0.0,0.0,0.0,0.0,
+                                        0.0
+            ,0.0,0.0,0.0,0.0,
+                                        0.0};
 
+            
 
+    BLconstants.colourModification = {1.0,0.0,0.0,0.0,
+                                    0.0,1.0,0.0,0.0,
+                                    0.0,0.0,1.0,0.0,
+                                    0.0,0.0,0.0,1.0};
+
+    BLconstants.movement = {0.0-((_windowExtent.width*0.98)/_windowExtent.width),0.0-((_windowExtent.height*0.95)/_windowExtent.height),0.0};;
+    
 
     for(int i = 0; i < _TAGA.size();i++)
     {
         _AGA.push_back({_TAGA[i],AGconstants,1});//,&AGMaterial
     }
+    _AGA[0].AGPC = BLconstants;
+    _AGA[0].isVisible = 0;
 	for (int x = -20; x <= 20; x++) {
 		for (int y = -20; y <= 20; y++) {
 
@@ -1290,46 +1288,39 @@ Mesh* VentumEngine::get_mesh(const std::string& name)
 
 void VentumEngine::drawMenu(VkCommandBuffer cmd,GL * menuStuff, size_t sizeOfMenuStuff)
 {
-	for (int i = 0; i < sizeOfMenuStuff; i++)
+	for (int i = 0; i < sizeOfMenuStuff; i++) // make it less than 18 lines per draw
 	{
         if(Modules[i].icon.isVisible)
         {
-//             struct AGPushConstants {
-//     glm::mat4 colourModification;
-//     glm::mat4 transformation;
-//     glm::vec3 movement;
-// };
-            int ratio = _windowExtent.width/_windowExtent.height;
-            AGPushConstants constants;
-            constants.colourModification = {0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f}; // black
-            constants.transformation = {0.05
-            ,0.0,0.0,0.0,0.0,
-                                        0.05*ratio
-            ,0.0,0.0,0.0,0.0,
-                                        0.0
-            ,0.0,0.0,0.0,0.0,
-                                        0.0
-            };
+            vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _AGPipeline);
 
+            Modules[i].icon.AGPC.movement.y = CBT+i/20;
 
+            VkDeviceSize offset = 0;
+            vkCmdBindVertexBuffers(cmd, 0, 1, &Modules[i].icon.AG._vertexBuffer._buffer, &offset);
 
-            MKTAG * object = &Modules[i].icon.AG;
+            vkCmdPushConstants(cmd, _AGPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(AGPushConstants), &Modules[i].icon.AGPC);
+
+            vkCmdDraw(cmd, Modules[i].icon.AG._vertices.size(), 1, 0, 0);
+        }
+    }
+
+    for(int i = 0; i < sizeOfMenuStuff+1;i++) // make it less than 18 lines per draw
+    { 
+        if(Modules[i].icon.isVisible) {
 
             vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _AGPipeline);
 
             VkDeviceSize offset = 0;
-            vkCmdBindVertexBuffers(cmd, 0, 1, &object->_vertexBuffer._buffer, &offset);
+            vkCmdBindVertexBuffers(cmd, 0, 1, &_AGA[BLACKLINE_ID].AG._vertexBuffer._buffer, &offset);
 
-            vkCmdPushConstants(cmd, _AGPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(AGPushConstants), &constants);
+            AGPushConstants BLC = _AGA[0].AGPC;
 
-            vkCmdDraw(cmd, object->_vertices.size(), 1, 0, 0);
-        }
-    }
+            BLC.movement.y = CBT+i/20;
+            
+            vkCmdPushConstants(cmd, _AGPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(AGPushConstants), &BLC);
 
-    for(int i = 0; i < sizeOfMenuStuff;i++)
-    { 
-        if(Modules[i].icon.isVisible) {
-
+            vkCmdDraw(cmd, _AGA[BLACKLINE_ID].AG._vertices.size(), 1, 0, 0);
         }
     }
 
@@ -1337,99 +1328,6 @@ void VentumEngine::drawMenu(VkCommandBuffer cmd,GL * menuStuff, size_t sizeOfMen
 
 void VentumEngine::draw_AG(VkCommandBuffer cmd,sub2MAKiT* first, int count)
 {
-    // #ifdef MKT_DEBUG
-   
-    // MKTAG AG; AG._vertices.resize(3);
-    // AG._vertices[0].position=
-    // {0.4,0.4,0.5};AG._vertices[0].color={1.0,1.0
-    // ,0.0};AG._vertices[1].position={-0.4,//i do love me some square code
-    // -0.4,0.4};AG._vertices[1].color={1.0,1.0,0.0};
-    // AG._vertices[2].position={0.4,-0.4,0.5};
-    // AG._vertices[2].color={1.0,1.0,0.0};
-    // const size_t bufferSize= AG._vertices.size();
-	// VkBufferCreateInfo stagingBufferInfo = {};
-	// stagingBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-	// stagingBufferInfo.pNext = nullptr;stagingBufferInfo.size = bufferSize;
-	// stagingBufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
-	// VmaAllocationCreateInfo vmaallocInfo = {};
-	// vmaallocInfo.usage = VMA_MEMORY_USAGE_CPU_ONLY;
-
-	// AllocatedBuffer stagingBuffer;
-    // DEBUG("test11");
-
-	// VK_CHECK(vmaCreateBuffer(_allocator, &stagingBufferInfo, &vmaallocInfo,
-	// 	&stagingBuffer._buffer,
-	// 	&stagingBuffer._allocation,
-	// 	nullptr));
-
-    // DEBUG("test22");
-	// void* data;
-	// vmaMapMemory(_allocator, stagingBuffer._allocation, &data);
-
-	// memcpy(data, AG._vertices.data(), AG._vertices.size() * sizeof(MKTAGA));
-
-    // DEBUG("test33");
-
-	// vmaUnmapMemory(_allocator, stagingBuffer._allocation);
-
-
-	// VkBufferCreateInfo vertexBufferInfo = {};
-	// vertexBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-	// vertexBufferInfo.pNext = nullptr;
-	// vertexBufferInfo.size = bufferSize;
-	// vertexBufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
-
-	// vmaallocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
-
-    // DEBUG("test44");
-	// VK_CHECK(vmaCreateBuffer(_allocator, &vertexBufferInfo, &vmaallocInfo,
-	// 	&AG._vertexBuffer._buffer,
-	// 	&AG._vertexBuffer._allocation,
-	// 	nullptr));
-
-	// immediate_submit([=](VkCommandBuffer cmd) {
-	// 	VkBufferCopy copy;
-	// 	copy.dstOffset = 0;
-	// 	copy.srcOffset = 0;
-	// 	copy.size = bufferSize;
-	// 	vkCmdCopyBuffer(cmd, stagingBuffer._buffer, AG._vertexBuffer._buffer, 1, & copy);
-	// });
-
-    // DEBUG("test55");
-    // _mainDeletionQueue.push_function([=]() {
-	// 	vmaDestroyBuffer(_allocator, AG._vertexBuffer._buffer, AG._vertexBuffer._allocation);
-	// });
-
-	// vmaDestroyBuffer(_allocator, stagingBuffer._buffer, stagingBuffer._allocation);
-
-    // AGPushConstants testConstants;
-
-    //         testConstants.colourModification = {1.0f,0.0f,0.0f,0.0f,0.0f,1.0f,0.0f,0.0f,0.0f,0.0f,1.0f,0.0f,0.0f,0.0f,0.0f,0.0f}; // black
-    //         testConstants.transformation = {1.0
-    //         ,0.0,0.0,0.0,0.0,
-    //                                     1.0
-    //         ,0.0,0.0,0.0,0.0,
-    //                                     1.0
-    //         ,0.0,0.0,0.0,0.0,
-    //                                     0.0
-    //         };
-    //         testConstants.movement = {0.0,0.0,0.0};
-
-    //         MKTAG * testObject = &AG;
-
-    // DEBUG("test66");
-    //         vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _AGPipeline);
-
-    //         VkDeviceSize offset = 0;
-
-    //         vkCmdBindVertexBuffers(cmd, 0, 1, &testObject->_vertexBuffer._buffer, &offset);
-
-    // DEBUG("test77");
-    //         vkCmdPushConstants(cmd, _AGPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(AGPushConstants), &testConstants);
-
-    //         vkCmdDraw(cmd, testObject->_vertices.size(), 1, 0, 0);
-
-    // #endif
 	for (int i = 0; i < count; i++)
 	{
         if(first[i].isVisible)
