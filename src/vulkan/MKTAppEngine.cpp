@@ -4,13 +4,11 @@
 #include <VulkanMA/vk_mem_alloc.h>
 #include "../DEBUG.h"
 
-#define add_AG(x,y) \
-{\
-    _HexAg = arrayGraphicsReader("./graphics/ArrayGraphics/" x ".MKTAG");\
-    _TAGA.push_back(_HexAg);\
-    upload_AG(_TAGA[_TAGA.size()-1]);\
-    y = _TAGA.size()-1;\
-}
+// Some basig graphics:
+
+#define BLACKLINE_ID 0
+#define MENUARRAYGRAPHIC 4
+#define MENULINEHORIZONTAL 5
 
 #define VK_CHECK(x)                                             \
 do                                                              \
@@ -57,6 +55,8 @@ void VentumEngine::init() {
     load_meshes(); //#0000ff
 
     load_AG(); //#0000ff
+
+    loadMenuAG();
 
     init_scene(); //#0000ff
 
@@ -127,6 +127,7 @@ void VentumEngine::draw() {
 
 //#00ff00
 //#00ff00
+    // drawMenu(cmd,Modules, sizeOfModules);
 
     if(_selectedShader%2==1)
 	    draw_objects(cmd, _renderables.data(), _renderables.size());
@@ -219,11 +220,10 @@ void VentumEngine::run() {
             }
             if(currentObjectToDraw > 2)
                 currentObjectToDraw = 0;
-            _AGA[currentObjectToDraw].AGPC.transformation[0].x = xSize;
-            _AGA[currentObjectToDraw].AGPC.transformation[1].y = ySize;
-            _AGA[currentObjectToDraw].AGPC.movement.x = xMove;
-            _AGA[currentObjectToDraw].AGPC.movement.y = yMove;
-            _AGA[currentObjectToDraw].isVisible = isVisible;
+            // for(int i = 0; i < _AGA.size();i++)
+            // {
+                // printf("\nobject number %d, is visible %d, movement %f %f %f, size %f %f %f %f",_AGA[i].isVisible,_AGA[i].AGPC.movement[0],_AGA[i].AGPC.movement[1],_AGA[i].AGPC.movement[2],_AGA[i].AGPC.transformation[0],_AGA[i].AGPC.transformation.value,_AGA[i].AGPC.transformation[10],_AGA[i].AGPC.transformation[15]);
+            // }
         }
     }
     DEBUG("III ran III");
@@ -411,7 +411,7 @@ void VentumEngine::init_default_renderpass()
     VkRenderPassCreateInfo render_pass_info = {};
     render_pass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
     render_pass_info.attachmentCount = 2;
-	render_pass_info.pAttachments = &attachments[0];
+	render_pass_info.pAttachments = attachments;
     render_pass_info.subpassCount = 1;
 	render_pass_info.pSubpasses = &subpass;
 
@@ -430,7 +430,7 @@ void VentumEngine::init_framebuffers()
 	fb_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
 	fb_info.pNext = nullptr;
 
-	fb_info.renderPass = _renderPass;
+	fb_info.renderPass = _renderPass; // this failes, time to fix it #ff0000
 	fb_info.attachmentCount = 1;
 	fb_info.width = _windowExtent.width;
 	fb_info.height = _windowExtent.height;
@@ -439,8 +439,8 @@ void VentumEngine::init_framebuffers()
     const uint32_t swapchain_imagecount = _swapchainImages.size();
 	_framebuffers = std::vector<VkFramebuffer>(swapchain_imagecount);
 
-    for (int i = 0; i < swapchain_imagecount; i++) {
-
+    for (int i = 0; i < swapchain_imagecount; i++) 
+    {
         VkImageView attachments[2];
 		attachments[0] = _swapchainImageViews[i];
 	    attachments[1] = _depthImageView;
@@ -760,16 +760,109 @@ void VentumEngine::load_AG()
 {
     DEBUG("started loading AG");
 
-    add_AG("menuArrayGraphic",ID_AG_BACKGROUND);
-    
-    add_AG("line",ID_AG_LINE_BACKGROUND);
+    FILE * MKTFILE = fopen("./graphics/ArrayGraphics/00_DEFAULT_AG.MKTI","rb");
 
-    add_AG("generated",ID_AG_TESTING_SHAPE);
+    const char fileNames[32] = "./graphics/ArrayGraphics/.MKTAG";
 
-    // add_AG("triangle");
+    if(MKTFILE != NULL)
+    {
+        fseek(MKTFILE, 0L, SEEK_END);
+        size_t fileSize = ftell(MKTFILE);
+        rewind(MKTFILE);
+        char * charArray = (char*)malloc(fileSize);
+        fread( charArray,1, fileSize, MKTFILE );
+        fclose( MKTFILE );
+
+        for(int i = 0; i < fileSize; i++)
+        {
+            if(charArray[i-1] == '\n' && charArray[i] != '{')
+            {
+                int sizeOfName = 0;
+                char * MKTAGName;
+                for(0; charArray[i+sizeOfName] != '\n'&& sizeOfName <= fileSize-i;sizeOfName++)0;
+                sizeOfName++;
+                MKTAGName = (char*)malloc(sizeOfName+30);
+                for(int a = 0; a < sizeOfName;a++)
+                    MKTAGName[a+25] = charArray[i+a];
+                for(int a = 0; a < 25;a++)
+                    MKTAGName[a] = fileNames[a];
+                for(int a = 0; a < 7;a++)
+                    MKTAGName[sizeOfName+a-2+25] = fileNames[a+25];
+
+                if(DEBUG("Loaded an AG: "))
+                    printf("%s\n",MKTAGName);
+                _HexAg = arrayGraphicsReader(MKTAGName);
+                _TAGA.push_back(_HexAg);
+                upload_AG(_TAGA[_TAGA.size()-1]);
+            }
+        }
+    } else {
+        printf("\nCannot find the 00_DEFAULT_AG.MKTI");
+    }
 
     DEBUG("finished loading AG");
+}
 
+void VentumEngine::loadMenuAG()
+{
+    const char fileNames[19] = "./lib/icons/.MKTAG";
+
+
+    // #ifdef _WIN32
+    // 15;
+    // #elif __gnu_linux__
+    // 16;
+    // #endif
+
+    FILE *MKTFILE;
+    MKTFILE = fopen( "./lib/libraryList.MKTI", "rb" );
+    char *charArray;
+    long sizeOfFile;
+    if( MKTFILE != NULL )
+    {
+        fseek(MKTFILE, 0L, SEEK_END);
+        sizeOfFile = ftell(MKTFILE);
+        rewind(MKTFILE);
+        charArray = (char*)malloc(sizeOfFile);
+        sizeOfFile = fread( charArray,1, sizeOfFile, MKTFILE );
+        fclose( MKTFILE );
+    } else {
+        // error file couldn't open
+    }
+    int moduleNumber = 0;
+    DEBUG("Read the Icon AG2");
+    for(int i = 1; i < sizeOfFile;i++)
+    {
+        if(charArray[i-1] == '\n' && charArray[i] != '{')
+        {
+        DEBUG("Read the Icon AG3");
+            char * MKTAGName;
+            size_t sizeOfName = 0;
+        DEBUG("Read the Icon AG4");
+        for(0; charArray[i+sizeOfName] != '\n' && i+sizeOfName < sizeOfFile;sizeOfName++)printf("\nbut why thought %d",sizeOfName);
+        DEBUG("Read the Icon AG4");
+            MKTAGName = (char*)malloc(sizeOfName+19);
+        DEBUG("Read the Icon AG4");
+                printf("\nlast1: %s\n",MKTAGName);
+            for(int a = 0; a < sizeOfName;a++)
+                MKTAGName[a+12] = charArray[a+i];
+                printf("\nlast2: %s\n",MKTAGName);
+            for(int a = 0; a < 12;a++)
+                MKTAGName[a] = fileNames[a];
+                printf("\nlast3: %s\n",MKTAGName);
+            for(int a = 0; a < 7;a++)
+                MKTAGName[sizeOfName+12+a] = fileNames[a+12];
+                printf("\nlast: %s\n",MKTAGName);
+            Modules[moduleNumber].icon.AG = arrayGraphicsReader(MKTAGName);
+            moduleNumber++;
+            free(MKTAGName);
+        }
+    }
+    if(moduleNumber != sizeOfModules)
+        0; // error, list of modules was changed whilst loading AGs
+    DEBUG("Read the Icon AG");
+    upload_AG(Modules[moduleNumber-1].icon.AG);
+    DEBUG("Loaded an Icon AG");
 }
 
 void VentumEngine::init_scene()
@@ -798,9 +891,14 @@ void VentumEngine::init_scene()
 
     AGconstants.movement = {0.0,0.0,0.0};
 
-    for(int i = 0; i < _TAGA.size();i++)
-        _AGA.push_back({_TAGA[i],AGconstants,1});//,&AGMaterial
+    // const char * defaultName = "defaultName";
 
+
+
+    for(int i = 0; i < _TAGA.size();i++)
+    {
+        _AGA.push_back({_TAGA[i],AGconstants,1});//,&AGMaterial
+    }
 	for (int x = -20; x <= 20; x++) {
 		for (int y = -20; y <= 20; y++) {
 
@@ -882,10 +980,6 @@ void VentumEngine::init_descriptors()
 
 		vkUpdateDescriptorSets(_device, 1, &setWrite, 0, nullptr);
 	}
-
-    _mainDeletionQueue.push_function([&]() {
-		vkDestroyDescriptorSetLayout(_device, _globalSetLayout, nullptr);
-	});
 
     _mainDeletionQueue.push_function([&]() {
 		vkDestroyDescriptorSetLayout(_device, _globalSetLayout, nullptr);
@@ -977,7 +1071,7 @@ VkPipeline PipelineBuilder::build_pipeline(VkDevice device, VkRenderPass pass)
 
 void VentumEngine::upload_AG(MKTAG& AG)
 {
-    const size_t bufferSize= AG._vertices.size() * sizeof(MKTAGA);
+    const size_t bufferSize= AG._vertices.size();
 	VkBufferCreateInfo stagingBufferInfo = {};
 	stagingBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 	stagingBufferInfo.pNext = nullptr;
@@ -989,16 +1083,20 @@ void VentumEngine::upload_AG(MKTAG& AG)
 	vmaallocInfo.usage = VMA_MEMORY_USAGE_CPU_ONLY;
 
 	AllocatedBuffer stagingBuffer;
+    DEBUG("test1");
 
 	VK_CHECK(vmaCreateBuffer(_allocator, &stagingBufferInfo, &vmaallocInfo,
 		&stagingBuffer._buffer,
 		&stagingBuffer._allocation,
-		nullptr));	
+		nullptr));
 
+    DEBUG("test2");
 	void* data;
 	vmaMapMemory(_allocator, stagingBuffer._allocation, &data);
 
 	memcpy(data, AG._vertices.data(), AG._vertices.size() * sizeof(MKTAGA));
+
+    DEBUG("test4");
 
 	vmaUnmapMemory(_allocator, stagingBuffer._allocation);
 
@@ -1119,25 +1217,156 @@ Mesh* VentumEngine::get_mesh(const std::string& name)
 	}
 }
 
+void VentumEngine::drawMenu(VkCommandBuffer cmd,GL * menuStuff, size_t sizeOfMenuStuff)
+{
+	for (int i = 0; i < sizeOfMenuStuff; i++)
+	{
+        if(Modules[i].icon.isVisible)
+        {
+//             struct AGPushConstants {
+//     glm::mat4 colourModification;
+//     glm::mat4 transformation;
+//     glm::vec3 movement;
+// };
+            int ratio = _windowExtent.width/_windowExtent.height;
+            AGPushConstants constants;
+            constants.colourModification = {0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f}; // black
+            constants.transformation = {0.05
+            ,0.0,0.0,0.0,0.0,
+                                        0.05*ratio
+            ,0.0,0.0,0.0,0.0,
+                                        0.0
+            ,0.0,0.0,0.0,0.0,
+                                        0.0
+            };
+
+
+
+            MKTAG * object = &Modules[i].icon.AG;
+
+            vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _AGPipeline);
+
+            VkDeviceSize offset = 0;
+            vkCmdBindVertexBuffers(cmd, 0, 1, &object->_vertexBuffer._buffer, &offset);
+
+            vkCmdPushConstants(cmd, _AGPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(AGPushConstants), &constants);
+
+            vkCmdDraw(cmd, object->_vertices.size(), 1, 0, 0);
+        }
+    }
+
+    for(int i = 0; i < sizeOfMenuStuff;i++)
+    { 
+        if(Modules[i].icon.isVisible) {
+
+        }
+    }
+
+}
+
 void VentumEngine::draw_AG(VkCommandBuffer cmd,sub2MAKiT* first, int count)
 {
+    #ifdef MKT_DEBUGA
+   
+    MKTAG AG;AG._vertices[0].position=
+    {1.0,1.0,0.0};AG._vertices[0].color={1.0,1.0
+    ,0.0};AG._vertices[1].position={-1.0,//i do love me some square code
+    -1.0,0.0};AG._vertices[1].color={1.0,1.0,0.0};
+    AG._vertices[2].position={1.0,-1.0,0.0};
+    AG._vertices[2].color={1.0,1.0,0.0};
+    const size_t bufferSize= AG._vertices.size();
+	VkBufferCreateInfo stagingBufferInfo = {};
+	stagingBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+	stagingBufferInfo.pNext = nullptr;stagingBufferInfo.size = bufferSize;
+	stagingBufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+	VmaAllocationCreateInfo vmaallocInfo = {};
+	vmaallocInfo.usage = VMA_MEMORY_USAGE_CPU_ONLY;
 
-	Mesh* lastAG = nullptr;
+	AllocatedBuffer stagingBuffer;
+    DEBUG("test1");
+
+	VK_CHECK(vmaCreateBuffer(_allocator, &stagingBufferInfo, &vmaallocInfo,
+		&stagingBuffer._buffer,
+		&stagingBuffer._allocation,
+		nullptr));
+
+    DEBUG("test2");
+	void* data;
+	vmaMapMemory(_allocator, stagingBuffer._allocation, &data);
+
+	memcpy(data, AG._vertices.data(), AG._vertices.size() * sizeof(MKTAGA));
+
+    DEBUG("test4");
+
+	vmaUnmapMemory(_allocator, stagingBuffer._allocation);
+
+
+	VkBufferCreateInfo vertexBufferInfo = {};
+	vertexBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+	vertexBufferInfo.pNext = nullptr;
+	vertexBufferInfo.size = bufferSize;
+	vertexBufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+
+	vmaallocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
+
+	VK_CHECK(vmaCreateBuffer(_allocator, &vertexBufferInfo, &vmaallocInfo,
+		&AG._vertexBuffer._buffer,
+		&AG._vertexBuffer._allocation,
+		nullptr));
+
+	immediate_submit([=](VkCommandBuffer cmd) {
+		VkBufferCopy copy;
+		copy.dstOffset = 0;
+		copy.srcOffset = 0;
+		copy.size = bufferSize;
+		vkCmdCopyBuffer(cmd, stagingBuffer._buffer, AG._vertexBuffer._buffer, 1, & copy);
+	});
+
+    _mainDeletionQueue.push_function([=]() {
+		vmaDestroyBuffer(_allocator, AG._vertexBuffer._buffer, AG._vertexBuffer._allocation);
+	});
+
+	vmaDestroyBuffer(_allocator, stagingBuffer._buffer, stagingBuffer._allocation);
+
+    AGPushConstants testConstants;
+
+            testConstants.colourModification = {1.0f,0.0f,0.0f,0.0f,0.0f,1.0f,0.0f,0.0f,0.0f,0.0f,1.0f,0.0f,0.0f,0.0f,0.0f,0.0f}; // black
+            testConstants.transformation = {1.0
+            ,0.0,0.0,0.0,0.0,
+                                        1.0
+            ,0.0,0.0,0.0,0.0,
+                                        1.0
+            ,0.0,0.0,0.0,0.0,
+                                        0.0
+            };
+            testConstants.movement = {0.0,0.0,0.0};
+
+            MKTAG * testObject = &AG;
+
+            vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _AGPipeline);
+
+            VkDeviceSize offset = 0;
+
+            vkCmdBindVertexBuffers(cmd, 0, 1, &testObject->_vertexBuffer._buffer, &offset);
+
+            vkCmdPushConstants(cmd, _AGPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(AGPushConstants), &testConstants);
+
+            vkCmdDraw(cmd, testObject->_vertices.size(), 1, 0, 0);
+
+    #endif
 	for (int i = 0; i < count; i++)
 	{
         if(first[i].isVisible)
         {
             AGPushConstants constants = first[i].AGPC;
-
             MKTAG * object = &first[i].AG;
-
-            AGMaterial = {_AGPipeline,_AGPipelineLayout};
 
             vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _AGPipeline);
 
-            // vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, first[i].material->pipelineLayout, 0, 1, &get_current_frame().globalDescriptor, 0, nullptr);
+            // vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _AGPipelineLayout, 0, 1, &get_current_frame().globalDescriptor, 0, nullptr);
 
             VkDeviceSize offset = 0;
+
             vkCmdBindVertexBuffers(cmd, 0, 1, &object->_vertexBuffer._buffer, &offset);
 
             vkCmdPushConstants(cmd, _AGPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(AGPushConstants), &constants);

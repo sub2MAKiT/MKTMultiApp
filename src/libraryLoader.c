@@ -13,7 +13,7 @@ char * windowsDLLLoading()
     FILE *MKTFILE;
     char * notLoaded = (char*)malloc(1);
     size_t sizeOfNotLoaded = 0;
-    MKTFILE = fopen( "./lib/libraryList", "rb" );
+    MKTFILE = fopen( "./lib/libraryList.MKTI", "rb" );
     if( MKTFILE != NULL )
     {
         char *charArray;
@@ -40,7 +40,6 @@ char * windowsDLLLoading()
                     FFP[a+librariesPathLength] = charArray[i+a];
 
                 const char extension[5] = ".dll";
-
                 sizeOfFP += 4;
 
                 FFP = (char*)realloc(FFP,sizeOfFP);
@@ -60,6 +59,7 @@ char * windowsDLLLoading()
                         notLoaded[sizeOfNotLoaded-(librariesPathLength+sizeOfFP)+a-1] = FFP[a];
                 } else {
                     Shmodules++;
+                    Modules = (GL*)realloc(Modules,sizeof(GL)*Shmodules);
                     hmodules = (FUNHANDLE*)realloc(hmodules,sizeof(FUNHANDLE) * Shmodules);
                     hmodules[Shmodules-1] = hLib;
                 }
@@ -87,7 +87,7 @@ void * getEntryAddress(FUNHANDLE libraryToLoad)
     FILE *MKTFILE;
     char * notLoaded = (char*)malloc(1);
     size_t sizeOfNotLoaded = 0;
-    MKTFILE = fopen( "./lib/libraryList", "rb" );
+    MKTFILE = fopen( "./lib/libraryList.MKTI", "rb" );
     if( MKTFILE != NULL )
     {
         char *charArray;
@@ -113,7 +113,15 @@ void * getEntryAddress(FUNHANDLE libraryToLoad)
                 for(int a = 0; a < sizeOfFP; a++)
                     FFP[a+librariesPathLength] = charArray[i+a];
 
-                const char extension[4] = ".os";
+                char*TFFP=(char*)malloc(sizeOfFP);
+                for(int a = 0; a < sizeOfFP;a++)
+                    TFFP[a] = FFP[a+librariesPathLength];
+
+                loadMenuAG(TFFP, sizeOfFP,Shmodules);
+
+                free(TFFP);
+
+                const char extension[4] = ".so";
 
                 sizeOfFP += 3;
 

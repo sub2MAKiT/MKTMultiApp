@@ -1,4 +1,5 @@
 #include "MKTarrayGraphics.h"
+#include "../DEBUG.h"
 #ifdef __gnu_linux__
 #include <cstdlib>
 #endif
@@ -12,11 +13,7 @@ MKTAG arrayGraphicsReader(const char * filePath)
 	list = (float*)malloc(sizeOfFile*sizeof(float));
 	fread( list,sizeof(float), sizeOfFile, MKTFILE );
 	fclose( MKTFILE );
-
-
     MKTAG _AG;
-
-
     _AG._vertices.resize(((sizeOfFile/sizeof(float))/3)/2);
 	for(int i = 0; i < sizeOfFile/sizeof(float);i += 6)
 	{

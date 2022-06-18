@@ -4,6 +4,9 @@
 #include "libraryLoader.h"
 #include "cmdMode.h"
 
+GL * Modules = (GL*)malloc(sizeof(GL));
+size_t sizeOfModules;
+
 int main(int argc, char* argv[])
 {
     char cmdMode = checkForCmdMode(argc,argv);
@@ -12,17 +15,13 @@ int main(int argc, char* argv[])
     handleCmdGrapics(cmdMode);
 
     char * notLoaded = loadLibaries;
-    void (**funArray)(void*);
-    funArray = (void(**)(void*))malloc(sizeof(void (*)(void*)));
-    long sizeOfFunArray = 0;
-    for(int i = 0; i < Shmodules;i++)
-    {
-        void * a;
-        sizeOfFunArray++;
-        funArray = (void(**)(void*))realloc(funArray,sizeof(void (*)(void*))*sizeOfFunArray);
-        funArray[sizeOfFunArray-1] = (void(*)(void*))getEntryAddress(hmodules[i]); // so much fun!!!
-        funArray[sizeOfFunArray-1](a);
-    }
+
+    sizeOfModules = Shmodules;
+
+    for(int i = 0; i < sizeOfModules;i++)
+        Modules[i].entry = (void(*)(void*))getEntryAddress(hmodules[i]); // so much fun!!!
+
+        // funArray[sizeOfFunArray-1](a);
     if(cmdMode == 0)
     {
         VentumEngine engine;
@@ -34,7 +33,7 @@ int main(int argc, char* argv[])
         engine.cleanup();
     } else if(cmdMode == 1)
     {
-        MKTMAcmdMode(funArray, sizeOfFunArray);
+        MKTMAcmdMode(Modules, sizeOfModules);
     }
     else if(cmdMode == 2)
         0;

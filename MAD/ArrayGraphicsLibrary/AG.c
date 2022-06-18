@@ -7,7 +7,7 @@ void generateShape();
 void entry(void * ptr)
 {
     FILE *MKTFILE;
-    MKTFILE = fopen( "./lib/libraryList", "rb" );
+    MKTFILE = fopen( "currentMode.MKTI", "rb" );
     char mode;
     if( MKTFILE != NULL )
     {

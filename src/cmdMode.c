@@ -1,11 +1,11 @@
 #define cmdModeDirectInclude
 #include "cmdMode.h"
 
-const char _MKTMA_VERSION[9] = "01.00.00";
+const char _MKTMA_VERSION[9] = "01.01.00";
 
 void handleCmdGrapics(char mode)
 {
-    FILE *MKTDATA = fopen("currentMode", "wb" );       
+    FILE *MKTDATA = fopen("currentMode.MKTI", "wb" );       
     
     fwrite(&mode,1,1,MKTDATA);
 
@@ -28,7 +28,7 @@ char checkForCmdMode(int argc, char ** argv)
     return 0;
 }
 
-void MKTMAcmdMode(void (**funArray)(void*), long sizeOfFunArray)
+void MKTMAcmdMode(GL * modules, long sizeOfFunArray)
 {
     char * command = (char*)malloc(100); // default command buffer
     printf("\nWELCOME TO MKTMULTIAPP CMD MODE:\n");
@@ -46,7 +46,7 @@ void MKTMAcmdMode(void (**funArray)(void*), long sizeOfFunArray)
             _MKTMACMD_copy(command);
         else {
             for(int i = 0; i < sizeOfFunArray;i++)
-                funArray[i]((void*)command);
+                modules[i].entry((void*)command);
         }
 
     } while(!(MKTcompStr(command,"exit")));
@@ -115,7 +115,7 @@ char MKTcompStr(char * charArray, const char * string)
 void _MKTMACMD_help()
 {
     FILE *MKTFILE;
-    MKTFILE = fopen( "./graphics/cmdMode", "rb" ); // ./graphics/cmdMode = comedy
+    MKTFILE = fopen( "./graphics/cmdMode.MKTI", "rb" ); // ./graphics/cmdMode = comedy
     if( MKTFILE != NULL )
     {
         char *charArray;

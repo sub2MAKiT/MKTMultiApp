@@ -116,6 +116,8 @@
         "libraryloader.h": "c",
         "windows.h": "c",
         "libloaderapi.h": "c",
-        "debug.h": "c"
+        "debug.h": "c",
+        "mktarraygraphics.h": "c",
+        "cmdmode.h": "c"
     }
 }

@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "./DEBUG.h"
+#include "./vulkan/MKTAppEngine.h"
+#include "./fileManagment/MKTarrayGraphics.h"
+
+void loadMenuAG(char * MKTAGOGName, size_t sizeOfOGName,int moduleNumber);
 
 #ifndef MKTDYNAMICLIBRARYLOADING // header guard
 #define MKTDYNAMICLIBRARYLOADING
@@ -23,7 +27,7 @@
 #endif // MKTDYNAMICLIBRARYLOADING
 
 #ifndef MKT_DLL_LOADING
-extern long Shmodules;
+extern long Shmodules; //  modules, more like shmodules am i right?
 extern FUNHANDLE * hmodules;
 #ifdef __gnu_linux__
 // for linux

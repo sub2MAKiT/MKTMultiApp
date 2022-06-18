@@ -73,6 +73,8 @@ typedef struct finalToRender{
     MKTAG AG;
     AGPushConstants AGPC;
     char isVisible;
+    // char * name;
+    // size_t sizeOfName;
     // Material* material;
 } sub2MAKiT;
 
@@ -94,9 +96,22 @@ struct UploadContext {
 	VkCommandBuffer _commandBuffer;
 };
 
+typedef struct LoadedModule {
+    sub2MAKiT icon;
+    void (*entry)(void*);
+} GL; // goodLuck
+
+extern GL * Modules;
+extern size_t sizeOfModules;
+
+void addToRenderQueue(int ID);
+void removeFromRenderQueue(int ID);
+
+
 class VentumEngine {
 public:
     
+    void upload_AG(MKTAG& AG);
     bool _isInitialized{false};
     int _frameNumber {0};
 
@@ -176,6 +191,8 @@ public:
     void draw_objects(VkCommandBuffer cmd,RenderObject* first, int count);
 
     void draw_AG(VkCommandBuffer cmd,sub2MAKiT* first, int count);
+
+    void drawMenu(VkCommandBuffer cmd,GL * menuStuff, size_t sizeOfMenuStuff);
     FrameData _frames[FRAME_OVERLAP];
 
     FrameData& get_current_frame();
@@ -188,12 +205,8 @@ public:
     UploadContext _uploadContext;
 
     Material AGMaterial;
-
-    // MAIN ARRAY GRAPHICS
-
-    int ID_AG_BACKGROUND;
-    int ID_AG_LINE_BACKGROUND;
-    int ID_AG_TESTING_SHAPE;
+    
+    void immediate_submit(std::function<void(VkCommandBuffer cmd)>&& function);
 
 private:
 
@@ -217,15 +230,14 @@ private:
 
     void load_AG();
 
-    void upload_mesh(Mesh& mesh);
+    void loadMenuAG();
 
-    void upload_AG(MKTAG& AG);
+    void upload_mesh(Mesh& mesh);
 
     void init_scene();
 
 	void init_descriptors();
 
-    void immediate_submit(std::function<void(VkCommandBuffer cmd)>&& function);
 };
 
 class PipelineBuilder {
