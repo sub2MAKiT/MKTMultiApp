@@ -5,6 +5,7 @@
 #include <deque>
 #include <functional>
 #include <iostream>
+#include "../libraryHeader.h"
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_vulkan.h>
@@ -98,7 +99,7 @@ struct UploadContext {
 
 typedef struct LoadedModule {
     sub2MAKiT icon;
-    void (*entry)(void*);
+    void (*entry)(functionInput);
 } GL; // goodLuck
 
 extern GL * Modules;

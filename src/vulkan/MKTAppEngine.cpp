@@ -1305,7 +1305,7 @@ void VentumEngine::drawMenu(VkCommandBuffer cmd,GL * menuStuff, size_t sizeOfMen
         }
     }
 
-    for(int i = 0; i < sizeOfMenuStuff+1;i++) // make it less than 18 lines per draw
+    for(int i = 0; i < sizeOfMenuStuff+5;i++) // make it less than 18 lines per draw
     { 
         if(Modules[i].icon.isVisible) {
 

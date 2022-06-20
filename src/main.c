@@ -19,7 +19,7 @@ int main(int argc, char* argv[])
     sizeOfModules = Shmodules;
 
     for(int i = 0; i < sizeOfModules;i++)
-        Modules[i].entry = (void(*)(void*))getEntryAddress(hmodules[i]); // so much fun!!!
+        Modules[i].entry = (void(*)(functionInput))getEntryAddress(hmodules[i]); // so much fun!!!
 
         // funArray[sizeOfFunArray-1](a);
     if(cmdMode == 0)
