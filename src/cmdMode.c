@@ -1,7 +1,7 @@
 #define cmdModeDirectInclude
 #include "cmdMode.h"
 
-const char _MKTMA_VERSION[9] = "01.02.00";
+const char _MKTMA_VERSION[9] = "01.02.01";
 
 void handleCmdGrapics(char mode)
 {
@@ -30,6 +30,7 @@ char checkForCmdMode(int argc, char ** argv)
 
 void MKTMAcmdMode(GL * modules, long sizeOfFunArray)
 {
+    funi garbageInput;
     char * command = (char*)malloc(100); // default command buffer
     printf("\nWELCOME TO MKTMULTIAPP CMD MODE:\n");
     do {
@@ -46,7 +47,7 @@ void MKTMAcmdMode(GL * modules, long sizeOfFunArray)
             _MKTMACMD_copy(command);
         else {
             for(int i = 0; i < sizeOfFunArray;i++)
-                modules[i].entry((void*)command);
+                modules[i].entry(garbageInput);
         }
 
     } while(!(MKTcompStr(command,"exit")));

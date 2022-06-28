@@ -6,6 +6,7 @@
 #include <functional>
 #include <iostream>
 #include "../libraryHeader.h"
+#include "../fileManagment/MKTPicture.h"
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_vulkan.h>
@@ -102,6 +103,11 @@ typedef struct LoadedModule {
     void (*entry)(functionInput);
 } GL; // goodLuck
 
+typedef struct vulPic {
+VkImage textureImage;
+VkDeviceMemory textureImageMemory;
+} vPic;
+
 extern GL * Modules;
 extern size_t sizeOfModules;
 
@@ -177,8 +183,11 @@ public:
 
     std::vector<RenderObject> _renderables;
 
+    
+
     std::vector<sub2MAKiT> _AGA;
     std::vector<MKTAG> _TAGA;
+    std::vector<vPic> _pictures;
 
     std::unordered_map<std::string,Material> _materials;
     std::unordered_map<std::string,Mesh> _meshes;
@@ -211,6 +220,12 @@ public:
 
     float CBT; // current bar transformation
 
+    MKTPic testLogo;
+
+    void loading_MKTP_image(MKTPic data);
+
+    uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
+
 private:
 
     void init_vulkan();
@@ -241,6 +256,9 @@ private:
 
 	void init_descriptors();
 
+    VkCommandBuffer beginSingleTimeCommands();
+
+    void endSingleTimeCommands(VkCommandBuffer commandBuffer);
 };
 
 class PipelineBuilder {

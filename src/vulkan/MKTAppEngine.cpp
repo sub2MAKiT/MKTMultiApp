@@ -914,8 +914,116 @@ void VentumEngine::loadMenuAG()
     DEBUG("Loaded an Icon AG");
 }
 
+void VentumEngine::loading_MKTP_image(MKTPic data)
+{
+    int CURRENT_ID = _pictures.size();
+    _pictures.resize(CURRENT_ID+1);
+    void* pixel_ptr = data.pixels;
+	VkDeviceSize imageSize = data.width * data.height * 4;
+
+	VkFormat image_format = VK_FORMAT_R8G8B8A8_SRGB;
+
+	AllocatedBuffer stagingBuffer = create_buffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VMA_MEMORY_USAGE_CPU_ONLY);
+
+	void* data_ptr;
+	vmaMapMemory(_allocator, stagingBuffer._allocation, &data_ptr);
+
+	memcpy(data_ptr, pixel_ptr, static_cast<size_t>(imageSize));
+
+	vmaUnmapMemory(_allocator, stagingBuffer._allocation);
+
+    free(data.pixels); // see? I care about manual memory allocation
+
+    VkImageCreateInfo imageInfo{};
+    imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+    imageInfo.imageType = VK_IMAGE_TYPE_2D;
+    imageInfo.extent.width = static_cast<uint32_t>(data.width);
+    imageInfo.extent.height = static_cast<uint32_t>(data.height);
+    imageInfo.extent.depth = 1;
+    imageInfo.mipLevels = 1;
+    imageInfo.arrayLayers = 1;
+    imageInfo.format = VK_FORMAT_R8G8B8A8_SRGB;
+    imageInfo.tiling = VK_IMAGE_TILING_LINEAR; // or _OPTIMAL, idk, I'm not a developer
+    imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    imageInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+	imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+    imageInfo.flags = 0; // Optional
+
+    if (vkCreateImage(_device, &imageInfo, nullptr, &_pictures[CURRENT_ID].textureImage) != VK_SUCCESS) {
+        // you should implement errors, just saying
+    }
+
+    VkMemoryRequirements memRequirements;
+    vkGetImageMemoryRequirements(_device, _pictures[CURRENT_ID].textureImage, &memRequirements);
+
+    VkMemoryAllocateInfo allocInfo{};
+    allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    allocInfo.allocationSize = memRequirements.size;
+    allocInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+
+    if (vkAllocateMemory(_device, &allocInfo, nullptr, &_pictures[CURRENT_ID].textureImageMemory) != VK_SUCCESS) {
+    // ERROR CHECKING
+    }
+
+    vkBindImageMemory(_device, _pictures[CURRENT_ID].textureImage, _pictures[CURRENT_ID].textureImageMemory, 0);
+
+
+    // some shananigans
+}
+
+// VkCommandBuffer VentumEngine::beginSingleTimeCommands() { #ff00ff
+
+
+//     VkCommandBufferAllocateInfo cmdAllocInfo = vkinit::command_buffer_allocate_info(_frames[0]._commandPool, 1);
+
+//     VK_CHECK(vkAllocateCommandBuffers(_device, &cmdAllocInfo, &_frames[i]._mainCommandBuffer));
+
+//     VkCommandBuffer commandBuffer;
+//     vkAllocateCommandBuffers(_device, &allocInfo, &commandBuffer);
+
+//     VkCommandBufferBeginInfo beginInfo{};
+//     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+//     beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+//     vkBeginCommandBuffer(commandBuffer, &beginInfo);
+
+//     return commandBuffer;
+// }
+
+// void VentumEngine::endSingleTimeCommands(VkCommandBuffer commandBuffer) {
+//     vkEndCommandBuffer(commandBuffer);
+
+//     VkSubmitInfo submitInfo{};
+//     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+//     submitInfo.commandBufferCount = 1;
+//     submitInfo.pCommandBuffers = &commandBuffer;
+
+//     vkQueueSubmit(_graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
+//     vkQueueWaitIdle(_graphicsQueue);
+
+//     vkFreeCommandBuffers(_device, _commandPool, 1, &commandBuffer);
+// } #ff00ff
+
+uint32_t VentumEngine::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) {
+    VkPhysicalDeviceMemoryProperties memProperties;
+    vkGetPhysicalDeviceMemoryProperties(_chosenGPU, &memProperties);
+
+    for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
+    if (typeFilter & (1 << i)) {
+        return i;
+    }
+}
+// error checking would be nice (memory type not found)
+return -1;
+}
+
+    
+
 void VentumEngine::init_scene()
 {
+    testLogo = MKTPicReader("./graphics/MKTPhotos/logo.MKTP");
+
     RenderObject DUCK;
     AGMaterial = {_AGPipeline,_AGPipelineLayout};
 	DUCK.mesh = get_mesh("DUCK");

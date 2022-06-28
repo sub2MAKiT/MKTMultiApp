@@ -118,6 +118,7 @@
         "libloaderapi.h": "c",
         "debug.h": "c",
         "mktarraygraphics.h": "c",
-        "cmdmode.h": "c"
+        "cmdmode.h": "c",
+        "mktpicture.h": "c"
     }
 }
