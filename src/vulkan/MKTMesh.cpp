@@ -60,6 +60,12 @@ VertexInputDescription Vertex::getAG_vertex_description()
     colorAttribute.location = 1;
     colorAttribute.format = VK_FORMAT_R32G32B32_SFLOAT;
     colorAttribute.offset = offsetof(MKTAGA2, color);
+
+    VkVertexInputAttributeDescription texCoorAttribute = {};
+    texCoorAttribute.binding = 0;
+    texCoorAttribute.location = 2;
+    texCoorAttribute.format = VK_FORMAT_R32G32_SFLOAT;
+    texCoorAttribute.offset = offsetof(MKTAGA2, texCoord);
     
     description.attributes.push_back(positionAttribute);
     description.attributes.push_back(colorAttribute);

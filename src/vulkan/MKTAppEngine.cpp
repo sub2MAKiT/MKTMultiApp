@@ -3,6 +3,7 @@
 #define VMA_IMPLEMENTATION
 #include <VulkanMA/vk_mem_alloc.h>
 #include "../DEBUG.h"
+#include "imageHandling.h"
 
 // Some basig graphics:
 
@@ -41,6 +42,10 @@ void VentumEngine::init() {
     init_swapchain(); //#0000ff
 
     init_commands(); //#0000ff
+
+    int why = loading_MKTP_image(MKTPicReader("./graphics/MKTPhotos/logo.MKTP")); // #ff0000
+
+    init_createTextureSampler(); // #0000ff
 
     init_default_renderpass(); //#0000ff
 
@@ -329,13 +334,11 @@ void VentumEngine::init_swapchain() //#0000ff
 
 	vmaCreateImage(_allocator, &dimg_info, &dimg_allocinfo, &_depthImage._image, &_depthImage._allocation, nullptr);
 
-    DEBUG("created an image");
 	VkImageViewCreateInfo dview_info = vkinit::imageview_create_info(_depthFormat, _depthImage._image, VK_IMAGE_ASPECT_DEPTH_BIT);
 
 	VK_CHECK(vkCreateImageView(_device, &dview_info, nullptr, &_depthImageView));
 
-    DEBUG("created an image view");
-    _mainDeletionQueue.push_function([=]() {
+	_mainDeletionQueue.push_function([=]() {
 		vkDestroyImageView(_device, _depthImageView, nullptr);
 		vmaDestroyImage(_allocator, _depthImage._image, _depthImage._allocation);
 	});
@@ -664,7 +667,7 @@ void VentumEngine::init_pipelines() {
 	pipelineBuilder._shaderStages.clear();
 
     VkShaderModule AGFragShader;
-    if (!load_shader_module("./shaders/DS.frag.spv", &AGFragShader))
+    if (!load_shader_module("./shaders/DiS.frag.spv", &AGFragShader))
     {
         std::cout << std::endl << "AG frag error" << std::endl;
     }
@@ -673,7 +676,7 @@ void VentumEngine::init_pipelines() {
     }
 
     VkShaderModule AGVertShader;
-	if (!load_shader_module("./shaders/DS.vert.spv", &AGVertShader))
+	if (!load_shader_module("./shaders/DiS.vert.spv", &AGVertShader))
 	{
 		std::cout << "Error when building the AG vertex shader module" << std::endl;
 	}
@@ -690,6 +693,58 @@ void VentumEngine::init_pipelines() {
     pipelineBuilder._pipelineLayout = _AGPipelineLayout;
 
 	_AGPipeline = pipelineBuilder.build_pipeline(_device, _renderPass);
+
+    // ----------------------------------------
+
+    // VkPipelineLayoutCreateInfo Image_pipeline_layout_info = vkinit::pipeline_layout_create_info();
+
+    // VkPushConstantRange AGpush_constant;
+	// AGpush_constant.offset = 0;
+	// AGpush_constant.size = sizeof(AGPushConstants);
+	// AGpush_constant.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+
+	// AG_pipeline_layout_info.pPushConstantRanges = &AGpush_constant;
+	// AG_pipeline_layout_info.pushConstantRangeCount = 1;
+
+    // VK_CHECK(vkCreatePipelineLayout(_device, &AG_pipeline_layout_info, nullptr, &_AGPipelineLayout));
+
+    // VertexInputDescription AGvertexDescription = Vertex::getAG_vertex_description();
+
+	// pipelineBuilder._vertexInputInfo.pVertexAttributeDescriptions = AGvertexDescription.attributes.data();
+	// pipelineBuilder._vertexInputInfo.vertexAttributeDescriptionCount = AGvertexDescription.attributes.size();
+
+	// pipelineBuilder._vertexInputInfo.pVertexBindingDescriptions = AGvertexDescription.bindings.data();
+	// pipelineBuilder._vertexInputInfo.vertexBindingDescriptionCount = AGvertexDescription.bindings.size();
+
+	// pipelineBuilder._shaderStages.clear();
+
+    // VkShaderModule AGFragShader;
+    // if (!load_shader_module("./shaders/DiS.frag.spv", &AGFragShader))
+    // {
+    //     std::cout << std::endl << "AG frag error" << std::endl;
+    // }
+    // else {
+    //     std::cout << std::endl << "AG frag loaded" << std::endl;
+    // }
+
+    // VkShaderModule AGVertShader;
+	// if (!load_shader_module("./shaders/DiS.vert.spv", &AGVertShader))
+	// {
+	// 	std::cout << "Error when building the AG vertex shader module" << std::endl;
+	// }
+	// else {
+	// 	std::cout << "AG vertex shader successfully loaded" << std::endl;
+	// }
+
+	// pipelineBuilder._shaderStages.push_back(
+	// 	vkinit::pipeline_shader_stage_create_info(VK_SHADER_STAGE_VERTEX_BIT, AGVertShader));
+
+	// pipelineBuilder._shaderStages.push_back(
+	// 	vkinit::pipeline_shader_stage_create_info(VK_SHADER_STAGE_FRAGMENT_BIT, AGFragShader));
+
+    // pipelineBuilder._pipelineLayout = _AGPipelineLayout;
+
+	// _AGPipeline = pipelineBuilder.build_pipeline(_device, _renderPass);
 
     // //--------------------------------------
     // //--------------------------------------
@@ -913,111 +968,6 @@ void VentumEngine::loadMenuAG()
     upload_AG(Modules[moduleNumber-1].icon.AG);
     DEBUG("Loaded an Icon AG");
 }
-
-void VentumEngine::loading_MKTP_image(MKTPic data)
-{
-    int CURRENT_ID = _pictures.size();
-    _pictures.resize(CURRENT_ID+1);
-    void* pixel_ptr = data.pixels;
-	VkDeviceSize imageSize = data.width * data.height * 4;
-
-	VkFormat image_format = VK_FORMAT_R8G8B8A8_SRGB;
-
-	AllocatedBuffer stagingBuffer = create_buffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VMA_MEMORY_USAGE_CPU_ONLY);
-
-	void* data_ptr;
-	vmaMapMemory(_allocator, stagingBuffer._allocation, &data_ptr);
-
-	memcpy(data_ptr, pixel_ptr, static_cast<size_t>(imageSize));
-
-	vmaUnmapMemory(_allocator, stagingBuffer._allocation);
-
-    free(data.pixels); // see? I care about manual memory allocation
-
-    VkImageCreateInfo imageInfo{};
-    imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-    imageInfo.imageType = VK_IMAGE_TYPE_2D;
-    imageInfo.extent.width = static_cast<uint32_t>(data.width);
-    imageInfo.extent.height = static_cast<uint32_t>(data.height);
-    imageInfo.extent.depth = 1;
-    imageInfo.mipLevels = 1;
-    imageInfo.arrayLayers = 1;
-    imageInfo.format = VK_FORMAT_R8G8B8A8_SRGB;
-    imageInfo.tiling = VK_IMAGE_TILING_LINEAR; // or _OPTIMAL, idk, I'm not a developer
-    imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    imageInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
-	imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-    imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
-    imageInfo.flags = 0; // Optional
-
-    if (vkCreateImage(_device, &imageInfo, nullptr, &_pictures[CURRENT_ID].textureImage) != VK_SUCCESS) {
-        // you should implement errors, just saying
-    }
-
-    VkMemoryRequirements memRequirements;
-    vkGetImageMemoryRequirements(_device, _pictures[CURRENT_ID].textureImage, &memRequirements);
-
-    VkMemoryAllocateInfo allocInfo{};
-    allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-    allocInfo.allocationSize = memRequirements.size;
-    allocInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-
-    if (vkAllocateMemory(_device, &allocInfo, nullptr, &_pictures[CURRENT_ID].textureImageMemory) != VK_SUCCESS) {
-    // ERROR CHECKING
-    }
-
-    vkBindImageMemory(_device, _pictures[CURRENT_ID].textureImage, _pictures[CURRENT_ID].textureImageMemory, 0);
-
-
-    // some shananigans
-}
-
-// VkCommandBuffer VentumEngine::beginSingleTimeCommands() { #ff00ff
-
-
-//     VkCommandBufferAllocateInfo cmdAllocInfo = vkinit::command_buffer_allocate_info(_frames[0]._commandPool, 1);
-
-//     VK_CHECK(vkAllocateCommandBuffers(_device, &cmdAllocInfo, &_frames[i]._mainCommandBuffer));
-
-//     VkCommandBuffer commandBuffer;
-//     vkAllocateCommandBuffers(_device, &allocInfo, &commandBuffer);
-
-//     VkCommandBufferBeginInfo beginInfo{};
-//     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-//     beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-
-//     vkBeginCommandBuffer(commandBuffer, &beginInfo);
-
-//     return commandBuffer;
-// }
-
-// void VentumEngine::endSingleTimeCommands(VkCommandBuffer commandBuffer) {
-//     vkEndCommandBuffer(commandBuffer);
-
-//     VkSubmitInfo submitInfo{};
-//     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-//     submitInfo.commandBufferCount = 1;
-//     submitInfo.pCommandBuffers = &commandBuffer;
-
-//     vkQueueSubmit(_graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
-//     vkQueueWaitIdle(_graphicsQueue);
-
-//     vkFreeCommandBuffers(_device, _commandPool, 1, &commandBuffer);
-// } #ff00ff
-
-uint32_t VentumEngine::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) {
-    VkPhysicalDeviceMemoryProperties memProperties;
-    vkGetPhysicalDeviceMemoryProperties(_chosenGPU, &memProperties);
-
-    for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
-    if (typeFilter & (1 << i)) {
-        return i;
-    }
-}
-// error checking would be nice (memory type not found)
-return -1;
-}
-
     
 
 void VentumEngine::init_scene()
@@ -1100,20 +1050,30 @@ void VentumEngine::init_descriptors()
 
 	camBufferBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
+    VkDescriptorSetLayoutBinding samplerLayoutBinding{};
+    samplerLayoutBinding.binding = 1;
+    samplerLayoutBinding.descriptorCount = 1;
+    samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    samplerLayoutBinding.pImmutableSamplers = nullptr;
+    samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+
 
 	VkDescriptorSetLayoutCreateInfo setinfo = {};
 	setinfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
 	setinfo.pNext = nullptr;
 
-	setinfo.bindingCount = 1;
+	setinfo.bindingCount = 2;
 	setinfo.flags = 0;
-	setinfo.pBindings = &camBufferBinding;
+	VkDescriptorSetLayoutBinding* tempArray = (VkDescriptorSetLayoutBinding*)malloc(sizeof(VkDescriptorSetLayoutBinding)*setinfo.bindingCount);
+    tempArray[0] = camBufferBinding;
+    tempArray[1] = samplerLayoutBinding;
+    setinfo.pBindings = tempArray;
 
 	vkCreateDescriptorSetLayout(_device, &setinfo, nullptr, &_globalSetLayout);
 
     std::vector<VkDescriptorPoolSize> sizes =
 	{
-		{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 10 }
+		{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 10 },{ VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,10}
 	};
 
 	VkDescriptorPoolCreateInfo pool_info = {};
@@ -1143,19 +1103,32 @@ void VentumEngine::init_descriptors()
 		binfo.offset = 0;
 		binfo.range = sizeof(GPUCameraData);
 
-		VkWriteDescriptorSet setWrite = {};
-		setWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		setWrite.pNext = nullptr;
+        VkDescriptorImageInfo imageInfo{};
+        imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        imageInfo.imageView = _pictures[0].textureImageView;
+        imageInfo.sampler = _textureSampler;
 
-		setWrite.dstBinding = 0;
-		setWrite.dstSet = _frames[i].globalDescriptor;
+		VkWriteDescriptorSet * setWrite = (VkWriteDescriptorSet*)malloc(sizeof(VkWriteDescriptorSet)*2);
+		setWrite[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        setWrite[0].dstSet = _frames[i].globalDescriptor;
+        setWrite[0].dstBinding = 0;
+        setWrite[0].dstArrayElement = 0;
+        setWrite[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        setWrite[0].descriptorCount = 1;
+        setWrite[0].pBufferInfo = &binfo;
+        setWrite[0].pNext = nullptr;
 
-		setWrite.descriptorCount = 1;
-		setWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-		setWrite.pBufferInfo = &binfo;
+        setWrite[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        setWrite[1].dstSet = _frames[i].globalDescriptor;
+        setWrite[1].dstBinding = 1;
+        setWrite[1].dstArrayElement = 0;
+        setWrite[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        setWrite[1].descriptorCount = 1;
+        setWrite[1].pImageInfo = &imageInfo;
+        setWrite[1].pNext = nullptr;
 
 
-		vkUpdateDescriptorSets(_device, 1, &setWrite, 0, nullptr);
+		vkUpdateDescriptorSets(_device, 2, setWrite, 0, nullptr);
 	}
 
     _mainDeletionQueue.push_function([&]() {
@@ -1304,6 +1277,347 @@ void VentumEngine::upload_AG(MKTAG& AG)
 	});
 
 	vmaDestroyBuffer(_allocator, stagingBuffer._buffer, stagingBuffer._allocation);
+}
+
+void VentumEngine::init_createTextureSampler()
+{
+    VkPhysicalDeviceProperties properties{};
+    vkGetPhysicalDeviceProperties(_chosenGPU, &properties);
+
+    VkSamplerCreateInfo samplerInfo{};
+    samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+    samplerInfo.magFilter = VK_FILTER_LINEAR;
+    samplerInfo.minFilter = VK_FILTER_LINEAR;
+    samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+    samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+    samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+    VkPhysicalDeviceFeatures supportedFeatures;
+    vkGetPhysicalDeviceFeatures(_chosenGPU, &supportedFeatures);
+    samplerInfo.anisotropyEnable = VK_FALSE; // supportedFeatures.samplerAnisotropy?VK_TRUE:
+    samplerInfo.maxAnisotropy = properties.limits.maxSamplerAnisotropy;
+    samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
+    samplerInfo.unnormalizedCoordinates = VK_FALSE;
+    samplerInfo.compareEnable = VK_FALSE;
+    samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
+    samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+    samplerInfo.mipLodBias = 0.0f;
+    samplerInfo.minLod = 0.0f;
+    samplerInfo.maxLod = 0.0f;
+
+    if (vkCreateSampler(_device, &samplerInfo, nullptr, &_textureSampler) != VK_SUCCESS) {
+        // errorHandling
+    }
+    _mainDeletionQueue.push_function([=]() {
+        vkDestroySampler(_device, _textureSampler, nullptr);
+    });
+}
+
+void VentumEngine::copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height) {
+    VkCommandBuffer commandBuffer = beginSingleTimeCommands();
+
+    VkBufferImageCopy region{};
+    region.bufferOffset = 0;
+    region.bufferRowLength = 0;
+    region.bufferImageHeight = 0;
+
+    region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    region.imageSubresource.mipLevel = 0;
+    region.imageSubresource.baseArrayLayer = 0;
+    region.imageSubresource.layerCount = 1;
+
+    region.imageOffset = {0, 0, 0};
+    region.imageExtent = {
+        width,
+        height,
+        1
+    };
+
+    vkCmdCopyBufferToImage(
+    commandBuffer,
+    buffer,
+    image,
+    VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+    1,
+    &region
+    );
+
+    endSingleTimeCommands(commandBuffer);
+}
+
+void VentumEngine::transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout) {
+    VkCommandBuffer commandBuffer = beginSingleTimeCommands();
+
+    VkImageMemoryBarrier barrier{};
+    barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+    barrier.oldLayout = oldLayout;
+    barrier.newLayout = newLayout;
+
+    barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+
+    barrier.image = image;
+    barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    barrier.subresourceRange.baseMipLevel = 0;
+    barrier.subresourceRange.levelCount = 1;
+    barrier.subresourceRange.baseArrayLayer = 0;
+    barrier.subresourceRange.layerCount = 1;
+
+    VkPipelineStageFlags sourceStage;
+    VkPipelineStageFlags destinationStage;
+
+    if (oldLayout == VK_IMAGE_LAYOUT_UNDEFINED && newLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL) {
+        barrier.srcAccessMask = 0;
+        barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+
+        sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+        destinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+    } else if (oldLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL && newLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
+        barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+        barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+        sourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+        destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+    } else {
+        throw std::invalid_argument("unsupported layout transition!");
+    }
+
+    vkCmdPipelineBarrier(
+        commandBuffer,
+        sourceStage, destinationStage,
+        0,
+        0, nullptr,
+        0, nullptr,
+        1, &barrier
+    );
+
+    endSingleTimeCommands(commandBuffer);
+}
+
+void VentumEngine::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) {
+    VkCommandBuffer commandBuffer = beginSingleTimeCommands();
+
+    VkBufferCopy copyRegion{};
+    copyRegion.size = size;
+    vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
+
+    endSingleTimeCommands(commandBuffer);
+}
+
+VkCommandBuffer VentumEngine::beginSingleTimeCommands() {
+
+
+    VkCommandBufferAllocateInfo allocInfo{};
+    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    allocInfo.commandPool = get_current_frame()._commandPool; // this is a bad idea
+    allocInfo.commandBufferCount = 1;
+
+    VkCommandBuffer commandBuffer;
+    vkAllocateCommandBuffers(_device, &allocInfo, &commandBuffer);
+
+    VkCommandBufferBeginInfo beginInfo{};
+    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+    vkBeginCommandBuffer(commandBuffer, &beginInfo);
+
+    return commandBuffer;
+}
+
+void VentumEngine::endSingleTimeCommands(VkCommandBuffer commandBuffer) {
+    vkEndCommandBuffer(commandBuffer);
+
+    VkSubmitInfo submitInfo{};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &commandBuffer;
+
+    vkQueueSubmit(_graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
+    vkQueueWaitIdle(_graphicsQueue);
+
+    vkFreeCommandBuffers(_device, get_current_frame()._commandPool, 1, &commandBuffer);
+}
+
+void VentumEngine::createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory) {
+    VkImageCreateInfo imageInfo{};
+    imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+    imageInfo.imageType = VK_IMAGE_TYPE_2D;
+    imageInfo.extent.width = width;
+    imageInfo.extent.height = height;
+    imageInfo.extent.depth = 1;
+    imageInfo.mipLevels = 1;
+    imageInfo.arrayLayers = 1;
+    imageInfo.format = format;
+    imageInfo.tiling = tiling;
+    imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    imageInfo.usage = usage;
+    imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+    imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+    VK_CHECK(vkCreateImage(_device, &imageInfo, nullptr, &image));
+
+    VkMemoryRequirements memRequirements;
+    vkGetImageMemoryRequirements(_device, image, &memRequirements);
+
+    VkMemoryAllocateInfo allocInfo{};
+    allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    allocInfo.allocationSize = memRequirements.size;
+    allocInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, properties);
+
+    VK_CHECK(vkAllocateMemory(_device, &allocInfo, nullptr, &imageMemory));
+
+    vkBindImageMemory(_device, image, imageMemory, 0);
+}
+
+void VentumEngine::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory) {
+    VkBufferCreateInfo bufferInfo{};
+    bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    bufferInfo.size = size;
+    bufferInfo.usage = usage;
+    bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+    VK_CHECK(vkCreateBuffer(_device, &bufferInfo, nullptr, &buffer));
+
+        DEBUG("created a buffer");
+    VkMemoryRequirements memRequirements;
+    vkGetBufferMemoryRequirements(_device, buffer, &memRequirements);
+
+    VkMemoryAllocateInfo allocInfo{};
+    allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    allocInfo.allocationSize = memRequirements.size;
+    allocInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, properties);
+
+    if(allocInfo.memoryTypeIndex == -1)
+        DEBUG("and we have a problem on our hands");
+
+    VK_CHECK(vkAllocateMemory(_device, &allocInfo, nullptr, &bufferMemory));
+        DEBUG("allocated memory");
+
+    vkBindBufferMemory(_device, buffer, bufferMemory, 0);
+}
+
+int VentumEngine::loading_MKTP_image(MKTPic data)
+{
+    VkDeviceSize imageSize = data.width * data.height * 4;
+
+    VkBuffer stagingBuffer;
+
+    // createBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+
+    VkBufferCreateInfo stagingBufferInfo = {};
+	stagingBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+	stagingBufferInfo.pNext = nullptr;
+	stagingBufferInfo.size = imageSize;
+	stagingBufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+
+    AllocatedBuffer stagingBufferMemory;
+
+    VmaAllocationCreateInfo vmaallocInfo = {};
+	vmaallocInfo.usage = VMA_MEMORY_USAGE_CPU_ONLY; // VMA_MEMORY_USAGE_CPU_TO_GPU // VMA_MEMORY_USAGE_AUTO
+
+	VK_CHECK(vmaCreateBuffer(_allocator, &stagingBufferInfo, &vmaallocInfo,
+		&stagingBufferMemory._buffer,
+		&stagingBufferMemory._allocation,
+		nullptr));
+
+    DEBUG("created buffer");
+    void* data_ptr;
+    vmaMapMemory(_allocator, stagingBufferMemory._allocation, &data_ptr);
+	memcpy(data_ptr, data.pixels, imageSize);
+	vmaUnmapMemory(_allocator, stagingBufferMemory._allocation);
+    // vkMapMemory(_device, stagingBufferMemory, 0, imageSize, 0, &data_ptr);
+    // memcpy(data_ptr, data.pixels, static_cast<size_t>(imageSize)); // now let us just hope that my made up format will work in this highly delicate system
+    // vkUnmapMemory(_device, stagingBufferMemory);
+    DEBUG("mapped memory");
+
+    
+
+    free(data.pixels); // #ff0000 might cause some minor fatal errors
+
+    VkImage textureImage;
+    VkDeviceMemory textureImageMemory;
+
+    VkImageCreateInfo imageInfo{};
+    imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+    imageInfo.imageType = VK_IMAGE_TYPE_2D;
+    imageInfo.extent.width = static_cast<uint32_t>(data.width);
+    imageInfo.extent.height = static_cast<uint32_t>(data.height);
+    imageInfo.extent.depth = 1;
+    imageInfo.mipLevels = 1;
+    imageInfo.arrayLayers = 1;
+    imageInfo.format = VK_FORMAT_R8G8B8A8_SRGB;
+    imageInfo.tiling = VK_IMAGE_TILING_LINEAR;
+    imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    imageInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+    imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+    imageInfo.flags = 0; // Optional
+    DEBUG("created image info");
+    VK_CHECK(vkCreateImage(_device, &imageInfo, nullptr, &textureImage));
+
+    VkMemoryRequirements memRequirements;
+    vkGetImageMemoryRequirements(_device, textureImage, &memRequirements);
+    DEBUG("got image memory requirements");
+    VkMemoryAllocateInfo allocInfo{};
+    allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    allocInfo.allocationSize = memRequirements.size;
+    allocInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+    DEBUG("found memory type");
+
+    VK_CHECK(vkAllocateMemory(_device, &allocInfo, nullptr, &textureImageMemory));
+    DEBUG("allocated memory");
+
+    vkBindImageMemory(_device, textureImage, textureImageMemory, 0);
+
+///later
+    transitionImageLayout(textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+    copyBufferToImage(stagingBufferMemory._buffer, textureImage, static_cast<uint32_t>(data.width), static_cast<uint32_t>(data.height));
+
+    DEBUG("copied buffer to image");
+    transitionImageLayout(textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
+    vkDestroyBuffer(_device, stagingBufferMemory._buffer, nullptr);
+    // vkFreeMemory(_device, stagingBufferMemory, nullptr); // #ff0000
+
+    VkImageView textureImageView;
+
+    VkImageViewCreateInfo viewInfo{};
+    viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+    viewInfo.image = textureImage;
+    viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+    viewInfo.format = VK_FORMAT_R8G8B8A8_SRGB;
+    viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    viewInfo.subresourceRange.baseMipLevel = 0;
+    viewInfo.subresourceRange.levelCount = 1;
+    viewInfo.subresourceRange.baseArrayLayer = 0;
+    viewInfo.subresourceRange.layerCount = 1;
+
+    VK_CHECK(vkCreateImageView(_device, &viewInfo, nullptr, &textureImageView));
+
+    _pictures.resize(_pictures.size()+1);
+    _pictures[_pictures.size()-1] = {textureImage,textureImageMemory,textureImageView};
+
+    _mainDeletionQueue.push_function([=]() {
+        vkDestroyImageView(_device, _pictures[_pictures.size()-1].textureImageView, nullptr);
+        vkDestroyImage(_device, _pictures[_pictures.size()-1].textureImage, nullptr);
+        vkFreeMemory(_device, _pictures[_pictures.size()-1].textureImageMemory, nullptr);
+    });
+
+    return _pictures.size()-1;
+    // some shananigans
+}
+
+uint32_t VentumEngine::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) {
+    VkPhysicalDeviceMemoryProperties memProperties;
+    vkGetPhysicalDeviceMemoryProperties(_chosenGPU, &memProperties);
+
+        for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
+        if (typeFilter & (1 << i)) {
+            return i;
+        }
+    }
+    // error checking would be nice (memory type not found)
+    return -1;
 }
 
 void VentumEngine::upload_mesh(Mesh& mesh)

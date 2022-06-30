@@ -106,6 +106,7 @@ typedef struct LoadedModule {
 typedef struct vulPic {
 VkImage textureImage;
 VkDeviceMemory textureImageMemory;
+VkImageView textureImageView;
 } vPic;
 
 extern GL * Modules;
@@ -148,6 +149,8 @@ public:
 
     std::vector<VkImageView> _swapchainImageViews;
 
+    VkSampler _textureSampler;
+
     VkQueue _graphicsQueue;
     uint32_t _graphicsQueueFamily;
 
@@ -184,7 +187,7 @@ public:
     std::vector<RenderObject> _renderables;
 
     
-
+    // IMPORTANT !!!
     std::vector<sub2MAKiT> _AGA;
     std::vector<MKTAG> _TAGA;
     std::vector<vPic> _pictures;
@@ -222,9 +225,19 @@ public:
 
     MKTPic testLogo;
 
-    void loading_MKTP_image(MKTPic data);
+    int loading_MKTP_image(MKTPic data);
 
     uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
+
+    void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
+
+    void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
+
+    void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
+
+    void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
+
+    void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
 
 private:
 
@@ -255,6 +268,8 @@ private:
     void init_scene();
 
 	void init_descriptors();
+
+    void init_createTextureSampler();
 
     VkCommandBuffer beginSingleTimeCommands();
 

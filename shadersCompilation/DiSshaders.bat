@@ -1,0 +1,2 @@
+C:\VulkanSDK\1.2.198.1\Bin\\glslc.exe .\src\vulkan\shaders\imageShaders\DiS.vert -o .\build\shaders\DiS.vert.spv
+C:\VulkanSDK\1.2.198.1\Bin\\glslc.exe .\src\vulkan\shaders\imageShaders\DiS.frag -o .\build\shaders\DiS.frag.spv

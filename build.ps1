@@ -6,7 +6,8 @@ param (
     [switch]$Dshaders = $false,
     [switch]$Cshaders = $false,
     [switch]$Pshaders = $false,
-    [switch]$DSshaders = $false
+    [switch]$DSshaders = $false,
+    [switch]$DiSshaders = $false
 )
 if ($DEBUG) {
     $DEBUGS = "-DMKT_DEBUG"
@@ -24,6 +25,9 @@ if ($Pshaders) {
 }
 if ($DSshaders) {
     ./shadersCompilation/DSshaders.bat
+}
+if ($DiSshaders) {
+    ./shadersCompilation/DiSshaders.bat
 }
 if($TESTDLL)
 {

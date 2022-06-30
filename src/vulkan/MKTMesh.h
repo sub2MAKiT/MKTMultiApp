@@ -32,6 +32,7 @@ struct Mesh {
 typedef struct MKTAGA2 {
     glm::vec3 position;
     glm::vec3 color;
+    glm::vec3 texCoord;
 } MKTAGA;
 
 typedef struct arrayGraphic{ 
