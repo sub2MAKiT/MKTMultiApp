@@ -60,15 +60,44 @@ VertexInputDescription Vertex::getAG_vertex_description()
     colorAttribute.location = 1;
     colorAttribute.format = VK_FORMAT_R32G32B32_SFLOAT;
     colorAttribute.offset = offsetof(MKTAGA2, color);
+    
+    description.attributes.push_back(positionAttribute);
+    description.attributes.push_back(colorAttribute);
+    return description;
+}
+
+VertexInputDescription Vertex::getPiC_vertex_description()
+{
+    VertexInputDescription description;
+
+    VkVertexInputBindingDescription mainBinding;
+    mainBinding.binding = 0;
+    mainBinding.stride = sizeof(MKTAPiC);
+    mainBinding.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+    description.bindings.push_back(mainBinding);
+
+    VkVertexInputAttributeDescription positionAttribute = {};
+    positionAttribute.binding = 0;
+    positionAttribute.location = 0;
+    positionAttribute.format = VK_FORMAT_R32G32B32_SFLOAT;
+    positionAttribute.offset = offsetof(MKTAPiC, position);
+
+    VkVertexInputAttributeDescription colorAttribute = {};
+    colorAttribute.binding = 0;
+    colorAttribute.location = 1;
+    colorAttribute.format = VK_FORMAT_R32G32B32_SFLOAT;
+    colorAttribute.offset = offsetof(MKTAPiC, color);
 
     VkVertexInputAttributeDescription texCoorAttribute = {};
     texCoorAttribute.binding = 0;
     texCoorAttribute.location = 2;
     texCoorAttribute.format = VK_FORMAT_R32G32_SFLOAT;
-    texCoorAttribute.offset = offsetof(MKTAGA2, texCoord);
+    texCoorAttribute.offset = offsetof(MKTAPiC, texCoord);
     
     description.attributes.push_back(positionAttribute);
     description.attributes.push_back(colorAttribute);
+    description.attributes.push_back(texCoorAttribute);
     return description;
 }
 

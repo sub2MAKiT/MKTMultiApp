@@ -2,6 +2,7 @@
 #include "types.h"
 #include <vector>
 #include <glm/vec3.hpp>
+#include <glm/vec2.hpp>
 
 struct VertexInputDescription {
     std::vector<VkVertexInputBindingDescription> bindings;
@@ -18,6 +19,7 @@ struct Vertex {
 
     static VertexInputDescription get_vertex_description();
     static VertexInputDescription getAG_vertex_description();
+    static VertexInputDescription getPiC_vertex_description();
 };
 
 struct Mesh {
@@ -32,10 +34,20 @@ struct Mesh {
 typedef struct MKTAGA2 {
     glm::vec3 position;
     glm::vec3 color;
-    glm::vec3 texCoord;
 } MKTAGA;
+
+typedef struct MKTAGA3 {
+    glm::vec3 position;
+    glm::vec3 color;
+    glm::vec2 texCoord;
+} MKTAPiC;
 
 typedef struct arrayGraphic{ 
     std::vector<MKTAGA> _vertices;
     AllocatedBuffer _vertexBuffer;
 } MKTAG;
+
+typedef struct pictureGraphics{
+    std::vector<MKTAPiC> _vertices;
+    AllocatedBuffer _vertexBuffer;
+} MKTPiC;

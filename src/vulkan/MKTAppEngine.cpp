@@ -7,6 +7,11 @@
 
 // Some basig graphics:
 
+#define MKTDRAW3D 1
+#define MKTDRAWAG 2
+#define MKTDRAWPIC 4
+#define MKTDRAWMENU 8
+
 #define BLACKLINE_ID 0
 #define MENUARRAYGRAPHIC 4
 #define MENULINEHORIZONTAL 5
@@ -64,6 +69,8 @@ void VentumEngine::init() {
     loadMenuAG();
 
     init_scene(); //#0000ff
+
+    init_VentumEngineVariables();
 
     _isInitialized = true;
 }
@@ -132,12 +139,7 @@ void VentumEngine::draw() {
 
 //#00ff00
 //#00ff00
-    if(_selectedShader%2==1)
-	    draw_objects(cmd, _renderables.data(), _renderables.size());
-    else
-        draw_AG(cmd,  _AGA.data(),  _AGA.size());
-
-    drawMenu(cmd,Modules, sizeOfModules);
+        MKTDRAW(cmd);
 //#00ff00
 //#00ff00
 
@@ -217,10 +219,12 @@ void VentumEngine::run() {
                     xMove -= 0.1;
                 else if(e.key.keysym.sym == SDLK_SPACE)
                     _selectedShader++;
-                else if(e.key.keysym.sym == SDLK_q)
-                    CBT++;
-                else if(e.key.keysym.sym == SDLK_e)
-                    isVisible -= (isVisible*2-1);
+                // else if(e.key.keysym.sym == SDLK_q)
+                // {
+                //     modesEnabled == MKTDRAWAG|MKTDRAWMENU|MKTDRAW3D;
+                // }
+                // else if(e.key.keysym.sym == SDLK_e)
+                // {
             }
             else if(e.type == SDL_MOUSEWHEEL)
                  if(e.wheel.y > 0)
@@ -644,6 +648,69 @@ void VentumEngine::init_pipelines() {
     // //--------------------------------------
     // //--------------------------------------
 
+    VkPipelineLayoutCreateInfo DiS_pipeline_layout_info = {};
+    DiS_pipeline_layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    DiS_pipeline_layout_info.pNext = nullptr;
+
+    DiS_pipeline_layout_info.flags = 0;
+    DiS_pipeline_layout_info.setLayoutCount = 1;
+    DiS_pipeline_layout_info.pSetLayouts = &_globalSetLayout;
+
+    VkPushConstantRange DiSpush_constant;
+	DiSpush_constant.offset = 0;
+	DiSpush_constant.size = sizeof(AGPushConstants);
+	DiSpush_constant.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+
+	DiS_pipeline_layout_info.pPushConstantRanges = &DiSpush_constant;
+	DiS_pipeline_layout_info.pushConstantRangeCount = 1;
+
+    VK_CHECK(vkCreatePipelineLayout(_device, &DiS_pipeline_layout_info, nullptr, &_DiSPipelineLayout));
+
+    VertexInputDescription DiSvertexDescription = Vertex::getPiC_vertex_description();
+
+	pipelineBuilder._vertexInputInfo.pVertexAttributeDescriptions = DiSvertexDescription.attributes.data();
+	pipelineBuilder._vertexInputInfo.vertexAttributeDescriptionCount = DiSvertexDescription.attributes.size();
+
+	pipelineBuilder._vertexInputInfo.pVertexBindingDescriptions = DiSvertexDescription.bindings.data();
+	pipelineBuilder._vertexInputInfo.vertexBindingDescriptionCount = DiSvertexDescription.bindings.size();
+
+	pipelineBuilder._shaderStages.clear();
+
+    VkShaderModule DiSFragShader;
+    if (!load_shader_module("./shaders/DiS.frag.spv", &DiSFragShader))
+    {
+        std::cout << std::endl << "DiS frag error" << std::endl;
+    }
+    else {
+        std::cout << std::endl << "DiS frag loaded" << std::endl;
+    }
+
+
+    VkShaderModule DiSVertShader;
+	if (!load_shader_module("./shaders/DiS.vert.spv", &DiSVertShader))
+	{
+		std::cout << "Error when building the DiS vertex shader module" << std::endl;
+	}
+	else {
+		std::cout << "DiS vertex shader successfully loaded" << std::endl;
+	}
+
+	pipelineBuilder._shaderStages.push_back(
+		vkinit::pipeline_shader_stage_create_info(VK_SHADER_STAGE_VERTEX_BIT, DiSVertShader));
+
+	pipelineBuilder._shaderStages.push_back(
+		vkinit::pipeline_shader_stage_create_info(VK_SHADER_STAGE_FRAGMENT_BIT, DiSFragShader));
+
+    pipelineBuilder._pipelineLayout = _DiSPipelineLayout;
+
+    PipelineBuilder PB; // jelly
+
+    // #ff0000
+    _DiSPipeline = pipelineBuilder.build_pipeline(_device, _renderPass);
+    // #ff0000
+
+    // ----------------------------------------
+
     VkPipelineLayoutCreateInfo AG_pipeline_layout_info = vkinit::pipeline_layout_create_info();
 
     VkPushConstantRange AGpush_constant;
@@ -667,7 +734,7 @@ void VentumEngine::init_pipelines() {
 	pipelineBuilder._shaderStages.clear();
 
     VkShaderModule AGFragShader;
-    if (!load_shader_module("./shaders/DiS.frag.spv", &AGFragShader))
+    if (!load_shader_module("./shaders/DS.frag.spv", &AGFragShader))
     {
         std::cout << std::endl << "AG frag error" << std::endl;
     }
@@ -676,7 +743,7 @@ void VentumEngine::init_pipelines() {
     }
 
     VkShaderModule AGVertShader;
-	if (!load_shader_module("./shaders/DiS.vert.spv", &AGVertShader))
+	if (!load_shader_module("./shaders/DS.vert.spv", &AGVertShader))
 	{
 		std::cout << "Error when building the AG vertex shader module" << std::endl;
 	}
@@ -693,58 +760,6 @@ void VentumEngine::init_pipelines() {
     pipelineBuilder._pipelineLayout = _AGPipelineLayout;
 
 	_AGPipeline = pipelineBuilder.build_pipeline(_device, _renderPass);
-
-    // ----------------------------------------
-
-    // VkPipelineLayoutCreateInfo Image_pipeline_layout_info = vkinit::pipeline_layout_create_info();
-
-    // VkPushConstantRange AGpush_constant;
-	// AGpush_constant.offset = 0;
-	// AGpush_constant.size = sizeof(AGPushConstants);
-	// AGpush_constant.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-
-	// AG_pipeline_layout_info.pPushConstantRanges = &AGpush_constant;
-	// AG_pipeline_layout_info.pushConstantRangeCount = 1;
-
-    // VK_CHECK(vkCreatePipelineLayout(_device, &AG_pipeline_layout_info, nullptr, &_AGPipelineLayout));
-
-    // VertexInputDescription AGvertexDescription = Vertex::getAG_vertex_description();
-
-	// pipelineBuilder._vertexInputInfo.pVertexAttributeDescriptions = AGvertexDescription.attributes.data();
-	// pipelineBuilder._vertexInputInfo.vertexAttributeDescriptionCount = AGvertexDescription.attributes.size();
-
-	// pipelineBuilder._vertexInputInfo.pVertexBindingDescriptions = AGvertexDescription.bindings.data();
-	// pipelineBuilder._vertexInputInfo.vertexBindingDescriptionCount = AGvertexDescription.bindings.size();
-
-	// pipelineBuilder._shaderStages.clear();
-
-    // VkShaderModule AGFragShader;
-    // if (!load_shader_module("./shaders/DiS.frag.spv", &AGFragShader))
-    // {
-    //     std::cout << std::endl << "AG frag error" << std::endl;
-    // }
-    // else {
-    //     std::cout << std::endl << "AG frag loaded" << std::endl;
-    // }
-
-    // VkShaderModule AGVertShader;
-	// if (!load_shader_module("./shaders/DiS.vert.spv", &AGVertShader))
-	// {
-	// 	std::cout << "Error when building the AG vertex shader module" << std::endl;
-	// }
-	// else {
-	// 	std::cout << "AG vertex shader successfully loaded" << std::endl;
-	// }
-
-	// pipelineBuilder._shaderStages.push_back(
-	// 	vkinit::pipeline_shader_stage_create_info(VK_SHADER_STAGE_VERTEX_BIT, AGVertShader));
-
-	// pipelineBuilder._shaderStages.push_back(
-	// 	vkinit::pipeline_shader_stage_create_info(VK_SHADER_STAGE_FRAGMENT_BIT, AGFragShader));
-
-    // pipelineBuilder._pipelineLayout = _AGPipelineLayout;
-
-	// _AGPipeline = pipelineBuilder.build_pipeline(_device, _renderPass);
 
     // //--------------------------------------
     // //--------------------------------------
@@ -884,6 +899,77 @@ void VentumEngine::load_AG()
         printf("\nCannot find the 00_DEFAULT_AG.MKTI");
     }
 
+    // MKTAG AG;
+    // AGPushConstants AGPC;
+    // char isVisible;
+
+    _defaultPictureRectangle._vertices.resize(6);
+
+    _defaultPictureRectangle._vertices = {
+        {{-1.0,-1.0,0.0},{0.0,0.0,0.0},{0.0,0.0}},
+        {{1.0,-1.0,0.0},{0.0,0.0,0.0},{1.0,0.0}},
+        {{-1.0,1.0,0.0},{0.0,0.0,0.0},{0.0,1.0}},
+
+        {{1.0,-1.0,0.0},{0.0,0.0,0.0},{1.0,0.0}},
+        {{-1.0,1.0,0.0},{0.0,0.0,0.0},{0.0,1.0}},
+        {{1.0,1.0,0.0},{0.0,0.0,0.0},{1.0,1.0}}
+    };
+
+    const size_t bufferSize= _defaultPictureRectangle._vertices.size() * sizeof(MKTAPiC);
+	VkBufferCreateInfo stagingBufferInfo = {};
+	stagingBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+	stagingBufferInfo.pNext = nullptr;
+	stagingBufferInfo.size = bufferSize;
+	stagingBufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+
+	VmaAllocationCreateInfo vmaallocInfo = {};
+	vmaallocInfo.usage = VMA_MEMORY_USAGE_CPU_ONLY;
+
+	AllocatedBuffer stagingBuffer;
+    DEBUG("test1PiC");
+
+	VK_CHECK(vmaCreateBuffer(_allocator, &stagingBufferInfo, &vmaallocInfo,
+		&stagingBuffer._buffer,
+		&stagingBuffer._allocation,
+		nullptr));
+
+    DEBUG("test2PiC");
+	void* data;
+	vmaMapMemory(_allocator, stagingBuffer._allocation, &data);
+
+	memcpy(data, _defaultPictureRectangle._vertices.data(), _defaultPictureRectangle._vertices.size() * sizeof(MKTAPiC));
+
+    DEBUG("test4PiC");
+
+	vmaUnmapMemory(_allocator, stagingBuffer._allocation);
+
+
+	VkBufferCreateInfo vertexBufferInfo = {};
+	vertexBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+	vertexBufferInfo.pNext = nullptr;
+	vertexBufferInfo.size = bufferSize;
+	vertexBufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+
+	vmaallocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
+
+	VK_CHECK(vmaCreateBuffer(_allocator, &vertexBufferInfo, &vmaallocInfo,
+		&_defaultPictureRectangle._vertexBuffer._buffer,
+		&_defaultPictureRectangle._vertexBuffer._allocation,
+		nullptr));
+
+	immediate_submit([=](VkCommandBuffer cmd) {
+		VkBufferCopy copy;
+		copy.dstOffset = 0;
+		copy.srcOffset = 0;
+		copy.size = bufferSize;
+		vkCmdCopyBuffer(cmd, stagingBuffer._buffer, _defaultPictureRectangle._vertexBuffer._buffer, 1, & copy);
+	});
+
+    _mainDeletionQueue.push_function([=]() {
+		vmaDestroyBuffer(_allocator, _defaultPictureRectangle._vertexBuffer._buffer, _defaultPictureRectangle._vertexBuffer._allocation);
+	});
+
+	vmaDestroyBuffer(_allocator, stagingBuffer._buffer, stagingBuffer._allocation);
     DEBUG("finished loading AG");
 }
 
@@ -929,19 +1015,15 @@ void VentumEngine::loadMenuAG()
         DEBUG("Read the Icon AG4");
             MKTAGName = (char*)malloc(sizeOfName+19);
         DEBUG("Read the Icon AG4");
-                printf("\nlast1: %s\n",MKTAGName);
             for(int a = 0; a < sizeOfName;a++)
                 MKTAGName[a+12] = charArray[a+i];
-                printf("\nlast2: %s\n",MKTAGName);
             for(int a = 0; a < 12;a++)
                 MKTAGName[a] = fileNames[a];
-                printf("\nlast3: %s\n",MKTAGName);
             for(int a = 0; a < 7;a++)
                 MKTAGName[sizeOfName+12+a] = fileNames[a+12];
-                printf("\nlast: %s\n",MKTAGName);
             Modules[moduleNumber].icon.AG = arrayGraphicsReader(MKTAGName);
             // for(int a = 0; a < 3;a++)
-                // Modules[moduleNumber].icon.AG._vertices[a].color = {1.0,1.0,1.0};
+            // Modules[moduleNumber].icon.AG._vertices[a].color = {1.0,1.0,1.0};
             AGPushConstants DEFAULTconstants;
             DEFAULTconstants.colourModification = {1.0f,0.0f,0.0f,0.0f,0.0f,1.0f,0.0f,0.0f,0.0f,0.0f,1.0f,0.0f,0.0f,0.0f,0.0f,1.0f}; // black
             float ratio = _windowExtent.width;
@@ -973,7 +1055,7 @@ void VentumEngine::loadMenuAG()
 void VentumEngine::init_scene()
 {
     testLogo = MKTPicReader("./graphics/MKTPhotos/logo.MKTP");
-
+    
     RenderObject DUCK;
     AGMaterial = {_AGPipeline,_AGPipelineLayout};
 	DUCK.mesh = get_mesh("DUCK");
@@ -1039,6 +1121,21 @@ void VentumEngine::init_scene()
 			_renderables.push_back(tri);
 		}
 	}
+}
+
+void VentumEngine::init_VentumEngineVariables()
+{
+    _drawQueue.Objects = &_renderables[0];
+    _drawQueue.ArrayGraphics = &_AGA[0];
+    _drawQueue.pictureGraphics = &_pictures[0];
+
+    _drawQueue.sizeOfArrayGraphics = _AGA.size();
+    _drawQueue.sizeOfObjects = _renderables.size();
+    _drawQueue.sizeOfPictureGraphics = _pictures.size();
+
+    modesEnabled = 14;
+
+    return;
 }
 
 void VentumEngine::init_descriptors()
@@ -1594,8 +1691,21 @@ int VentumEngine::loading_MKTP_image(MKTPic data)
 
     VK_CHECK(vkCreateImageView(_device, &viewInfo, nullptr, &textureImageView));
 
+    _defaultPushConstants.transformation = {2.0,0.0,0.0,0.0,
+                                0.0,2.0,0.0,0.0,
+                                0.0,0.0,2.0,0.0,
+                                0.0,0.0,0.0,1.0};
+
+    _defaultPushConstants.colourModification = {1.0,0.0,0.0,0.0,
+                                    0.0,1.0,0.0,0.0,
+                                    0.0,0.0,1.0,0.0,
+                                    0.0,0.0,0.0,1.0};
+
+    _defaultPushConstants.movement = {0.0,0.0,0.0};
+
+
     _pictures.resize(_pictures.size()+1);
-    _pictures[_pictures.size()-1] = {textureImage,textureImageMemory,textureImageView};
+    _pictures[_pictures.size()-1] = {textureImage,textureImageMemory,textureImageView,_defaultPushConstants,1};
 
     _mainDeletionQueue.push_function([=]() {
         vkDestroyImageView(_device, _pictures[_pictures.size()-1].textureImageView, nullptr);
@@ -1708,6 +1818,20 @@ Mesh* VentumEngine::get_mesh(const std::string& name)
 	}
 }
 
+void VentumEngine::MKTDRAW(VkCommandBuffer cmd)
+{
+    // if(modesEnabled&MKTDRAWAG)
+        // draw_AG(cmd,_drawQueue.ArrayGraphics, _drawQueue.sizeOfArrayGraphics);
+    if(modesEnabled&MKTDRAWPIC)
+        draw_PiC(cmd,_drawQueue.pictureGraphics, _drawQueue.sizeOfPictureGraphics);
+    // if(modesEnabled&MKTDRAWMENU)
+        // drawMenu(cmd,Modules, sizeOfModules);
+    // if(modesEnabled&MKTDRAW3D)
+        // draw_objects(cmd,_drawQueue.Objects, _drawQueue.sizeOfObjects);
+
+    return;
+}
+
 void VentumEngine::drawMenu(VkCommandBuffer cmd,GL * menuStuff, size_t sizeOfMenuStuff)
 {
 	for (int i = 0; i < sizeOfMenuStuff; i++) // make it less than 18 lines per draw
@@ -1745,7 +1869,32 @@ void VentumEngine::drawMenu(VkCommandBuffer cmd,GL * menuStuff, size_t sizeOfMen
             vkCmdDraw(cmd, _AGA[BLACKLINE_ID].AG._vertices.size(), 1, 0, 0);
         }
     }
+}
 
+void VentumEngine::draw_PiC(VkCommandBuffer cmd,vPic* first, int count)
+{
+	for (int i = 0; i < count; i++)
+	{
+        if(first[i].isVisible)
+        {
+            AGPushConstants constants = first[i].PC;
+            MKTPiC * object = &_defaultPictureRectangle;
+
+            vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _DiSPipeline);
+
+            // vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _AGPipelineLayout, 0, 1, &get_current_frame().globalDescriptor, 0, nullptr);
+
+            VkDeviceSize offset = 0;
+
+            vkCmdPushConstants(cmd, _DiSPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(AGPushConstants), &constants);
+
+            vkCmdBindVertexBuffers(cmd, 0, 1, &object->_vertexBuffer._buffer, &offset);//#ff0000 problem
+
+            vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _DiSPipelineLayout, 0, 1, &get_current_frame().globalDescriptor, 0, nullptr);
+
+            vkCmdDraw(cmd, object->_vertices.size(), 1, 0, 0);
+        }
+    }
 }
 
 void VentumEngine::draw_AG(VkCommandBuffer cmd,sub2MAKiT* first, int count)

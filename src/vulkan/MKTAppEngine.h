@@ -71,6 +71,11 @@ struct GPUCameraData{
 	glm::mat4 viewproj;
 };
 
+typedef struct defaultPicStruct {
+    MKTPiC Pic;
+    AGPushConstants AGPC;
+}DefaultPic;
+
 typedef struct finalToRender{
     MKTAG AG;
     AGPushConstants AGPC;
@@ -107,7 +112,19 @@ typedef struct vulPic {
 VkImage textureImage;
 VkDeviceMemory textureImageMemory;
 VkImageView textureImageView;
+AGPushConstants PC;
+char isVisible;
 } vPic;
+
+typedef struct MainRenderStruct {
+sub2MAKiT* ArrayGraphics;
+vPic* pictureGraphics;
+RenderObject* Objects;
+
+size_t sizeOfArrayGraphics;
+size_t sizeOfPictureGraphics;
+size_t sizeOfObjects;
+} DrawStruct;
 
 extern GL * Modules;
 extern size_t sizeOfModules;
@@ -134,6 +151,8 @@ public:
     void draw();
 
     void run();
+
+    char modesEnabled;
 
     VkInstance _instance;
     VkDebugUtilsMessengerEXT _debug_messenger;
@@ -169,6 +188,9 @@ public:
     Mesh _triangleMesh;
     MKTAG _HexAg;
 
+    VkPipelineLayout _DiSPipelineLayout;
+    VkPipeline _DiSPipeline;
+
     int _selectedShader{0};
 
     DeletionQueue _mainDeletionQueue;
@@ -184,13 +206,18 @@ public:
 
     VkFormat _depthFormat;
 
-    std::vector<RenderObject> _renderables;
+    AGPushConstants _defaultPushConstants;
 
+    std::vector<MKTAG> _TAGA;
+
+    MKTPiC _defaultPictureRectangle;
     
     // IMPORTANT !!!
     std::vector<sub2MAKiT> _AGA;
-    std::vector<MKTAG> _TAGA;
     std::vector<vPic> _pictures;
+    std::vector<RenderObject> _renderables;
+
+    DrawStruct _drawQueue;
 
     std::unordered_map<std::string,Material> _materials;
     std::unordered_map<std::string,Mesh> _meshes;
@@ -241,6 +268,10 @@ public:
 
 private:
 
+
+
+    void MKTDRAW(VkCommandBuffer cmd);
+
     void init_vulkan();
 
     void init_swapchain();
@@ -271,9 +302,13 @@ private:
 
     void init_createTextureSampler();
 
+    void draw_PiC(VkCommandBuffer cmd,vPic* first, int count);
+
     VkCommandBuffer beginSingleTimeCommands();
 
     void endSingleTimeCommands(VkCommandBuffer commandBuffer);
+
+    void init_VentumEngineVariables();
 };
 
 class PipelineBuilder {
@@ -288,6 +323,7 @@ public:
     VkPipelineColorBlendAttachmentState _colorBlendAttachment;
     VkPipelineMultisampleStateCreateInfo _multisampling;
     VkPipelineLayout _pipelineLayout;
+
 
     VkPipeline build_pipeline(VkDevice device, VkRenderPass pass);
 

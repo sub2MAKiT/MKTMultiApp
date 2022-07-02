@@ -1,7 +1,7 @@
 #define cmdModeDirectInclude
 #include "cmdMode.h"
 
-const char _MKTMA_VERSION[9] = "01.02.02";
+const char _MKTMA_VERSION[9] = "01.03.02";
 
 void handleCmdGrapics(char mode)
 {
