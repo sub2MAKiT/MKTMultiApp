@@ -35,5 +35,39 @@ int main()
     C.G = 0;
     C.B = 0;
     fwrite(&C,1,sizeof(colour),MKTFILE);
+    fclose(MKTFILE);
+
+
+
+
+    MKTFILE = fopen("./build/graphics/MKTPhotos/wideColoursTest.MKTP","wb");
+    *size = 10;
+    fwrite(size,1,sizeof(size_t),MKTFILE);
+
+    C.A = 255;
+    C.R = 128;
+    C.G = 128;
+    C.B = 0;
+    for(int i = 0; i < 50;i++)
+        fwrite(&C,1,sizeof(colour),MKTFILE);
+    C.A = 255;
+    C.R = 0;
+    C.G = 0;
+    C.B = 255;
+    for(int i = 0; i < 50;i++)
+        fwrite(&C,1,sizeof(colour),MKTFILE);
+    C.A = 255;
+    C.R = 0;
+    C.G = 255;
+    C.B = 0;
+    for(int i = 0; i < 50;i++)
+        fwrite(&C,1,sizeof(colour),MKTFILE);
+    C.A = 255;
+    C.R = 255;
+    C.G = 0;
+    C.B = 0;
+    for(int i = 0; i < 50;i++)
+        fwrite(&C,1,sizeof(colour),MKTFILE);
+    fclose(MKTFILE);
     return 0;
 }

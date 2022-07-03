@@ -114,6 +114,9 @@ VkDeviceMemory textureImageMemory;
 VkImageView textureImageView;
 AGPushConstants PC;
 char isVisible;
+VkDescriptorSet * _currentDescriptor; // bad idea i know
+VkDescriptorPool _currentPool; // I know, an even worse idea but...
+VkDescriptorSetLayoutBinding _currentSetLayoutBinding; // It's too late to quit now
 } vPic;
 
 typedef struct MainRenderStruct {
@@ -268,7 +271,7 @@ public:
 
 private:
 
-
+    void logoLoadingFunctionThatIsVeryImportant();
 
     void MKTDRAW(VkCommandBuffer cmd);
 
@@ -298,7 +301,7 @@ private:
 
     void init_scene();
 
-	void init_descriptors();
+	void init_descriptors(int picture);
 
     void init_createTextureSampler();
 
@@ -309,6 +312,8 @@ private:
     void endSingleTimeCommands(VkCommandBuffer commandBuffer);
 
     void init_VentumEngineVariables();
+
+    void updateSpecificPictureDescriptor(vPic * Picture, size_t picureNumber);
 };
 
 class PipelineBuilder {
