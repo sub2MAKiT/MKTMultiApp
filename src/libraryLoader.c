@@ -117,8 +117,6 @@ void * getEntryAddress(FUNHANDLE libraryToLoad)
                 for(int a = 0; a < sizeOfFP;a++)
                     TFFP[a] = FFP[a+librariesPathLength];
 
-                loadMenuAG(TFFP, sizeOfFP,Shmodules);
-
                 free(TFFP);
 
                 const char extension[4] = ".so";

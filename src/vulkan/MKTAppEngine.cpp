@@ -890,7 +890,13 @@ void VentumEngine::load_AG()
                 for(int a = 0; a < 25;a++)
                     MKTAGName[a] = fileNames[a];
                 for(int a = 0; a < 7;a++)
-                    MKTAGName[sizeOfName+a-2+25] = fileNames[a+25];
+                    MKTAGName[sizeOfName+a-
+                    #ifdef _WIN32
+                    2
+                    #elif __gnu_linux__
+                    1
+                    #endif
+                    +25] = fileNames[a+25];
 
                 if(DEBUG("Loaded an AG: "))
                     printf("%s\n",MKTAGName);

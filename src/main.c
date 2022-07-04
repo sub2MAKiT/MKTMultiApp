@@ -1,6 +1,7 @@
 #include "./vulkan/MKTAppEngine.h"
 #define MKTGNUBASEDLIBRARY
 #define MKT_DEBUG_GUARD
+#include "DEBUG.h"
 #include "libraryLoader.h"
 #include "cmdMode.h"
 
