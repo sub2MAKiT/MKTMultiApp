@@ -57,7 +57,7 @@ void VentumEngine::init() {
     init_framebuffers(); //#0000ff
 
     init_sync_structures(); //#0000ff
-
+    
     logoLoadingFunctionThatIsVeryImportant(); // don't ask me why, but deleting this file will cause the whole engine to crash (I've made my own coconut.png)
 
     init_descriptors(); //#0000ff
@@ -658,7 +658,7 @@ void VentumEngine::init_pipelines() {
 
     DiS_pipeline_layout_info.flags = 0;
     DiS_pipeline_layout_info.setLayoutCount = 1;
-    DiS_pipeline_layout_info.pSetLayouts = &_globalSetLayout;
+    DiS_pipeline_layout_info.pSetLayouts = &_picturesSetLayout;
 
     VkPushConstantRange DiSpush_constant;
 	DiSpush_constant.offset = 0;
@@ -936,20 +936,16 @@ void VentumEngine::load_AG()
 	vmaallocInfo.usage = VMA_MEMORY_USAGE_CPU_ONLY;
 
 	AllocatedBuffer stagingBuffer;
-    DEBUG("test1PiC");
 
 	VK_CHECK(vmaCreateBuffer(_allocator, &stagingBufferInfo, &vmaallocInfo,
 		&stagingBuffer._buffer,
 		&stagingBuffer._allocation,
 		nullptr));
 
-    DEBUG("test2PiC");
 	void* data;
 	vmaMapMemory(_allocator, stagingBuffer._allocation, &data);
 
 	memcpy(data, _defaultPictureRectangle._vertices.data(), _defaultPictureRectangle._vertices.size() * sizeof(MKTAPiC));
-
-    DEBUG("test4PiC");
 
 	vmaUnmapMemory(_allocator, stagingBuffer._allocation);
 
@@ -1148,25 +1144,25 @@ void VentumEngine::init_VentumEngineVariables()
     return;
 }
 
-void VentumEngine::CreatePictureDescriptors(vPic * pPic)
+void VentumEngine::CreatePictureDescriptors(vPic * pPic, size_t index)
 {
+    pPic[index]._currentDescriptor = (VkDescriptorSet*)malloc(sizeof(VkDescriptorSet));
     VkDescriptorSetAllocateInfo allocInfo ={};
     allocInfo.pNext = nullptr;
     allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
     allocInfo.descriptorPool = _descriptorPool;
     allocInfo.descriptorSetCount = 1;
     allocInfo.pSetLayouts = &_picturesSetLayout;
-
-    vkAllocateDescriptorSets(_device, &allocInfo, &pPic->_currentDescriptor);
+    VK_CHECK(vkAllocateDescriptorSets(_device, &allocInfo, pPic[index]._currentDescriptor));
 
     VkDescriptorImageInfo imageInfo{};
     imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-    imageInfo.imageView = pPic->textureImageView;
+    imageInfo.imageView = pPic[index].textureImageView;
     imageInfo.sampler = _textureSampler;
 
     VkWriteDescriptorSet setWrite = {};
     setWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    setWrite.dstSet = pPic->_currentDescriptor;
+    setWrite.dstSet = pPic[index]._currentDescriptor[0];
     setWrite.dstBinding = 0;
     setWrite.dstArrayElement = 0;
     setWrite.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
@@ -1225,9 +1221,7 @@ void VentumEngine::init_descriptors()
 	pP_info.poolSizeCount = 1;
 	pP_info.pPoolSizes = &size;
     
-	vkCreateDescriptorPool(_device, &pP_info, nullptr, &_picturesDescriptorPool);
-
-
+	VK_CHECK(vkCreateDescriptorPool(_device, &pP_info, nullptr, &_picturesDescriptorPool));
 
     std::vector<VkDescriptorPoolSize> sizes =
 	{
@@ -1273,7 +1267,7 @@ void VentumEngine::init_descriptors()
         vkUpdateDescriptorSets(_device, 1, &setWrite, 0, nullptr);
 	}
 
-    CreatePictureDescriptors(_pictures.data());
+    CreatePictureDescriptors(_pictures.data(),0);
 
     _mainDeletionQueue.push_function([&]() {
 		vkDestroyDescriptorSetLayout(_device, _globalSetLayout, nullptr);
@@ -1287,7 +1281,7 @@ void VentumEngine::init_descriptors()
 		});
 	}
 
-    imagesLoaded = 2;
+    imagesLoaded = 1;
 
     // _pictures[0]._currentPool = _descriptorPool;
     // _pictures[0]._currentDescriptor = (VkDescriptorSet*)malloc(sizeof(VkDescriptorSet)*FRAME_OVERLAP);
@@ -1564,20 +1558,17 @@ void VentumEngine::upload_AG(MKTAG& AG)
 	vmaallocInfo.usage = VMA_MEMORY_USAGE_CPU_ONLY;
 
 	AllocatedBuffer stagingBuffer;
-    DEBUG("test1");
 
 	VK_CHECK(vmaCreateBuffer(_allocator, &stagingBufferInfo, &vmaallocInfo,
 		&stagingBuffer._buffer,
 		&stagingBuffer._allocation,
 		nullptr));
 
-    DEBUG("test2");
 	void* data;
 	vmaMapMemory(_allocator, stagingBuffer._allocation, &data);
 
 	memcpy(data, AG._vertices.data(), AG._vertices.size() * sizeof(MKTAGA));
 
-    DEBUG("test4");
 
 	vmaUnmapMemory(_allocator, stagingBuffer._allocation);
 
@@ -1927,7 +1918,6 @@ void VentumEngine::logoLoadingFunctionThatIsVeryImportant()
 
     VK_CHECK(vkCreateImageView(_device, &viewInfo, nullptr, &textureImageView));
     DEBUG("created image view");
-    printf("\n");
 
     _defaultPushConstants.transformation = {2.0,0.0,0.0,0.0,
                                 0.0,2.0,0.0,0.0,
@@ -1960,6 +1950,8 @@ int VentumEngine::loading_MKTP_image(MKTPic data)
 
     VkBuffer stagingBuffer;
 
+    // createBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+
     VkBufferCreateInfo stagingBufferInfo = {};
 	stagingBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 	stagingBufferInfo.pNext = nullptr;
@@ -1981,7 +1973,12 @@ int VentumEngine::loading_MKTP_image(MKTPic data)
     vmaMapMemory(_allocator, stagingBufferMemory._allocation, &data_ptr);
 	memcpy(data_ptr, data.pixels, imageSize);
 	vmaUnmapMemory(_allocator, stagingBufferMemory._allocation);
+    // vkMapMemory(_device, stagingBufferMemory, 0, imageSize, 0, &data_ptr);
+    // memcpy(data_ptr, data.pixels, static_cast<size_t>(imageSize)); // now let us just hope that my made up format will work in this highly delicate system
+    // vkUnmapMemory(_device, stagingBufferMemory);
     DEBUG("mapped memory");
+
+    
 
     free(data.pixels); // #ff0000 might cause some minor fatal errors
 
@@ -2028,7 +2025,6 @@ int VentumEngine::loading_MKTP_image(MKTPic data)
     transitionImageLayout(textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
     vkDestroyBuffer(_device, stagingBufferMemory._buffer, nullptr);
-    DEBUG("destroyed the buffer");
     // vkFreeMemory(_device, stagingBufferMemory, nullptr); // #ff0000
 
     VkImageView textureImageView;
@@ -2045,48 +2041,28 @@ int VentumEngine::loading_MKTP_image(MKTPic data)
     viewInfo.subresourceRange.layerCount = 1;
 
     VK_CHECK(vkCreateImageView(_device, &viewInfo, nullptr, &textureImageView));
+    DEBUG("created image view");
+
 
     _pictures.resize(_pictures.size()+1);
-    _pictures[_pictures.size()-1] = {textureImage,textureImageMemory,textureImageView,_defaultPushConstants,1};
+    imagesLoaded++;
+    _pictures[_pictures.size()-1] = {textureImage,textureImageMemory,textureImageView,_defaultPushConstants,1,{}};
+
+    _pictures[_pictures.size()-1].PC.transformation = {0.1,0.0,0.0,0.0,
+                                    0.0,0.1,0.0,0.0,
+                                    0.0,0.0,0.1,0.0,
+                                    0.0,0.0,0.0,1.0};
+
+                                    _drawQueue.sizeOfPictureGraphics++;
+
+    CreatePictureDescriptors(_pictures.data(),_pictures.size()-1);
 
     _mainDeletionQueue.push_function([=]() {
         vkDestroyImageView(_device, _pictures[_pictures.size()-1].textureImageView, nullptr);
         vkDestroyImage(_device, _pictures[_pictures.size()-1].textureImage, nullptr);
         vkFreeMemory(_device, _pictures[_pictures.size()-1].textureImageMemory, nullptr);
     });
-///////////////////////////////////////////////////
-///////////////////////////////////////////////////
-///////////////////////////////////////////////////
-///////////////////////////////////////////////////
-///////////////////////////////////////////////////
-///////////////////////////////////////////////////
-///////////////////////////////////////////////////
-///////////////////////////////////////////////////
-///////////////////////////////////////////////////
-///////////////////////////////////////////////////
-///////////////////////////////////////////////////
-///////////////////////////////////////////////////
-///////////////////////////////////////////////////
-///////////////////////////////////////////////////
-///////////////////////////////////////////////////
-
-    // init_descriptors( _pictures.size()-1); //#0000ff
-    // updateSpecificPictureDescriptor(_pictures.data(), _pictures.size()-1);
-    CreatePictureDescriptors(&_pictures[_pictures.size()-1]);
-
-    _pictures[_pictures.size()-1].PC = _defaultPushConstants;
-
-    _pictures[_pictures.size()-1].PC.transformation = {1.0,0.0,0.0,0.0,
-                                0.0,1.0,0.0,0.0,
-                                0.0,0.0,1.0,0.0,
-                                0.0,0.0,0.0,1.0};
-
-    DEBUG("finished descriptor writing loop");
-    imagesLoaded++;
-	// add buffers to deletion queues
-
-    _drawQueue.sizeOfPictureGraphics++;
-    DEBUG("loaded a MKTP image");
+    DEBUG("loaded the logo");
     return _pictures.size()-1;
     // some shananigans
 }
@@ -2249,8 +2225,10 @@ void VentumEngine::draw_PiC(VkCommandBuffer cmd,vPic* first, int count)
 {
 	for (int i = 0; i < count; i++)
 	{
+        printf("\nbefore: %d",i);
         if(first[i].isVisible)
         {
+            printf("\nINTeresting: %d",i);
             AGPushConstants constants = first[i].PC;
             MKTPiC * object = &_defaultPictureRectangle;
 
@@ -2264,7 +2242,7 @@ void VentumEngine::draw_PiC(VkCommandBuffer cmd,vPic* first, int count)
 
             vkCmdBindVertexBuffers(cmd, 0, 1, &object->_vertexBuffer._buffer, &offset);//#ff0000 problem
 
-            vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _DiSPipelineLayout, 0, 1, &get_current_frame().globalDescriptor, 0, nullptr);
+            vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _DiSPipelineLayout, 0, 1, first[i]._currentDescriptor, 0, nullptr);
 
             vkCmdDraw(cmd, object->_vertices.size(), 1, 0, 0);
         }

@@ -114,7 +114,7 @@ VkDeviceMemory textureImageMemory;
 VkImageView textureImageView;
 AGPushConstants PC;
 char isVisible;
-VkDescriptorSet _currentDescriptor; // bad idea i know
+VkDescriptorSet * _currentDescriptor; // bad idea i know
 } vPic;
 
 typedef struct MainRenderStruct {
@@ -245,6 +245,7 @@ public:
     VkDescriptorSetLayout _globalSetLayout;
     VkDescriptorPool _descriptorPool;
 
+    
     VkDescriptorSetLayout _picturesSetLayout;
     VkDescriptorPool _picturesDescriptorPool;
 
@@ -274,7 +275,7 @@ public:
 
 private:
 
-    void CreatePictureDescriptors(vPic * pPic);
+    void CreatePictureDescriptors(vPic * pPic,size_t index);
 
     void logoLoadingFunctionThatIsVeryImportant();
 
