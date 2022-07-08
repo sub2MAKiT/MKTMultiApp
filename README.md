@@ -22,3 +22,4 @@
 21. 01.02.02 - Working (probably) image shader'
 22. 01.03.02 - Working image drawing
 23. 01.04.00 - Working Linux version
+24. 01.05.00 - Working loading images during runtime

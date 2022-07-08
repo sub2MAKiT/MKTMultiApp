@@ -114,7 +114,6 @@ VkDeviceMemory textureImageMemory;
 VkImageView textureImageView;
 AGPushConstants PC;
 char isVisible;
-VkDescriptorSet * _currentDescriptor; // bad idea i know
 } vPic;
 
 typedef struct MainRenderStruct {
@@ -245,9 +244,12 @@ public:
     VkDescriptorSetLayout _globalSetLayout;
     VkDescriptorPool _descriptorPool;
 
-    
+    size_t _currentPicturesDescriptorSize;
+    VkDescriptorSet * _currentPicturesDescriptor; // bad idea i know
     VkDescriptorSetLayout _picturesSetLayout;
     VkDescriptorPool _picturesDescriptorPool;
+
+    char TEMPpictureToShow;
 
     UploadContext _uploadContext;
 
