@@ -60,7 +60,7 @@ void VentumEngine::init() {
 
     logoLoadingFunctionThatIsVeryImportant(); // don't ask me why, but deleting this file will cause the whole engine to crash (I've made my own coconut.png)
 
-    init_descriptors(0); //#0000ff
+    init_descriptors(); //#0000ff
 
     init_pipelines(); //#0000ff
 
@@ -74,7 +74,7 @@ void VentumEngine::init() {
 
     init_VentumEngineVariables();
 
-    // loading_MKTP_image(MKTPicReader("./graphics/MKTPhotos/wideColoursTest.MKTP"));
+    loading_MKTP_image(MKTPicReader("./graphics/MKTPhotos/wideColoursTest.MKTP"));
 
     _isInitialized = true;
 }
@@ -1143,45 +1143,91 @@ void VentumEngine::init_VentumEngineVariables()
     _drawQueue.sizeOfObjects = _renderables.size();
     _drawQueue.sizeOfPictureGraphics = _pictures.size();
 
-    _pictures[1].PC.transformation = {1.0,0.0,0.0,0.0,
-                                0.0,1.0,0.0,0.0,
-                                0.0,0.0,1.0,0.0,
-                                0.0,0.0,0.0,1.0};
-
     modesEnabled = 14;
 
     return;
 }
 
-void VentumEngine::init_descriptors( int picture )
+void VentumEngine::CreatePictureDescriptors(vPic * pPic)
+{
+    VkDescriptorSetAllocateInfo allocInfo ={};
+    allocInfo.pNext = nullptr;
+    allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+    allocInfo.descriptorPool = _descriptorPool;
+    allocInfo.descriptorSetCount = 1;
+    allocInfo.pSetLayouts = &_picturesSetLayout;
+
+    vkAllocateDescriptorSets(_device, &allocInfo, &pPic->_currentDescriptor);
+
+    VkDescriptorImageInfo imageInfo{};
+    imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    imageInfo.imageView = pPic->textureImageView;
+    imageInfo.sampler = _textureSampler;
+
+    VkWriteDescriptorSet setWrite = {};
+    setWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    setWrite.dstSet = pPic->_currentDescriptor;
+    setWrite.dstBinding = 0;
+    setWrite.dstArrayElement = 0;
+    setWrite.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    setWrite.descriptorCount = 1;
+    setWrite.pImageInfo = &imageInfo;
+    setWrite.pNext = nullptr;
+    
+    vkUpdateDescriptorSets(_device, 1, &setWrite, 0, nullptr);
+
+    return;
+}
+
+void VentumEngine::init_descriptors()
 {
     VkDescriptorSetLayoutBinding camBufferBinding = {};
 	camBufferBinding.binding = 0;
 	camBufferBinding.descriptorCount = 1;
 	camBufferBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-
 	camBufferBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
+	VkDescriptorSetLayoutCreateInfo setInfo = {};
+	setInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+	setInfo.pNext = nullptr;
+
+	setInfo.bindingCount = 1;
+	setInfo.flags = 0;
+    setInfo.pBindings = &camBufferBinding;
+
+	vkCreateDescriptorSetLayout(_device, &setInfo, nullptr, &_globalSetLayout);
+
     VkDescriptorSetLayoutBinding samplerLayoutBinding{};
-    samplerLayoutBinding.binding = 1;
+    samplerLayoutBinding.binding = 0;
     samplerLayoutBinding.descriptorCount = 1;
     samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
     samplerLayoutBinding.pImmutableSamplers = nullptr;
     samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
-
-	VkDescriptorSetLayoutCreateInfo setinfo = {};
+    VkDescriptorSetLayoutCreateInfo setinfo = {};
 	setinfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
 	setinfo.pNext = nullptr;
 
-	setinfo.bindingCount = 2;
+	setinfo.bindingCount = 1;
 	setinfo.flags = 0;
-	VkDescriptorSetLayoutBinding* tempArray = (VkDescriptorSetLayoutBinding*)malloc(sizeof(VkDescriptorSetLayoutBinding)*setinfo.bindingCount);
-    tempArray[0] = camBufferBinding;
-    tempArray[1] = samplerLayoutBinding;
-    setinfo.pBindings = tempArray;
+    setinfo.pBindings = &samplerLayoutBinding;
 
-	vkCreateDescriptorSetLayout(_device, &setinfo, nullptr, &_globalSetLayout);
+    vkCreateDescriptorSetLayout(_device, &setinfo, nullptr, &_picturesSetLayout);
+
+    VkDescriptorPoolSize size = {};
+    size.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    size.descriptorCount = 10; // to change
+
+    VkDescriptorPoolCreateInfo pP_info = {};
+	pP_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+	pP_info.flags = 0;
+	pP_info.maxSets = 10; // to change
+	pP_info.poolSizeCount = 1;
+	pP_info.pPoolSizes = &size;
+    
+	vkCreateDescriptorPool(_device, &pP_info, nullptr, &_picturesDescriptorPool);
+
+
 
     std::vector<VkDescriptorPoolSize> sizes =
 	{
@@ -1215,33 +1261,19 @@ void VentumEngine::init_descriptors( int picture )
 		binfo.offset = 0;
 		binfo.range = sizeof(GPUCameraData);
 
-        VkDescriptorImageInfo imageInfo{};
-        imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-        imageInfo.imageView = _pictures[0].textureImageView;
-        imageInfo.sampler = _textureSampler;
-
-		VkWriteDescriptorSet * setWrite = (VkWriteDescriptorSet*)malloc(sizeof(VkWriteDescriptorSet)*2);
-		setWrite[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        setWrite[0].dstSet = _frames[i].globalDescriptor;
-        setWrite[0].dstBinding = 0;
-        setWrite[0].dstArrayElement = 0;
-        setWrite[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        setWrite[0].descriptorCount = 1;
-        setWrite[0].pBufferInfo = &binfo;
-        setWrite[0].pNext = nullptr;
-
-        setWrite[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        setWrite[1].dstSet = _frames[i].globalDescriptor;
-        setWrite[1].dstBinding = 1;
-        setWrite[1].dstArrayElement = 0;
-        setWrite[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        setWrite[1].descriptorCount = 1;
-        setWrite[1].pImageInfo = &imageInfo;
-        setWrite[1].pNext = nullptr;
-
-        printf("\noh no1 %x %x",_frames[i].globalDescriptor,VK_NULL_HANDLE);
-		vkUpdateDescriptorSets(_device, 2, setWrite, 0, nullptr);
+		VkWriteDescriptorSet setWrite;
+		setWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        setWrite.dstSet = _frames[i].globalDescriptor;
+        setWrite.dstBinding = 0;
+        setWrite.dstArrayElement = 0;
+        setWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        setWrite.descriptorCount = 1;
+        setWrite.pBufferInfo = &binfo;
+        setWrite.pNext = nullptr;
+        vkUpdateDescriptorSets(_device, 1, &setWrite, 0, nullptr);
 	}
+
+    CreatePictureDescriptors(_pictures.data());
 
     _mainDeletionQueue.push_function([&]() {
 		vkDestroyDescriptorSetLayout(_device, _globalSetLayout, nullptr);
@@ -1255,10 +1287,12 @@ void VentumEngine::init_descriptors( int picture )
 		});
 	}
 
-    _pictures[0]._currentPool = _descriptorPool;
-    _pictures[0]._currentDescriptor = (VkDescriptorSet*)malloc(sizeof(VkDescriptorSet)*FRAME_OVERLAP);
-    for(int i = 0; i < FRAME_OVERLAP;i++)
-        _pictures[0]._currentDescriptor[i] = _frames[i].globalDescriptor;
+    imagesLoaded = 2;
+
+    // _pictures[0]._currentPool = _descriptorPool;
+    // _pictures[0]._currentDescriptor = (VkDescriptorSet*)malloc(sizeof(VkDescriptorSet)*FRAME_OVERLAP);
+    // for(int i = 0; i < FRAME_OVERLAP;i++)
+        // _pictures[0]._currentDescriptor[i] = _frames[i].globalDescriptor;
 }
 
 void VentumEngine::updateSpecificPictureDescriptor(vPic * Picture, size_t pictureNumber)
@@ -1305,7 +1339,7 @@ void VentumEngine::updateSpecificPictureDescriptor(vPic * Picture, size_t pictur
 	pool_info.poolSizeCount = (uint32_t)sizes.size();
 	pool_info.pPoolSizes = sizes.data();
 
-	vkCreateDescriptorPool(_device, &pool_info, nullptr, &Picture[pictureNumber]._currentPool);
+	// vkCreateDescriptorPool(_device, &pool_info, nullptr, &Picture[pictureNumber]._currentPool);
 
     for (int i = 0; i < FRAME_OVERLAP; i++)
 	{
@@ -1360,10 +1394,10 @@ void VentumEngine::updateSpecificPictureDescriptor(vPic * Picture, size_t pictur
 		});
 	}
 
-    _pictures[pictureNumber]._currentPool = _descriptorPool;
-    _pictures[pictureNumber]._currentDescriptor = (VkDescriptorSet*)malloc(sizeof(VkDescriptorSet)*FRAME_OVERLAP);
-    for(int i = 0; i < FRAME_OVERLAP;i++)
-        _pictures[pictureNumber]._currentDescriptor[i] = tempFrameData[i].globalDescriptor;
+    // _pictures[pictureNumber]._currentPool = _descriptorPool;
+    // _pictures[pictureNumber]._currentDescriptor = (VkDescriptorSet*)malloc(sizeof(VkDescriptorSet)*FRAME_OVERLAP);
+    // for(int i = 0; i < FRAME_OVERLAP;i++)
+        // _pictures[pictureNumber]._currentDescriptor[i] = tempFrameData[i].globalDescriptor;
 
 printf("\nTHIS WILL BE FUN: %x %d",_pictures[1]._currentDescriptor,*(int*)(_pictures[1]._currentDescriptor));
     free(tempFrameData);
@@ -1572,7 +1606,7 @@ void VentumEngine::upload_AG(MKTAG& AG)
     _mainDeletionQueue.push_function([=]() {
 		vmaDestroyBuffer(_allocator, AG._vertexBuffer._buffer, AG._vertexBuffer._allocation);
 	});
-
+    DEBUG("before unmapping");
 	vmaDestroyBuffer(_allocator, stagingBuffer._buffer, stagingBuffer._allocation);
 }
 
@@ -1892,6 +1926,8 @@ void VentumEngine::logoLoadingFunctionThatIsVeryImportant()
     viewInfo.subresourceRange.layerCount = 1;
 
     VK_CHECK(vkCreateImageView(_device, &viewInfo, nullptr, &textureImageView));
+    DEBUG("created image view");
+    printf("\n");
 
     _defaultPushConstants.transformation = {2.0,0.0,0.0,0.0,
                                 0.0,2.0,0.0,0.0,
@@ -1992,6 +2028,7 @@ int VentumEngine::loading_MKTP_image(MKTPic data)
     transitionImageLayout(textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
     vkDestroyBuffer(_device, stagingBufferMemory._buffer, nullptr);
+    DEBUG("destroyed the buffer");
     // vkFreeMemory(_device, stagingBufferMemory, nullptr); // #ff0000
 
     VkImageView textureImageView;
@@ -2017,12 +2054,35 @@ int VentumEngine::loading_MKTP_image(MKTPic data)
         vkDestroyImage(_device, _pictures[_pictures.size()-1].textureImage, nullptr);
         vkFreeMemory(_device, _pictures[_pictures.size()-1].textureImageMemory, nullptr);
     });
+///////////////////////////////////////////////////
+///////////////////////////////////////////////////
+///////////////////////////////////////////////////
+///////////////////////////////////////////////////
+///////////////////////////////////////////////////
+///////////////////////////////////////////////////
+///////////////////////////////////////////////////
+///////////////////////////////////////////////////
+///////////////////////////////////////////////////
+///////////////////////////////////////////////////
+///////////////////////////////////////////////////
+///////////////////////////////////////////////////
+///////////////////////////////////////////////////
+///////////////////////////////////////////////////
+///////////////////////////////////////////////////
 
     // init_descriptors( _pictures.size()-1); //#0000ff
     // updateSpecificPictureDescriptor(_pictures.data(), _pictures.size()-1);
+    CreatePictureDescriptors(&_pictures[_pictures.size()-1]);
 
-    
+    _pictures[_pictures.size()-1].PC = _defaultPushConstants;
 
+    _pictures[_pictures.size()-1].PC.transformation = {1.0,0.0,0.0,0.0,
+                                0.0,1.0,0.0,0.0,
+                                0.0,0.0,1.0,0.0,
+                                0.0,0.0,0.0,1.0};
+
+    DEBUG("finished descriptor writing loop");
+    imagesLoaded++;
 	// add buffers to deletion queues
 
     _drawQueue.sizeOfPictureGraphics++;
@@ -2136,7 +2196,7 @@ void VentumEngine::MKTDRAW(VkCommandBuffer cmd)
 {
     // if(modesEnabled&MKTDRAWAG)
         // draw_AG(cmd,_drawQueue.ArrayGraphics, _drawQueue.sizeOfArrayGraphics);
-    if(modesEnabled&MKTDRAWPIC)
+    // if(modesEnabled&MKTDRAWPIC)
         draw_PiC(cmd,_drawQueue.pictureGraphics, _drawQueue.sizeOfPictureGraphics);
     // if(modesEnabled&MKTDRAWMENU)
         // drawMenu(cmd,Modules, sizeOfModules);
@@ -2204,7 +2264,7 @@ void VentumEngine::draw_PiC(VkCommandBuffer cmd,vPic* first, int count)
 
             vkCmdBindVertexBuffers(cmd, 0, 1, &object->_vertexBuffer._buffer, &offset);//#ff0000 problem
 
-            vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _DiSPipelineLayout, 0, 1, &first[i]._currentDescriptor[_frameNumber%FRAME_OVERLAP], 0, nullptr);
+            vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _DiSPipelineLayout, 0, 1, &get_current_frame().globalDescriptor, 0, nullptr);
 
             vkCmdDraw(cmd, object->_vertices.size(), 1, 0, 0);
         }

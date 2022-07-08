@@ -114,9 +114,7 @@ VkDeviceMemory textureImageMemory;
 VkImageView textureImageView;
 AGPushConstants PC;
 char isVisible;
-VkDescriptorSet * _currentDescriptor; // bad idea i know
-VkDescriptorPool _currentPool; // I know, an even worse idea but...
-VkDescriptorSetLayoutBinding _currentSetLayoutBinding; // It's too late to quit now
+VkDescriptorSet _currentDescriptor; // bad idea i know
 } vPic;
 
 typedef struct MainRenderStruct {
@@ -139,6 +137,8 @@ void removeFromRenderQueue(int ID);
 class VentumEngine {
 public:
     
+    int imagesLoaded;
+
     void upload_AG(MKTAG& AG);
     bool _isInitialized{false};
     int _frameNumber {0};
@@ -245,6 +245,9 @@ public:
     VkDescriptorSetLayout _globalSetLayout;
     VkDescriptorPool _descriptorPool;
 
+    VkDescriptorSetLayout _picturesSetLayout;
+    VkDescriptorPool _picturesDescriptorPool;
+
     UploadContext _uploadContext;
 
     Material AGMaterial;
@@ -270,6 +273,8 @@ public:
     void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
 
 private:
+
+    void CreatePictureDescriptors(vPic * pPic);
 
     void logoLoadingFunctionThatIsVeryImportant();
 
@@ -301,7 +306,7 @@ private:
 
     void init_scene();
 
-	void init_descriptors(int picture);
+	void init_descriptors();
 
     void init_createTextureSampler();
 
