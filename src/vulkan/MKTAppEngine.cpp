@@ -48,8 +48,6 @@ void VentumEngine::init() {
 
     init_commands(); //#0000ff
 
-    // why = loading_MKTP_image(MKTPicReader("./graphics/MKTPhotos/wideColoursTest.MKTP"));
-
     init_createTextureSampler(); // #0000ff
 
     init_default_renderpass(); //#0000ff
@@ -205,52 +203,21 @@ void VentumEngine::run() {
             if (e.type == SDL_QUIT) bQuit = true;
             else if (e.type == SDL_KEYDOWN)
             {
-                if (e.key.keysym.sym == SDLK_RIGHT)
-                    xSize += 0.01;
-                else if(e.key.keysym.sym == SDLK_LEFT)
-                    xSize -= 0.01;
-                else if(e.key.keysym.sym == SDLK_UP)
-                    ySize += 0.01;
-                else if(e.key.keysym.sym == SDLK_DOWN)
-                    ySize -= 0.01;
-                else if(e.key.keysym.sym == SDLK_s)
-                    yMove += 0.1;
-                else if(e.key.keysym.sym == SDLK_w)
-                    yMove -= 0.1;
-                else if(e.key.keysym.sym == SDLK_d)
-                    xMove += 0.1;
-                else if(e.key.keysym.sym == SDLK_a)
-                    xMove -= 0.1;
-                else if(e.key.keysym.sym == SDLK_SPACE)
-                    TEMPpictureToShow++;
-                // else if(e.key.keysym.sym == SDLK_q)
-                // {
-                //     modesEnabled == MKTDRAWAG|MKTDRAWMENU|MKTDRAW3D;
-                // }
-                // else if(e.key.keysym.sym == SDLK_e)
-                // {
+                if(e.key.keysym.sym == SDLK_SPACE) // temp
+                    0;
+
             }
             else if(e.type == SDL_MOUSEWHEEL)
-                 if(e.wheel.y > 0)
-                {
-                     CBT += 0.01;
-                }
-                else if(e.wheel.y < 0)
-                {
-                     CBT -= 0.01;
-                }
+                    CBT += e.wheel.y < 0?0.01:-0.01;
             else if(e.type == SDL_MOUSEBUTTONDOWN)
                 if(e.button.button == SDL_BUTTON_LEFT)
                     printf("is it a float %f or an int %d",e.button.x,e.button.x);
                 
+            
 
             if(currentObjectToDraw > 2)
                 currentObjectToDraw = 0;
 
-            // for(int i = 0; i < _AGA.size();i++)
-            // {
-                // printf("\nobject number %d, is visible %d, movement %f %f %f, size %f %f %f %f",_AGA[i].isVisible,_AGA[i].AGPC.movement[0],_AGA[i].AGPC.movement[1],_AGA[i].AGPC.movement[2],_AGA[i].AGPC.transformation[0],_AGA[i].AGPC.transformation.value,_AGA[i].AGPC.transformation[10],_AGA[i].AGPC.transformation[15]);
-            // }
         }
     }
     DEBUG("III ran III");
@@ -983,13 +950,6 @@ void VentumEngine::loadMenuAG()
 {
     const char fileNames[19] = "./lib/icons/.MKTAG";
 
-
-    // #ifdef _WIN32
-    // 15;
-    // #elif __gnu_linux__
-    // 16;
-    // #endif
-
     CBT = 0.0;
 
     FILE *MKTFILE;
@@ -1131,15 +1091,7 @@ void VentumEngine::init_scene()
 
 void VentumEngine::init_VentumEngineVariables()
 {
-    _drawQueue.Objects = &_renderables[0];
-    _drawQueue.ArrayGraphics = &_AGA[0];
-    _drawQueue.pictureGraphics = &_pictures[0];
-
-    _drawQueue.sizeOfArrayGraphics = _AGA.size();
-    _drawQueue.sizeOfObjects = _renderables.size();
-    _drawQueue.sizeOfPictureGraphics = _pictures.size();
-
-    TEMPpictureToShow = 0;
+    setupRenderArray(&_render);
 
     modesEnabled = 14;
 
@@ -2059,9 +2011,9 @@ int VentumEngine::loading_MKTP_image(MKTPic data)
                                     0.0,0.0,0.1,0.0,
                                     0.0,0.0,0.0,1.0};
 
-                                    _drawQueue.sizeOfPictureGraphics++;
 
     CreatePictureDescriptors(_pictures.data(),_pictures.size()-1);
+    addToRenderArray(&_render,1, _pictures.size()-1, 0);
 
     _mainDeletionQueue.push_function([=]() {
         vkDestroyImageView(_device, _pictures[_pictures.size()-1].textureImageView, nullptr);
@@ -2176,15 +2128,107 @@ Mesh* VentumEngine::get_mesh(const std::string& name)
 
 void VentumEngine::MKTDRAW(VkCommandBuffer cmd)
 {
-    // if(modesEnabled&MKTDRAWAG)
-        // draw_AG(cmd,_drawQueue.ArrayGraphics, _drawQueue.sizeOfArrayGraphics);
-    // if(modesEnabled&MKTDRAWPIC)
-        draw_PiC(cmd,_drawQueue.pictureGraphics, _drawQueue.sizeOfPictureGraphics);
-    // if(modesEnabled&MKTDRAWMENU)
-        // drawMenu(cmd,Modules, sizeOfModules);
-    // if(modesEnabled&MKTDRAW3D)
-        // draw_objects(cmd,_drawQueue.Objects, _drawQueue.sizeOfObjects);
+    glm::vec3 camPos = { 0.f,-6.f,-10.f };
 
+    glm::mat4 view = glm::translate(glm::mat4(1.f), camPos);
+    glm::mat4 projection = glm::perspective(glm::radians(70.f), 1700.f / 900.f, 0.1f, 200.0f);
+    projection[1][1] *= -1;
+
+    GPUCameraData camData;
+    camData.proj = projection;
+    camData.view = view;
+    camData.viewproj = projection * view;
+
+    void* data;
+    vmaMapMemory(_allocator, get_current_frame().cameraBuffer._allocation, &data);
+
+    memcpy(data, &camData, sizeof(GPUCameraData));
+
+    vmaUnmapMemory(_allocator, get_current_frame().cameraBuffer._allocation);
+
+    Mesh* lastMesh = nullptr;
+    Material* lastMaterial = nullptr;
+
+    for(int iLayer = 0; iLayer < _render.size;iLayer++)
+    {
+        for(int renderObject = 0; renderObject < _render.sizePerArray[iLayer];renderObject++)
+        {
+            if(modesEnabled&MKTDRAWAG)
+                if(_render.arrayPointers[iLayer][renderObject].type == 0)
+                {
+                    int fasterID = _render.arrayPointers[iLayer][renderObject].ID;
+                    if(_AGA[fasterID].isVisible)
+                    {
+                        AGPushConstants constants = _AGA[fasterID].AGPC;
+                        MKTAG * object = &_AGA[fasterID].AG;
+
+                        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _AGPipeline);
+
+                        VkDeviceSize offset = 0;
+
+                        vkCmdPushConstants(cmd, _AGPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(AGPushConstants), &constants);
+
+                        vkCmdBindVertexBuffers(cmd, 0, 1, &object->_vertexBuffer._buffer, &offset);
+
+                        vkCmdDraw(cmd, object->_vertices.size(), 1, 0, 0);
+                    }
+                }
+            if(modesEnabled&MKTDRAWPIC)
+                if(_render.arrayPointers[iLayer][renderObject].type == 1)
+                {
+                    int fasterID = _render.arrayPointers[iLayer][renderObject].ID;
+                    if(_pictures[fasterID].isVisible)
+                    {
+                        AGPushConstants constants = _pictures[fasterID].PC;
+                        MKTPiC * object = &_defaultPictureRectangle;
+
+                        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _DiSPipeline);
+
+                        VkDeviceSize offset = 0;
+
+                        vkCmdPushConstants(cmd, _DiSPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(AGPushConstants), &constants);
+
+                        vkCmdBindVertexBuffers(cmd, 0, 1, &object->_vertexBuffer._buffer, &offset);//#ff0000 problem
+
+                        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _DiSPipelineLayout, 0, 1, &_currentPicturesDescriptor[fasterID], 0, nullptr);
+
+                        vkCmdDraw(cmd, object->_vertices.size(), 1, 0, 0);
+                    }
+                }
+            if(modesEnabled&MKTDRAW3D)
+                if(_render.arrayPointers[iLayer][renderObject].type == 2)
+                {
+                    int fasterID = _render.arrayPointers[iLayer][renderObject].ID;
+                    RenderObject& object = _renderables[fasterID];
+
+                    if (object.material != lastMaterial) {
+
+                        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, object.material->pipeline);
+                        lastMaterial = object.material;
+                        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, object.material->pipelineLayout, 0, 1, &get_current_frame().globalDescriptor, 0, nullptr);
+                    }
+
+
+                    glm::mat4 model = object.transformMatrix;
+                    glm::mat4 mesh_matrix = projection * view * model;
+
+                    MeshPushConstants constants;
+                    constants.render_matrix = object.transformMatrix;
+
+                    vkCmdPushConstants(cmd, object.material->pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(MeshPushConstants), &constants);
+
+                    if (object.mesh != lastMesh) {
+                        VkDeviceSize offset = 0;
+                        vkCmdBindVertexBuffers(cmd, 0, 1, &object.mesh->_vertexBuffer._buffer, &offset);
+                        lastMesh = object.mesh;
+                    }
+                    vkCmdDraw(cmd, object.mesh->_vertices.size(), 1, 0, 0);
+                }
+        }
+    }
+
+    if(modesEnabled&MKTDRAWMENU)
+        drawMenu(cmd,Modules, sizeOfModules);
     return;
 }
 
@@ -2218,116 +2262,13 @@ void VentumEngine::drawMenu(VkCommandBuffer cmd,GL * menuStuff, size_t sizeOfMen
 
             AGPushConstants BLC = _AGA[0].AGPC;
 
-            BLC.movement.y = CBT+i/20;
+            BLC.movement.y = CBT+i*20;
             
             vkCmdPushConstants(cmd, _AGPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(AGPushConstants), &BLC);
 
             vkCmdDraw(cmd, _AGA[BLACKLINE_ID].AG._vertices.size(), 1, 0, 0);
         }
     }
-}
-
-void VentumEngine::draw_PiC(VkCommandBuffer cmd,vPic* first, int count)
-{
-	for (int i = 0; i < count; i++)
-	{
-        printf("\nbefore: %d",i);
-        if(first[i].isVisible)
-        {
-            printf("\nINTeresting: %d",i);
-            AGPushConstants constants = first[i].PC;
-            MKTPiC * object = &_defaultPictureRectangle;
-
-            vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _DiSPipeline);
-
-            // vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _AGPipelineLayout, 0, 1, &get_current_frame().globalDescriptor, 0, nullptr);
-
-            VkDeviceSize offset = 0;
-
-            vkCmdPushConstants(cmd, _DiSPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(AGPushConstants), &constants);
-
-            vkCmdBindVertexBuffers(cmd, 0, 1, &object->_vertexBuffer._buffer, &offset);//#ff0000 problem
-
-            vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _DiSPipelineLayout, 0, 1, &_currentPicturesDescriptor[TEMPpictureToShow%2], 0, nullptr);
-
-            vkCmdDraw(cmd, object->_vertices.size(), 1, 0, 0);
-        }
-    }
-}
-
-void VentumEngine::draw_AG(VkCommandBuffer cmd,sub2MAKiT* first, int count)
-{
-	for (int i = 0; i < count; i++)
-	{
-        if(first[i].isVisible)
-        {
-            AGPushConstants constants = first[i].AGPC;
-            MKTAG * object = &first[i].AG;
-
-            vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _AGPipeline);
-
-            // vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _AGPipelineLayout, 0, 1, &get_current_frame().globalDescriptor, 0, nullptr);
-
-            VkDeviceSize offset = 0;
-
-            vkCmdPushConstants(cmd, _AGPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(AGPushConstants), &constants);
-
-            vkCmdBindVertexBuffers(cmd, 0, 1, &object->_vertexBuffer._buffer, &offset);
-
-            vkCmdDraw(cmd, object->_vertices.size(), 1, 0, 0);
-        }
-    }
-}
-
-void VentumEngine::draw_objects(VkCommandBuffer cmd,RenderObject* first, int count)
-{
-	glm::vec3 camPos = { 0.f,-6.f,-10.f };
-
-	glm::mat4 view = glm::translate(glm::mat4(1.f), camPos);
-	glm::mat4 projection = glm::perspective(glm::radians(70.f), 1700.f / 900.f, 0.1f, 200.0f);
-	projection[1][1] *= -1;
-
-    GPUCameraData camData;
-	camData.proj = projection;
-	camData.view = view;
-	camData.viewproj = projection * view;
-
-	void* data;
-	vmaMapMemory(_allocator, get_current_frame().cameraBuffer._allocation, &data);
-
-	memcpy(data, &camData, sizeof(GPUCameraData));
-
-	vmaUnmapMemory(_allocator, get_current_frame().cameraBuffer._allocation);
-
-	Mesh* lastMesh = nullptr;
-	Material* lastMaterial = nullptr;
-	for (int i = 0; i < count; i++)
-	{
-		RenderObject& object = first[i];
-
-		if (object.material != lastMaterial) {
-
-			vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, object.material->pipeline);
-            lastMaterial = object.material;
-            vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, object.material->pipelineLayout, 0, 1, &get_current_frame().globalDescriptor, 0, nullptr);
-        }
-
-
-		glm::mat4 model = object.transformMatrix;
-		glm::mat4 mesh_matrix = projection * view * model;
-
-		MeshPushConstants constants;
-		constants.render_matrix = object.transformMatrix;
-
-		vkCmdPushConstants(cmd, object.material->pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(MeshPushConstants), &constants);
-
-		if (object.mesh != lastMesh) {
-			VkDeviceSize offset = 0;
-			vkCmdBindVertexBuffers(cmd, 0, 1, &object.mesh->_vertexBuffer._buffer, &offset);
-			lastMesh = object.mesh;
-		}
-		vkCmdDraw(cmd, object.mesh->_vertices.size(), 1, 0, 0);
-	}
 }
 
 FrameData& VentumEngine::get_current_frame()

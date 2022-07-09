@@ -7,6 +7,7 @@
 #include <iostream>
 #include "../libraryHeader.h"
 #include "../fileManagment/MKTPicture.h"
+#include "./_render.h"
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_vulkan.h>
@@ -116,16 +117,6 @@ AGPushConstants PC;
 char isVisible;
 } vPic;
 
-typedef struct MainRenderStruct {
-sub2MAKiT* ArrayGraphics;
-vPic* pictureGraphics;
-RenderObject* Objects;
-
-size_t sizeOfArrayGraphics;
-size_t sizeOfPictureGraphics;
-size_t sizeOfObjects;
-} DrawStruct;
-
 extern GL * Modules;
 extern size_t sizeOfModules;
 
@@ -215,11 +206,10 @@ public:
     MKTPiC _defaultPictureRectangle;
     
     // IMPORTANT !!!
+    RenderArray _render;
     std::vector<sub2MAKiT> _AGA;
     std::vector<vPic> _pictures;
     std::vector<RenderObject> _renderables;
-
-    DrawStruct _drawQueue;
 
     std::unordered_map<std::string,Material> _materials;
     std::unordered_map<std::string,Mesh> _meshes;
@@ -229,10 +219,6 @@ public:
     Material* get_material(const std::string& name);
 
     Mesh* get_mesh(const std::string& name);
-
-    void draw_objects(VkCommandBuffer cmd,RenderObject* first, int count);
-
-    void draw_AG(VkCommandBuffer cmd,sub2MAKiT* first, int count);
 
     void drawMenu(VkCommandBuffer cmd,GL * menuStuff, size_t sizeOfMenuStuff);
     FrameData _frames[FRAME_OVERLAP];
@@ -248,8 +234,6 @@ public:
     VkDescriptorSet * _currentPicturesDescriptor; // bad idea i know
     VkDescriptorSetLayout _picturesSetLayout;
     VkDescriptorPool _picturesDescriptorPool;
-
-    char TEMPpictureToShow;
 
     UploadContext _uploadContext;
 
@@ -312,8 +296,6 @@ private:
 	void init_descriptors();
 
     void init_createTextureSampler();
-
-    void draw_PiC(VkCommandBuffer cmd,vPic* first, int count);
 
     VkCommandBuffer beginSingleTimeCommands();
 

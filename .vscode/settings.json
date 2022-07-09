@@ -119,6 +119,7 @@
         "debug.h": "c",
         "mktarraygraphics.h": "c",
         "cmdmode.h": "c",
-        "mktpicture.h": "c"
+        "mktpicture.h": "c",
+        "_render.h": "c"
     }
 }
