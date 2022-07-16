@@ -1,3 +1,4 @@
+#define _MKTENGINEINCLUDEGUARD_
 #include "MKTAppEngine.h"
 #include "../fileManagment/MKTarrayGraphics.h"
 #define VMA_IMPLEMENTATION
@@ -5,7 +6,7 @@
 #include "../DEBUG.h"
 #include "imageHandling.h"
 
-// Some basig graphics:
+// Some basic graphics:
 
 #define MKTDRAW3D 1
 #define MKTDRAWAG 2
@@ -27,7 +28,45 @@ do                                                              \
     }                                                           \
 } while (0)
 
-void VentumEngine::init() {
+// temp section (it's here only for now)
+MKTPic MKTPicReader(const char * FP)
+{
+    MKTPic picToBeRead;
+    FILE *MKTFILE = fopen(FP, "rb" );
+	char *list;
+	fseek(MKTFILE,0L,SEEK_END);
+	size_t sizeOfFile = ftell(MKTFILE);
+	rewind(MKTFILE);
+	list = (char*)malloc(sizeOfFile);
+	fread( list,1, sizeOfFile, MKTFILE );
+
+    picToBeRead.width = *(size_t*)list;
+    picToBeRead.pixels = (MKTPix*)malloc(sizeOfFile-sizeof(size_t));
+
+    for(int i = 0; i < sizeOfFile-sizeof(size_t);i++)
+    {
+        if(i%4 == 0)
+            picToBeRead.pixels[(i-(i%4))/4].R = list[i+sizeof(size_t)];
+        if(i%4 == 1)
+            picToBeRead.pixels[(i-(i%4))/4].G = list[i+sizeof(size_t)];
+        if(i%4 == 2)
+            picToBeRead.pixels[(i-(i%4))/4].B = list[i+sizeof(size_t)];
+        if(i%4 == 3)
+            picToBeRead.pixels[(i-(i%4))/4].A = list[i+sizeof(size_t)];
+    }
+	
+    fclose( MKTFILE );
+
+    picToBeRead.height = (sizeOfFile-sizeof(size_t))/sizeof(MKTPix)/picToBeRead.width;
+    // if(DEBUG("loadImage"))
+        // for(int i = 0; i < picToBeRead.height * picToBeRead.width;i++)
+            // printf("\ntesting the picture: %d %d %d %d",picToBeRead.pixels[i].R,picToBeRead.pixels[i].G,picToBeRead.pixels[i].B,picToBeRead.pixels[i].A);
+
+    return picToBeRead;
+}
+//
+
+void init() {
 
     SDL_Init(SDL_INIT_VIDEO);
 
@@ -56,7 +95,9 @@ void VentumEngine::init() {
 
     init_sync_structures(); //#0000ff
     
-    logoLoadingFunctionThatIsVeryImportant(); // don't ask me why, but deleting this file will cause the whole engine to crash (I've made my own coconut.png)
+    init_fileConverter(); //#0000ff
+
+    logoLoadingFunctionThatIsVeryImportant(); //#0000ff don't ask me why, but deleting this file will cause the whole engine to crash (I've made my own coconut.png)
 
     init_descriptors(); //#0000ff
 
@@ -66,19 +107,23 @@ void VentumEngine::init() {
 
     load_AG(); //#0000ff
 
-    loadMenuAG();
+    loadMenuAG(); //#0000ff
 
     init_scene(); //#0000ff
 
-    init_VentumEngineVariables();
+    init_VentumEngineVariables(); //#0000ff
 
-    loading_MKTP_image(MKTPicReader("./graphics/MKTPhotos/wideColoursTest.MKTP"));
+    char * temp=(char*)malloc(42);
+    strcpy(temp,"./graphics/MKTPhotos/wideColoursTest.MKTP");
+    printf("\ncheckForPic: %x %s %d",temp,temp,loadFile(temp, 1));
+    free(temp);
 
     _isInitialized = true;
 }
 
-void VentumEngine::cleanup() {
+void cleanup() {
     if (_isInitialized) {
+        freeRenderArray(&_render);
 
         vkWaitForFences(_device, 1, &get_current_frame()._renderFence, true, 1000000000);
 
@@ -95,7 +140,7 @@ void VentumEngine::cleanup() {
     }
 }
 
-void VentumEngine::draw() {
+void draw() {
     //it don't be drawing
     VK_CHECK(vkWaitForFences(_device, 1, &get_current_frame()._renderFence, true, 1000000000));
     VK_CHECK(vkResetFences(_device, 1, &get_current_frame()._renderFence));
@@ -182,7 +227,7 @@ void VentumEngine::draw() {
     _frameNumber++;
 }
 
-void VentumEngine::run() {
+void run() {
     SDL_Event e;
     bool bQuit = false;
 
@@ -204,7 +249,10 @@ void VentumEngine::run() {
             else if (e.type == SDL_KEYDOWN)
             {
                 if(e.key.keysym.sym == SDLK_SPACE) // temp
-                    0;
+                    if(_render.sizePerArray[0] == 1)
+                        addToRenderArray(&_render,1, _pictures.size()-1, 0);
+                    else
+                        removeRenderObject(&_render,0,1,1);
 
             }
             else if(e.type == SDL_MOUSEWHEEL)
@@ -225,7 +273,7 @@ void VentumEngine::run() {
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 
-void VentumEngine::init_vulkan() //#0000ff
+void init_vulkan() //#0000ff
 {
     vkb::InstanceBuilder builder;
 
@@ -269,7 +317,7 @@ void VentumEngine::init_vulkan() //#0000ff
     DEBUG("II init:vulkan II");
 }
 
-void VentumEngine::init_swapchain() //#0000ff
+void init_swapchain() //#0000ff
 {
     vkb::SwapchainBuilder swapchainBuilder{_chosenGPU,_device,_surface };
 
@@ -321,7 +369,7 @@ void VentumEngine::init_swapchain() //#0000ff
     DEBUG("II init:swapchain II");
 }
 
-void VentumEngine::init_commands()
+void init_commands()
 {
 	VkCommandPoolCreateInfo commandPoolInfo = vkinit::command_pool_create_info(_graphicsQueueFamily, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT);
 
@@ -355,7 +403,7 @@ void VentumEngine::init_commands()
     DEBUG("II init:commands II");
 }
 
-void VentumEngine::init_default_renderpass()
+void init_default_renderpass()
 {
     VkAttachmentDescription color_attachment = {};
 	color_attachment.format = _swapchainImageFormat;
@@ -430,7 +478,7 @@ void VentumEngine::init_default_renderpass()
     DEBUG("II init:renderPass II");
 }
 
-void VentumEngine::init_framebuffers()
+void init_framebuffers()
 {
     VkFramebufferCreateInfo fb_info = {};
 	fb_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
@@ -464,7 +512,7 @@ void VentumEngine::init_framebuffers()
 	}
 }
 
-void VentumEngine::init_sync_structures()
+void init_sync_structures()
 {
     VkFenceCreateInfo fenceCreateInfo = vkinit::fence_create_info(VK_FENCE_CREATE_SIGNALED_BIT);
 
@@ -499,7 +547,7 @@ void VentumEngine::init_sync_structures()
     DEBUG("II init:sync structures II");
 }
 
-bool VentumEngine::load_shader_module(const char* filePath, VkShaderModule* outShaderModule)
+bool load_shader_module(const char* filePath, VkShaderModule* outShaderModule)
 {
     std::ifstream file(filePath, std::ios::ate | std::ios::binary);
 
@@ -535,7 +583,7 @@ bool VentumEngine::load_shader_module(const char* filePath, VkShaderModule* outS
     return true;
 }
 
-void VentumEngine::init_pipelines() {
+void init_pipelines() {
     VkShaderModule triangleFragShader;
     if (!load_shader_module("./shaders/triangle.frag.spv", &triangleFragShader))
     {
@@ -802,7 +850,7 @@ void VentumEngine::init_pipelines() {
     });
 }
 
-void VentumEngine::load_meshes()
+void load_meshes()
 {
     DEBUG("started loading meshes");
     _triangleMesh._vertices.resize(3);
@@ -826,7 +874,7 @@ void VentumEngine::load_meshes()
 	_meshes["triangle"] = _triangleMesh;
 }
 
-void VentumEngine::load_AG()
+void load_AG()
 {
     DEBUG("started loading AG");
 
@@ -946,7 +994,7 @@ void VentumEngine::load_AG()
     DEBUG("finished loading AG");
 }
 
-void VentumEngine::loadMenuAG()
+void loadMenuAG()
 {
     const char fileNames[19] = "./lib/icons/.MKTAG";
 
@@ -1018,10 +1066,8 @@ void VentumEngine::loadMenuAG()
 }
     
 
-void VentumEngine::init_scene()
+void init_scene()
 {
-    testLogo = MKTPicReader("./graphics/MKTPhotos/logo.MKTP");
-    
     RenderObject DUCK;
     AGMaterial = {_AGPipeline,_AGPipelineLayout};
 	DUCK.mesh = get_mesh("DUCK");
@@ -1089,7 +1135,7 @@ void VentumEngine::init_scene()
 	}
 }
 
-void VentumEngine::init_VentumEngineVariables()
+void init_VentumEngineVariables()
 {
     setupRenderArray(&_render);
 
@@ -1098,7 +1144,7 @@ void VentumEngine::init_VentumEngineVariables()
     return;
 }
 
-void VentumEngine::CreatePictureDescriptors(vPic * pPic, size_t index)
+void CreatePictureDescriptors(vPic * pPic, size_t index)
 {
     _currentPicturesDescriptorSize++;
     _currentPicturesDescriptor = (VkDescriptorSet*)realloc(_currentPicturesDescriptor,sizeof(VkDescriptorSet)*_currentPicturesDescriptorSize);
@@ -1130,7 +1176,7 @@ void VentumEngine::CreatePictureDescriptors(vPic * pPic, size_t index)
     return;
 }
 
-void VentumEngine::init_descriptors()
+void init_descriptors()
 {
     _currentPicturesDescriptorSize = 0;
     _currentPicturesDescriptor = (VkDescriptorSet*)malloc(sizeof(VkDescriptorSet)*3);
@@ -1247,7 +1293,7 @@ void VentumEngine::init_descriptors()
         // _pictures[0]._currentDescriptor[i] = _frames[i].globalDescriptor;
 }
 
-void VentumEngine::updateSpecificPictureDescriptor(vPic * Picture, size_t pictureNumber)
+void updateSpecificPictureDescriptor(vPic * Picture, size_t pictureNumber)
 {
     FrameData * tempFrameData = (FrameData*)malloc(sizeof(FrameData)*FRAME_OVERLAP);
 
@@ -1428,7 +1474,7 @@ void VentumEngine::updateSpecificPictureDescriptor(vPic * Picture, size_t pictur
 }
 
 
-void VentumEngine::immediate_submit(std::function<void(VkCommandBuffer cmd)>&& function)
+void immediate_submit(std::function<void(VkCommandBuffer cmd)>&& function)
 {
 	VkCommandBuffer cmd = _uploadContext._commandBuffer;
 
@@ -1502,7 +1548,7 @@ VkPipeline PipelineBuilder::build_pipeline(VkDevice device, VkRenderPass pass)
         }
 }
 
-void VentumEngine::upload_AG(MKTAG& AG)
+void upload_AG(MKTAG& AG)
 {
     const size_t bufferSize= AG._vertices.size() * sizeof(MKTAGA);
 	VkBufferCreateInfo stagingBufferInfo = {};
@@ -1559,7 +1605,7 @@ void VentumEngine::upload_AG(MKTAG& AG)
 	vmaDestroyBuffer(_allocator, stagingBuffer._buffer, stagingBuffer._allocation);
 }
 
-void VentumEngine::init_createTextureSampler()
+void init_createTextureSampler()
 {
     VkPhysicalDeviceProperties properties{};
     vkGetPhysicalDeviceProperties(_chosenGPU, &properties);
@@ -1592,7 +1638,7 @@ void VentumEngine::init_createTextureSampler()
     });
 }
 
-void VentumEngine::copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height) {
+void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height) {
     VkCommandBuffer commandBuffer = beginSingleTimeCommands();
 
     VkBufferImageCopy region{};
@@ -1624,7 +1670,7 @@ void VentumEngine::copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t wi
     endSingleTimeCommands(commandBuffer);
 }
 
-void VentumEngine::transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout) {
+void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout) {
     VkCommandBuffer commandBuffer = beginSingleTimeCommands();
 
     VkImageMemoryBarrier barrier{};
@@ -1673,7 +1719,7 @@ void VentumEngine::transitionImageLayout(VkImage image, VkFormat format, VkImage
     endSingleTimeCommands(commandBuffer);
 }
 
-void VentumEngine::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) {
+void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) {
     VkCommandBuffer commandBuffer = beginSingleTimeCommands();
 
     VkBufferCopy copyRegion{};
@@ -1683,7 +1729,7 @@ void VentumEngine::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSi
     endSingleTimeCommands(commandBuffer);
 }
 
-VkCommandBuffer VentumEngine::beginSingleTimeCommands() {
+VkCommandBuffer beginSingleTimeCommands() {
 
 
     VkCommandBufferAllocateInfo allocInfo{};
@@ -1704,7 +1750,7 @@ VkCommandBuffer VentumEngine::beginSingleTimeCommands() {
     return commandBuffer;
 }
 
-void VentumEngine::endSingleTimeCommands(VkCommandBuffer commandBuffer) {
+void endSingleTimeCommands(VkCommandBuffer commandBuffer) {
     vkEndCommandBuffer(commandBuffer);
 
     VkSubmitInfo submitInfo{};
@@ -1718,7 +1764,7 @@ void VentumEngine::endSingleTimeCommands(VkCommandBuffer commandBuffer) {
     vkFreeCommandBuffers(_device, get_current_frame()._commandPool, 1, &commandBuffer);
 }
 
-void VentumEngine::createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory) {
+void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory) {
     VkImageCreateInfo imageInfo{};
     imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
     imageInfo.imageType = VK_IMAGE_TYPE_2D;
@@ -1749,7 +1795,7 @@ void VentumEngine::createImage(uint32_t width, uint32_t height, VkFormat format,
     vkBindImageMemory(_device, image, imageMemory, 0);
 }
 
-void VentumEngine::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory) {
+void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory) {
     VkBufferCreateInfo bufferInfo{};
     bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
     bufferInfo.size = size;
@@ -1776,10 +1822,9 @@ void VentumEngine::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkM
     vkBindBufferMemory(_device, buffer, bufferMemory, 0);
 }
 
-void VentumEngine::logoLoadingFunctionThatIsVeryImportant()
+void logoLoadingFunctionThatIsVeryImportant()
 {
     MKTPic data = MKTPicReader("./graphics/MKTPhotos/logo.MKTP");
-
     VkDeviceSize imageSize = data.width * data.height * 4;
 
     VkBuffer stagingBuffer;
@@ -1902,7 +1947,7 @@ void VentumEngine::logoLoadingFunctionThatIsVeryImportant()
     return;
 }
 
-int VentumEngine::loading_MKTP_image(MKTPic data)
+int loading_MKTP_image(MKTPic data)
 {
     VkDeviceSize imageSize = data.width * data.height * 4;
 
@@ -1925,6 +1970,8 @@ int VentumEngine::loading_MKTP_image(MKTPic data)
 		&stagingBufferMemory._buffer,
 		&stagingBufferMemory._allocation,
 		nullptr));
+
+        printf("\nafterError");
 
     DEBUG("created buffer");
     void* data_ptr;
@@ -2025,7 +2072,7 @@ int VentumEngine::loading_MKTP_image(MKTPic data)
     // some shananigans
 }
 
-uint32_t VentumEngine::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) {
+uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) {
     VkPhysicalDeviceMemoryProperties memProperties;
     vkGetPhysicalDeviceMemoryProperties(_chosenGPU, &memProperties);
 
@@ -2038,7 +2085,7 @@ uint32_t VentumEngine::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags
     return -1;
 }
 
-void VentumEngine::upload_mesh(Mesh& mesh)
+void upload_mesh(Mesh& mesh)
 {
     const size_t bufferSize= mesh._vertices.size() * sizeof(Vertex);
 	VkBufferCreateInfo stagingBufferInfo = {};
@@ -2094,7 +2141,7 @@ void VentumEngine::upload_mesh(Mesh& mesh)
 	vmaDestroyBuffer(_allocator, stagingBuffer._buffer, stagingBuffer._allocation);
 }
 
-Material* VentumEngine::create_material(VkPipeline pipeline, VkPipelineLayout layout, const std::string& name)
+Material* create_material(VkPipeline pipeline, VkPipelineLayout layout, const std::string& name)
 {
 	Material mat;
 	mat.pipeline = pipeline;
@@ -2103,7 +2150,7 @@ Material* VentumEngine::create_material(VkPipeline pipeline, VkPipelineLayout la
 	return &_materials[name];
 }
 
-Material* VentumEngine::get_material(const std::string& name)
+Material* get_material(const std::string& name)
 {
 	auto it = _materials.find(name);
 	if (it == _materials.end()) {
@@ -2115,7 +2162,7 @@ Material* VentumEngine::get_material(const std::string& name)
 }
 
 
-Mesh* VentumEngine::get_mesh(const std::string& name)
+Mesh* get_mesh(const std::string& name)
 {
 	auto it = _meshes.find(name);
 	if (it == _meshes.end()) {
@@ -2126,7 +2173,7 @@ Mesh* VentumEngine::get_mesh(const std::string& name)
 	}
 }
 
-void VentumEngine::MKTDRAW(VkCommandBuffer cmd)
+void MKTDRAW(VkCommandBuffer cmd)
 {
     glm::vec3 camPos = { 0.f,-6.f,-10.f };
 
@@ -2232,7 +2279,7 @@ void VentumEngine::MKTDRAW(VkCommandBuffer cmd)
     return;
 }
 
-void VentumEngine::drawMenu(VkCommandBuffer cmd,GL * menuStuff, size_t sizeOfMenuStuff)
+void drawMenu(VkCommandBuffer cmd,GL * menuStuff, size_t sizeOfMenuStuff)
 {
 	for (int i = 0; i < sizeOfMenuStuff; i++) // make it less than 18 lines per draw
 	{
@@ -2271,12 +2318,12 @@ void VentumEngine::drawMenu(VkCommandBuffer cmd,GL * menuStuff, size_t sizeOfMen
     }
 }
 
-FrameData& VentumEngine::get_current_frame()
+FrameData& get_current_frame()
 {
 	return _frames[_frameNumber % FRAME_OVERLAP];
 }
 
-AllocatedBuffer VentumEngine::create_buffer(size_t allocSize, VkBufferUsageFlags usage, VmaMemoryUsage memoryUsage)
+AllocatedBuffer create_buffer(size_t allocSize, VkBufferUsageFlags usage, VmaMemoryUsage memoryUsage)
 {
 	//allocate vertex buffer
 	VkBufferCreateInfo bufferInfo = {};
@@ -2299,4 +2346,144 @@ AllocatedBuffer VentumEngine::create_buffer(size_t allocSize, VkBufferUsageFlags
 		nullptr));
 
 	return newBuffer;
+}
+
+// file handling
+//
+//
+//
+//
+//
+
+void init_fileConverter()
+{
+    FILE*MKTFILE = fopen("./files/files.MKTI","rb");
+    if( MKTFILE != NULL )
+    {
+        char *charArray;
+        fseek(MKTFILE, 0L, SEEK_END);
+        long sizeOfFile = ftell(MKTFILE);
+        rewind(MKTFILE);
+        charArray = (char*)malloc(sizeOfFile);
+        sizeOfFile = fread( charArray,1, sizeOfFile, MKTFILE );
+        fclose( MKTFILE );
+        _MKT_fileTypesSupported = 0;
+        for(int i = 0; i <sizeOfFile;i++)_MKT_fileTypesSupported+=charArray[i]=='\n'?1:0;
+        _MKT_fileTypes = (MKTfileImporter*)malloc(sizeof(MKTfileImporter)*_MKT_fileTypesSupported);
+        int currentModule = 0;
+        for(int i = 0; i < sizeOfFile;i++)
+        {
+            if(i==0||charArray[i-1]=='\n')
+            {
+                int offset;
+                _MKT_fileTypes[currentModule].string = (char*)malloc(1);
+                for(offset = 0; charArray[i+offset]!=' ';offset++)
+                {   
+                    _MKT_fileTypes[currentModule].string = (char*)realloc(_MKT_fileTypes[currentModule].string,offset+1);
+                    _MKT_fileTypes[currentModule].string[offset] = charArray[i+offset];
+                    _MKT_fileTypes[currentModule].sizeOfString = offset+1;
+                }
+                _MKT_fileTypes[currentModule].sizeOfString = offset+1;
+                _MKT_fileTypes[currentModule].string = (char*)realloc(_MKT_fileTypes[currentModule].string,offset+1);
+                _MKT_fileTypes[currentModule].string[offset] = 0;
+                offset++;
+                _MKT_fileTypes[currentModule].type = charArray[i+offset];
+
+                char FFP[100]; // i give up
+
+                snprintf(FFP,100,"./files/%s.%s",_MKT_fileTypes[currentModule].string,
+                #ifdef _WIN32
+                "dll"
+                #elif __gnu_linux__
+                "so"
+                #endif
+                );
+                _MKT_fileTypes[currentModule].loadFile = 
+                #ifdef _WIN32
+                (void *(*)(char *FP))GetProcAddress(LoadLibrary(FFP), "_MKTP_read")
+                #elif __gnu_linux__
+                    dlopen(FFP,RTLD_NOW);
+                #endif
+                ;
+            }
+        }
+
+    } else {
+        printf("\nCannot find file file");
+    }
+}
+
+int loadFile(char * filePath, char mode)
+{
+    char error = 0;
+    if(mode == 0) // arrayGraphics
+        0;
+    else if(mode == 1) // images
+    {
+        MKTPic data  = _MKT_loadImage(filePath,&error);
+        if(error == 0)
+            return loading_MKTP_image(data);
+        else
+            printf("\nERROR DURING FILELOADING: %d",error);
+    }
+    else if(mode == 2) // objects
+        0;
+    else if(mode == 3) // data
+        0;
+    return -1;
+}
+
+MKTPic _MKT_loadImage(char * filePath,char * error)
+{
+    int stringLenght;
+    MKTPic returnPic;
+    for(stringLenght = 0; filePath[stringLenght] != 0;stringLenght++)printf("\ntwo things: %d %c",stringLenght, filePath[stringLenght]);
+    int dotPlace;
+    for(dotPlace = 0; filePath[stringLenght-dotPlace] != '.';dotPlace++)printf("\ntwo things: %d %d %c",dotPlace,stringLenght, filePath[stringLenght-dotPlace]);
+    FILE*MKTFILE = fopen("./files/files.MKTI","rb");
+    if( MKTFILE != NULL )
+    {
+        char *charArray;
+        fseek(MKTFILE, 0L, SEEK_END);
+        long sizeOfFile = ftell(MKTFILE);
+        rewind(MKTFILE);
+        charArray = (char*)malloc(sizeOfFile);
+        sizeOfFile = fread( charArray,1, sizeOfFile, MKTFILE );
+        fclose( MKTFILE );
+        int index = 0;
+        
+        char foundMatch = false;
+        for(int i = 0; i < sizeOfFile&&!foundMatch;i++)
+            if(i==0||charArray[i-1] == '\n') { index++;
+                for(int offset = 0; offset <= dotPlace&&!foundMatch;offset++)
+                    if(dotPlace!=offset+1&&charArray[i+offset]!=filePath[stringLenght-dotPlace+offset+1])
+                        break;
+                    else
+                        if(dotPlace==offset+1&&charArray[i+offset]==' ')
+                            foundMatch = true;}
+
+    printf("\ndid it?");
+        if(!foundMatch)
+        {
+            *error = 1;
+            return returnPic;
+        }
+    printf("\nyes");
+        free(charArray);
+        index--;
+        if(_MKT_fileTypes[index].type != 1)
+        {
+            *error = 2;
+            return returnPic;
+        }
+    printf("it did %d",index);
+        void * PPtr = _MKT_fileTypes[index].loadFile(filePath);
+    printf(", it did");
+        return *(MKTPic*)PPtr;
+
+
+    } else {
+        printf("\nCannot find file file");
+    }
+    return returnPic;
 }

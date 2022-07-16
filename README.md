@@ -24,3 +24,4 @@
 23. 01.04.00 - Working Linux version
 24. 01.05.00 - Working loading images during runtime
 25. 01.06.00 - Working depth layers
+26. 01.07.00 - Deleted the VentumEngine class

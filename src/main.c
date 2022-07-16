@@ -25,13 +25,11 @@ int main(int argc, char* argv[])
         // funArray[sizeOfFunArray-1](a);
     if(cmdMode == 0)
     {
-        VentumEngine engine;
+        init();
 
-        engine.init();
+        run();
 
-        engine.run();
-
-        engine.cleanup();
+        cleanup();
     } else if(cmdMode == 1)
     {
         MKTMAcmdMode(Modules, sizeOfModules);

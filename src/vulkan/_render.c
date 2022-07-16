@@ -31,3 +31,38 @@ void addToRenderArray(RenderArray * _render,char type, int ID, int layer)
     _render->arrayPointers[layer][_render->sizePerArray[layer]-1].type = type;
     _render->arrayPointers[layer][_render->sizePerArray[layer]-1].ID = ID;
 }
+
+void reallocateRenderArray(RenderArray * _render,int inLayer, int outLayer,int ID, char type)
+{
+    removeRenderObject(_render,inLayer,ID, type);
+    addToRenderArray(_render,type, ID, outLayer);
+}
+
+int findRenderObject(RenderArray * _render,int layer,int ID, char type)
+{
+    for(int i = 0; i < _render->sizePerArray[layer];i++)
+        if(_render->arrayPointers[layer][i].ID == ID && _render->arrayPointers[layer][i].type == type)
+            return i;
+    return -1;
+}
+
+void removeRenderObject(RenderArray * _render,int layer,int ID, char type)
+{
+    int RMID = findRenderObject(_render,layer,ID, type);
+    if(RMID > 0)
+    {
+        for(int i = RMID;i < _render->sizePerArray[layer]-1;i++)
+            _render->arrayPointers[layer][i] = _render->arrayPointers[layer][i+1];
+        _render->sizePerArray[layer]--;
+        _render->arrayPointers[layer] = (DrawStruct*)realloc(_render->arrayPointers[layer],sizeof(DrawStruct)*_render->sizePerArray[layer]);
+    }
+}
+
+void freeRenderArray(RenderArray * render)
+{
+    for(int i = 0; i < render->size;i++)
+        free(render->arrayPointers[i]);
+    free(render->arrayPointers);
+    free(render->sizePerArray);
+    // free(render);
+}

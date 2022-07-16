@@ -13,3 +13,7 @@ typedef struct MainRenderArray {
 
 void setupRenderArray(RenderArray * render);
 void addToRenderArray(RenderArray * _render,char type, int ID, int layer);
+void reallocateRenderArray(RenderArray * _render,int inLayer, int outLayer,int ID, char type);
+int findRenderObject(RenderArray * _render,int layer,int ID, char type);
+void removeRenderObject(RenderArray * _render,int layer,int ID, char type);
+void freeRenderArray(RenderArray * render);

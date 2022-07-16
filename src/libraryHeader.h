@@ -4,8 +4,8 @@ typedef struct AGDATAFORRENDER {
     int ID;
 } AGDFR;
 typedef struct functionInput {
-    int(*loadAG)(const char * FP);
-    void(*displayAG)(AGDFR data);
+    int(*loadFile)(const char * FP,char mode);
+    void(*MKTUSE)(AGDFR data);
     double mouseX;
     double mouseY;
     int buttonPressed;
