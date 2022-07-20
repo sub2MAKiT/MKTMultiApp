@@ -113,11 +113,6 @@ void init() {
 
     init_VentumEngineVariables(); //#0000ff
 
-    char * temp=(char*)malloc(42);
-    strcpy(temp,"./graphics/MKTPhotos/wideColoursTest.MKTP");
-    printf("\ncheckForPic: %x %s %d",temp,temp,loadFile(temp, 1));
-    free(temp);
-
     _isInitialized = true;
 }
 
@@ -243,6 +238,7 @@ void run() {
     while (!bQuit)
     {
         draw();
+        DEBUG("frame");
         while (SDL_PollEvent(&e) != 0)
         {
             if (e.type == SDL_QUIT) bQuit = true;
@@ -698,20 +694,20 @@ void init_pipelines() {
     VkShaderModule DiSFragShader;
     if (!load_shader_module("./shaders/DiS.frag.spv", &DiSFragShader))
     {
-        std::cout << std::endl << "DiS frag error" << std::endl;
+        DEBUG("DiS frag error");
     }
     else {
-        std::cout << std::endl << "DiS frag loaded" << std::endl;
+        DEBUG("DiS frag loaded");
     }
 
 
     VkShaderModule DiSVertShader;
 	if (!load_shader_module("./shaders/DiS.vert.spv", &DiSVertShader))
 	{
-		std::cout << "Error when building the DiS vertex shader module" << std::endl;
+		DEBUG("Error when building the DiS vertex shader module");
 	}
 	else {
-		std::cout << "DiS vertex shader successfully loaded" << std::endl;
+		DEBUG("DiS vertex shader successfully loaded");
 	}
 
 	pipelineBuilder._shaderStages.push_back(
@@ -755,19 +751,19 @@ void init_pipelines() {
     VkShaderModule AGFragShader;
     if (!load_shader_module("./shaders/DS.frag.spv", &AGFragShader))
     {
-        std::cout << std::endl << "AG frag error" << std::endl;
+        DEBUG("AG frag error");
     }
     else {
-        std::cout << std::endl << "AG frag loaded" << std::endl;
+        DEBUG("AG frag loaded");
     }
 
     VkShaderModule AGVertShader;
 	if (!load_shader_module("./shaders/DS.vert.spv", &AGVertShader))
 	{
-		std::cout << "Error when building the AG vertex shader module" << std::endl;
+		DEBUG("Error when building the AG vertex shader module");
 	}
 	else {
-		std::cout << "AG vertex shader successfully loaded" << std::endl;
+		DEBUG("AG vertex shader successfully loaded");
 	}
 
 	pipelineBuilder._shaderStages.push_back(
@@ -813,10 +809,10 @@ void init_pipelines() {
     VkShaderModule meshVertShader;
 	if (!load_shader_module("./shaders/PMtriangle.vert.spv", &meshVertShader))
 	{
-		std::cout << "Error when building the triangle vertex shader module" << std::endl;
+		DEBUG("Error when building the triangle vertex shader module");
 	}
 	else {
-		std::cout << "Red Triangle vertex shader successfully loaded" << std::endl;
+		DEBUG("Red Triangle vertex shader successfully loaded");
 	}
 
 	pipelineBuilder._shaderStages.push_back(
@@ -914,7 +910,7 @@ void load_AG()
                     +25] = fileNames[a+25];
 
                 if(DEBUG("Loaded an AG: "))
-                    printf("%s\n",MKTAGName);
+                    printf("     %s\n",MKTAGName);
                 _HexAg = arrayGraphicsReader(MKTAGName);
                 _TAGA.push_back(_HexAg);
                 upload_AG(_TAGA[_TAGA.size()-1]);
@@ -1025,16 +1021,17 @@ void loadMenuAG()
             char * MKTAGName;
             size_t sizeOfName = 0;
         DEBUG("Read the Icon AG4");
-        for(0; charArray[i+sizeOfName] != '\n' && i+sizeOfName < sizeOfFile;sizeOfName++)printf("\nbut why thought %d",sizeOfName);
-        DEBUG("Read the Icon AG4");
+        for(0; charArray[i+sizeOfName+1] != '\n' && i+sizeOfName < sizeOfFile;sizeOfName++)0;
+        DEBUG("Read the Icon AG5");
             MKTAGName = (char*)malloc(sizeOfName+19);
-        DEBUG("Read the Icon AG4");
+        DEBUG("Read the Icon AG6");
             for(int a = 0; a < sizeOfName;a++)
                 MKTAGName[a+12] = charArray[a+i];
             for(int a = 0; a < 12;a++)
                 MKTAGName[a] = fileNames[a];
             for(int a = 0; a < 7;a++)
                 MKTAGName[sizeOfName+12+a] = fileNames[a+12];
+             DEBUG("Read the Icon AG7");
             Modules[moduleNumber].icon.AG = arrayGraphicsReader(MKTAGName);
             // for(int a = 0; a < 3;a++)
             // Modules[moduleNumber].icon.AG._vertices[a].color = {1.0,1.0,1.0};
@@ -1042,6 +1039,7 @@ void loadMenuAG()
             DEFAULTconstants.colourModification = {1.0f,0.0f,0.0f,0.0f,0.0f,1.0f,0.0f,0.0f,0.0f,0.0f,1.0f,0.0f,0.0f,0.0f,0.0f,1.0f}; // black
             float ratio = _windowExtent.width;
             ratio /= _windowExtent.height;
+             DEBUG("Read the Icon AG8");
             DEFAULTconstants.transformation = {0.05/ratio
             ,0.0,0.0,0.0,0.0,
                                         0.05
@@ -1054,6 +1052,7 @@ void loadMenuAG()
             DEFAULTconstants.movement = {0.0-((_windowExtent.width*0.98)/_windowExtent.width),0.0-((_windowExtent.height*0.95)/_windowExtent.height),0.0};
             Modules[moduleNumber].icon.isVisible = 1;
             Modules[moduleNumber].icon.AGPC = DEFAULTconstants;
+        upload_AG(Modules[moduleNumber].icon.AG);
             moduleNumber++;
             free(MKTAGName);
         }
@@ -1061,20 +1060,18 @@ void loadMenuAG()
     if(moduleNumber != sizeOfModules)
         0; // error, list of modules was changed whilst loading AGs
     DEBUG("Read the Icon AG");
-    upload_AG(Modules[moduleNumber-1].icon.AG);
     DEBUG("Loaded an Icon AG");
 }
     
 
 void init_scene()
 {
-    RenderObject DUCK;
-    AGMaterial = {_AGPipeline,_AGPipelineLayout};
-	DUCK.mesh = get_mesh("DUCK");
-	DUCK.material = get_material("defaultmesh");
-	DUCK.transformMatrix = glm::mat4{ 1.0f };
-
-	_renderables.push_back(DUCK);
+    // RenderObject DUCK;
+    // AGMaterial = {_AGPipeline,_AGPipelineLayout};
+	// DUCK.mesh = get_mesh("DUCK");
+	// DUCK.material = get_material("defaultmesh");
+	// DUCK.transformMatrix = glm::mat4{ 1.0f };
+	// _renderables.push_back(DUCK);
 
     AGPushConstants AGconstants;
 
@@ -2186,6 +2183,8 @@ void MKTDRAW(VkCommandBuffer cmd)
     camData.view = view;
     camData.viewproj = projection * view;
 
+    char boundDefault = 0;
+
     void* data;
     vmaMapMemory(_allocator, get_current_frame().cameraBuffer._allocation, &data);
 
@@ -2290,6 +2289,7 @@ void drawMenu(VkCommandBuffer cmd,GL * menuStuff, size_t sizeOfMenuStuff)
             Modules[i].icon.AGPC.movement.y = CBT+i/20;
 
             VkDeviceSize offset = 0;
+                        
             vkCmdBindVertexBuffers(cmd, 0, 1, &Modules[i].icon.AG._vertexBuffer._buffer, &offset);
 
             vkCmdPushConstants(cmd, _AGPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(AGPushConstants), &Modules[i].icon.AGPC);
@@ -2400,7 +2400,7 @@ void init_fileConverter()
                 );
                 _MKT_fileTypes[currentModule].loadFile = 
                 #ifdef _WIN32
-                (void *(*)(char *FP))GetProcAddress(LoadLibrary(FFP), "_MKTP_read")
+                (void *(*)(char *FP,int*error))GetProcAddress(LoadLibrary(FFP), "_MKTP_read")
                 #elif __gnu_linux__
                     dlopen(FFP,RTLD_NOW);
                 #endif
@@ -2415,7 +2415,7 @@ void init_fileConverter()
 
 int loadFile(char * filePath, char mode)
 {
-    char error = 0;
+    int error = 0;
     if(mode == 0) // arrayGraphics
         0;
     else if(mode == 1) // images
@@ -2433,7 +2433,7 @@ int loadFile(char * filePath, char mode)
     return -1;
 }
 
-MKTPic _MKT_loadImage(char * filePath,char * error)
+MKTPic _MKT_loadImage(char * filePath,int * error)
 {
     int stringLenght;
     MKTPic returnPic;
@@ -2462,13 +2462,11 @@ MKTPic _MKT_loadImage(char * filePath,char * error)
                         if(dotPlace==offset+1&&charArray[i+offset]==' ')
                             foundMatch = true;}
 
-    printf("\ndid it?");
         if(!foundMatch)
         {
             *error = 1;
             return returnPic;
         }
-    printf("\nyes");
         free(charArray);
         index--;
         if(_MKT_fileTypes[index].type != 1)
@@ -2476,10 +2474,7 @@ MKTPic _MKT_loadImage(char * filePath,char * error)
             *error = 2;
             return returnPic;
         }
-    printf("it did %d",index);
-        void * PPtr = _MKT_fileTypes[index].loadFile(filePath);
-    printf(", it did");
-        return *(MKTPic*)PPtr;
+        return *(MKTPic*)_MKT_fileTypes[index].loadFile(filePath,error);
 
 
     } else {

@@ -139,14 +139,14 @@ typedef struct MKTFILECONVERTERSTRUCT {
 size_t sizeOfString;
 char * string;
 char type;
-void*(*loadFile)(char * FP);
+void*(*loadFile)(char * FP,int * error);
 } MKTfileImporter;
 
 extern GL * Modules;
 extern size_t sizeOfModules;
 
 int loadFile(char * filePath, char mode);
-MKTPic _MKT_loadImage(char * filePath,char * error);
+MKTPic _MKT_loadImage(char * filePath,int * error);
 void addToRenderQueue(int ID);
 void removeFromRenderQueue(int ID);
 void init_fileConverter();

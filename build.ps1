@@ -9,8 +9,37 @@ param (
     [switch]$DSshaders = $false,
     [switch]$DiSshaders = $false,
     [switch]$commitFiles = $false,
-    [switch]$buildFiles = $false
+    [switch]$buildFiles = $false,
+    [switch]$buildModuleHandler = $false,
+    [switch]$all = $false,
+    [switch]$modules = $false
 )
+if($all)
+{
+    $DEBUG = $true
+    $fast = $true
+    $TESTDLL = $true
+    $FULLDLL = $true
+    $Dshaders = $true
+    $Cshaders = $true
+    $Pshaders = $true
+    $DSshaders = $true
+    $DiSshaders = $true
+    $commitFiles = $true
+    $buildFiles = $true
+    $buildModuleHandler = $true
+}
+if($modules)
+{
+    $commitFiles = $true
+    $buildFiles = $true
+    $buildModuleHandler = $true
+}
+if($buildModuleHandler)
+{
+    gcc ./MKTModuleHandler/MKTMH.c -shared -o ./MKTModuleHandler/MKTMH.dll
+    cp ./MKTModuleHandler/MKTMH.dll ./build/lib/windows/
+}
 if($buildFiles)
 {
     gcc ./MKTfileConverters/MKTP/src/MKTP.c -shared -o ./MKTfileConverters/MKTP/build/windows/MKTP.dll
