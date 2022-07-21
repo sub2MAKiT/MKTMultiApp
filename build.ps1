@@ -49,7 +49,7 @@ if($commitFiles)
     cp ./MKTfileConverters/MKTP/build/windows/* ./build/files/
 }
 if ($DEBUG) {
-    $DEBUGS = "-DMKT_DEBUG"
+    $DEBUGS = "-DMKT_DEBUG -g"
 } else {
     $DEBUGS = ""
 }

@@ -49,6 +49,8 @@ char * windowsDLLLoading()
                 
                 FFP[librariesPathLength+sizeOfFP] = 0;
 
+                printf("\n%s",FFP);
+
                 FUNHANDLE hLib = LoadLibrary(FFP);
                 DEBUG("loaded");
                 if (hLib == NULL) { // not 100% sure if this errorHandling works, so :D
@@ -59,7 +61,6 @@ char * windowsDLLLoading()
                         notLoaded[sizeOfNotLoaded-(librariesPathLength+sizeOfFP)+a-1] = FFP[a];
                 } else {
                     Shmodules++;
-                    Modules = (GL*)realloc(Modules,sizeof(GL)*Shmodules);
                     hmodules = (FUNHANDLE*)realloc(hmodules,sizeof(FUNHANDLE) * Shmodules);
                     hmodules[Shmodules-1] = hLib;
                 }
@@ -71,9 +72,12 @@ char * windowsDLLLoading()
     return notLoaded;
 }
 
-void * getEntryAddress(FUNHANDLE libraryToLoad)
+void getEntryAddress(FUNHANDLE libraryToLoad, GL * Module)
 {
-    return (void*)GetProcAddress(libraryToLoad, "entry");
+    Module->init = (void(*)(initi))GetProcAddress(libraryToLoad, "init");
+    Module->run = (void(*)(funi))GetProcAddress(libraryToLoad, "run");
+    Module->cleanUp = (void(*)(cleanUpi))GetProcAddress(libraryToLoad, "cleanUp");
+    return;
 }
 
 #elif __gnu_linux__

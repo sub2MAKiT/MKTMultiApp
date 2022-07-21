@@ -1,7 +1,7 @@
 #define cmdModeDirectInclude
 #include "cmdMode.h"
 
-const char _MKTMA_VERSION[9] = "01.07.01";
+const char _MKTMA_VERSION[9] = "01.07.02";
 
 void handleCmdGrapics(char mode)
 {
@@ -47,7 +47,7 @@ void MKTMAcmdMode(GL * modules, long sizeOfFunArray)
             _MKTMACMD_copy(command);
         else {
             for(int i = 0; i < sizeOfFunArray;i++)
-                modules[i].entry(garbageInput);
+                modules[i].run(garbageInput);
         }
 
     } while(!(MKTcompStr(command,"exit")));

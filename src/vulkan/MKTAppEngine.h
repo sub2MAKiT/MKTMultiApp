@@ -111,7 +111,9 @@ struct UploadContext {
 
 typedef struct LoadedModule {
     sub2MAKiT icon;
-    void (*entry)(functionInput);
+    void (*init)(initi);
+    void (*run)(funi);
+    void (*cleanUp)(cleanUpi);
 } GL; // goodLuck
 
 typedef struct vulPic {
@@ -255,7 +257,11 @@ VkCommandBuffer beginSingleTimeCommands();
 void endSingleTimeCommands(VkCommandBuffer commandBuffer);
 void init_VentumEngineVariables();
 void updateSpecificPictureDescriptor(vPic * Picture, size_t picureNumber);
+float CBTStatus;
+float ratio;
 #else
+extern float ratio;
+extern float CBTStatus;
 extern void CreatePictureDescriptors(vPic * pPic,size_t index);
 extern void logoLoadingFunctionThatIsVeryImportant();
 extern void MKTDRAW(VkCommandBuffer cmd);

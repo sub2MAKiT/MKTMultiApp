@@ -2,9 +2,25 @@
 #include <stdlib.h>
 #include "../src/libraryHeader.h"
 
-void entry(funi input)
+void init(initi input)
 {
-    printf("\nMKTMH started\n");
+    printf("\nMKTMH init\n");
+
+    return;
+}
+
+void run(funi input)
+{
+    printf("\nMKTMH runtime\n");
+
+    
+
+    return;
+}
+
+void cleanUp(cleanUpi input)
+{
+    printf("\nMKTMH cleanUp\n");
 
     return;
 }

@@ -37,7 +37,7 @@ void  *dlsym(void *, const char *);
 int    dlclose(void *);
 char  *dlerror(void);
 
-void * getEntryAddress(FUNHANDLE libraryToLoad);
+GL getEntryAddress(FUNHANDLE libraryToLoad);
 #define loadLibaries 0;
 #define getEntryInLibrary(x) 0;
 #define unloadLibraries 0;
@@ -47,7 +47,7 @@ void * getEntryAddress(FUNHANDLE libraryToLoad);
 
 char * windowsDLLLoading();
 #define unloadLibraries for(int i = 0; i < Shmodules;i++)FreeLibrary(hmodules[i]);
-void * getEntryAddress(FUNHANDLE libraryToLoad);
+void getEntryAddress(FUNHANDLE libraryToLoad,GL * Module);
 #define loadLibaries windowsDLLLoading()
 
 #elif __APPLE__

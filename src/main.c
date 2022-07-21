@@ -5,7 +5,7 @@
 #include "libraryLoader.h"
 #include "cmdMode.h"
 
-GL * Modules = (GL*)malloc(sizeof(GL));
+GL * Modules;
 size_t sizeOfModules;
 
 int main(int argc, char* argv[])
@@ -19,12 +19,18 @@ int main(int argc, char* argv[])
 
     sizeOfModules = Shmodules;
 
+    Modules = (GL*)malloc(sizeof(GL)*Shmodules);
+
     for(int i = 0; i < sizeOfModules;i++)
-        Modules[i].entry = (void(*)(funi))getEntryAddress(hmodules[i]); // so much fun!!!
+        getEntryAddress(hmodules[i],&Modules[i]); // so much fun!!!
+
+    DEBUG("init init");
 
         // funArray[sizeOfFunArray-1](a);
     if(cmdMode == 0)
     {
+        DEBUG("started graphical mode");
+
         init();
 
         run();

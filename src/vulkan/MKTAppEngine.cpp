@@ -4,7 +4,7 @@
 #define VMA_IMPLEMENTATION
 #include <VulkanMA/vk_mem_alloc.h>
 #include "../DEBUG.h"
-#include "imageHandling.h"
+
 
 // Some basic graphics:
 
@@ -112,6 +112,23 @@ void init() {
     init_scene(); //#0000ff
 
     init_VentumEngineVariables(); //#0000ff
+
+    #ifdef _WIN32
+    char _USEROS_ = 0;
+    #elif __gnu_linux__
+    char _USEROS_ = 1;
+    #elif __APPLE__
+    char _USEROS_ = 2;
+    #endif
+
+    initi initData = {};
+
+    initData.userOS = _USEROS_;
+    initData.windowX = _windowExtent.width;
+    initData.windowY = _windowExtent.height;
+
+    for(int i = 0; i < sizeOfModules;i++)
+        Modules[i].init(initData);
 
     _isInitialized = true;
 }
@@ -238,7 +255,6 @@ void run() {
     while (!bQuit)
     {
         draw();
-        DEBUG("frame");
         while (SDL_PollEvent(&e) != 0)
         {
             if (e.type == SDL_QUIT) bQuit = true;
@@ -249,6 +265,10 @@ void run() {
                         addToRenderArray(&_render,1, _pictures.size()-1, 0);
                     else
                         removeRenderObject(&_render,0,1,1);
+                else if(e.key.keysym.sym == SDLK_w)
+                    CBTStatus += 0.01;
+                else if(e.key.keysym.sym == SDLK_s)
+                    CBTStatus -= 0.01;
 
             }
             else if(e.type == SDL_MOUSEWHEEL)
@@ -1091,7 +1111,7 @@ void init_scene()
 
     // const char * defaultName = "defaultName";
     AGPushConstants BLconstants;
-    float ratio = _windowExtent.width;
+    ratio = _windowExtent.width;
     ratio /= _windowExtent.height;
     BLconstants.transformation = {0.05/ratio
             ,0.0,0.0,0.0,0.0,
@@ -1135,6 +1155,8 @@ void init_scene()
 void init_VentumEngineVariables()
 {
     setupRenderArray(&_render);
+
+    CBTStatus = 4;
 
     modesEnabled = 14;
 
@@ -2286,7 +2308,9 @@ void drawMenu(VkCommandBuffer cmd,GL * menuStuff, size_t sizeOfMenuStuff)
         {
             vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _AGPipeline);
 
-            Modules[i].icon.AGPC.movement.y = CBT+i/20;
+            Modules[i].icon.AGPC.movement.y = CBT+(float)(i*(CBTStatus*ratio)/40);
+            Modules[i].icon.AGPC.movement.x = -0.98+(((CBTStatus-1)/20)/ratio);
+            Modules[i].icon.AGPC.transformation = {(CBTStatus/20)/ratio,0.0,0.0,0.0,0.0,(CBTStatus/40)*ratio,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0};
 
             VkDeviceSize offset = 0;
                         
@@ -2298,7 +2322,7 @@ void drawMenu(VkCommandBuffer cmd,GL * menuStuff, size_t sizeOfMenuStuff)
         }
     }
 
-    for(int i = 0; i < sizeOfMenuStuff+5;i++) // make it less than 18 lines per draw
+    for(int i = 0; i < sizeOfMenuStuff;i++) // make it less than 18 lines per draw
     { 
         if(Modules[i].icon.isVisible) {
 
@@ -2309,7 +2333,9 @@ void drawMenu(VkCommandBuffer cmd,GL * menuStuff, size_t sizeOfMenuStuff)
 
             AGPushConstants BLC = _AGA[0].AGPC;
 
-            BLC.movement.y = CBT+i*20;
+            BLC.movement.y = CBT+(float)(i*(CBTStatus*ratio)/40);
+            BLC.movement.x = -0.98+(((CBTStatus-1)/20)/ratio);
+            BLC.transformation = {(CBTStatus/20)/ratio,0.0,0.0,0.0,0.0,CBTStatus/250,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0};
             
             vkCmdPushConstants(cmd, _AGPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(AGPushConstants), &BLC);
 
