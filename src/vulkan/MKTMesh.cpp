@@ -101,6 +101,27 @@ VertexInputDescription Vertex::getPiC_vertex_description()
     return description;
 }
 
+VertexInputDescription Vertex::getfQS_vertex_description()
+{
+    VertexInputDescription description;
+
+    VkVertexInputBindingDescription mainBinding;
+    mainBinding.binding = 0;
+    mainBinding.stride = sizeof(MKTfQS);
+    mainBinding.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+    description.bindings.push_back(mainBinding);
+
+    VkVertexInputAttributeDescription positionAttribute = {};
+    positionAttribute.binding = 0;
+    positionAttribute.location = 0;
+    positionAttribute.format = VK_FORMAT_R32G32B32_SFLOAT;
+    positionAttribute.offset = offsetof(MKTfQS, position);
+
+    description.attributes.push_back(positionAttribute);
+    return description;
+}
+
 bool Mesh::load_from_obj(const char* filename)
 {
 	tinyobj::attrib_t attrib;

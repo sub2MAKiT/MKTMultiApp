@@ -1,10 +1,10 @@
 #define _MKTENGINEINCLUDEGUARD_
+#define MKTUTILSTHIRD
 #include "MKTAppEngine.h"
 #include "../fileManagment/MKTarrayGraphics.h"
 #define VMA_IMPLEMENTATION
 #include <VulkanMA/vk_mem_alloc.h>
 #include "../DEBUG.h"
-
 
 // Some basic graphics:
 
@@ -12,6 +12,7 @@
 #define MKTDRAWAG 2
 #define MKTDRAWPIC 4
 #define MKTDRAWMENU 8
+#define MKTDRAWTEXT 16
 
 #define BLACKLINE_ID 0
 #define MENUARRAYGRAPHIC 4
@@ -27,44 +28,6 @@ do                                                              \
         abort();                                                \
     }                                                           \
 } while (0)
-
-// temp section (it's here only for now)
-MKTPic MKTPicReader(const char * FP)
-{
-    MKTPic picToBeRead;
-    FILE *MKTFILE = fopen(FP, "rb" );
-	char *list;
-	fseek(MKTFILE,0L,SEEK_END);
-	size_t sizeOfFile = ftell(MKTFILE);
-	rewind(MKTFILE);
-	list = (char*)malloc(sizeOfFile);
-	fread( list,1, sizeOfFile, MKTFILE );
-
-    picToBeRead.width = *(size_t*)list;
-    picToBeRead.pixels = (MKTPix*)malloc(sizeOfFile-sizeof(size_t));
-
-    for(int i = 0; i < sizeOfFile-sizeof(size_t);i++)
-    {
-        if(i%4 == 0)
-            picToBeRead.pixels[(i-(i%4))/4].R = list[i+sizeof(size_t)];
-        if(i%4 == 1)
-            picToBeRead.pixels[(i-(i%4))/4].G = list[i+sizeof(size_t)];
-        if(i%4 == 2)
-            picToBeRead.pixels[(i-(i%4))/4].B = list[i+sizeof(size_t)];
-        if(i%4 == 3)
-            picToBeRead.pixels[(i-(i%4))/4].A = list[i+sizeof(size_t)];
-    }
-	
-    fclose( MKTFILE );
-
-    picToBeRead.height = (sizeOfFile-sizeof(size_t))/sizeof(MKTPix)/picToBeRead.width;
-    // if(DEBUG("loadImage"))
-        // for(int i = 0; i < picToBeRead.height * picToBeRead.width;i++)
-            // printf("\ntesting the picture: %d %d %d %d",picToBeRead.pixels[i].R,picToBeRead.pixels[i].G,picToBeRead.pixels[i].B,picToBeRead.pixels[i].A);
-
-    return picToBeRead;
-}
-//
 
 void init() {
 
@@ -113,6 +76,13 @@ void init() {
 
     init_VentumEngineVariables(); //#0000ff
 
+    /* 
+    logoLoading
+    load_AG
+    loadMenuAG
+    init_scene
+    load_file
+    */
     #ifdef _WIN32
     char _USEROS_ = 0;
     #elif __gnu_linux__
@@ -133,171 +103,18 @@ void init() {
     _isInitialized = true;
 }
 
-void cleanup() {
-    if (_isInitialized) {
-        freeRenderArray(&_render);
-
-        vkWaitForFences(_device, 1, &get_current_frame()._renderFence, true, 1000000000);
-
-        _mainDeletionQueue.flush();
-
-        vkDestroySurfaceKHR(_instance, _surface, nullptr);
-
-        vkDestroyDevice(_device, nullptr);
-        vkDestroyInstance(_instance, nullptr);
-
-        SDL_DestroyWindow(_window);
-
-        DEBUG("III cleaned up III");
-    }
-}
-
-void draw() {
-    //it don't be drawing
-    VK_CHECK(vkWaitForFences(_device, 1, &get_current_frame()._renderFence, true, 1000000000));
-    VK_CHECK(vkResetFences(_device, 1, &get_current_frame()._renderFence));
-
-    uint32_t swapchainImageIndex;
-    VK_CHECK(vkAcquireNextImageKHR(_device, _swapchain, 1000000000, get_current_frame()._presentSemaphore, nullptr, &swapchainImageIndex));
-
-    VK_CHECK(vkResetCommandBuffer(get_current_frame()._mainCommandBuffer, 0));
-
-    VkCommandBuffer cmd = get_current_frame()._mainCommandBuffer;
-
-    VkCommandBufferBeginInfo cmdBeginInfo = {};
-    cmdBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    cmdBeginInfo.pNext = nullptr;
-
-    cmdBeginInfo.pInheritanceInfo = nullptr;
-    cmdBeginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-
-    VK_CHECK(vkBeginCommandBuffer(cmd, &cmdBeginInfo));
-
-    VkClearValue clearValue;
-    clearValue.color = {{0.0f, 0.0f, 1.0f, 1.0f}};
-    VkClearValue depthClear;
-    depthClear.depthStencil.depth = 1.f;
-
-    VkRenderPassBeginInfo rpInfo = {};
-    rpInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-    rpInfo.pNext = nullptr;
-
-    rpInfo.renderPass = _renderPass;
-    rpInfo.renderArea.offset.x = 0;
-    rpInfo.renderArea.offset.y = 0;
-    rpInfo.renderArea.extent = _windowExtent;
-    rpInfo.framebuffer = _framebuffers[swapchainImageIndex];
-
-    rpInfo.clearValueCount = 2;
-
-    VkClearValue clearValues[] = {clearValue, depthClear};
-
-    rpInfo.pClearValues = &clearValues[0];
-
-    vkCmdBeginRenderPass(cmd, &rpInfo, VK_SUBPASS_CONTENTS_INLINE);
-
-//#00ff00
-//#00ff00
-        MKTDRAW(cmd);
-//#00ff00
-//#00ff00
-
-    vkCmdEndRenderPass(cmd);
-
-    VK_CHECK(vkEndCommandBuffer(cmd));
-
-    VkSubmitInfo submit = {};
-    submit.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submit.pNext = nullptr;
-
-    VkPipelineStageFlags waitStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-
-    submit.pWaitDstStageMask = &waitStage;
-
-    submit.waitSemaphoreCount = 1;
-    submit.pWaitSemaphores = &get_current_frame()._presentSemaphore;
-
-    submit.signalSemaphoreCount = 1;
-    submit.pSignalSemaphores = &get_current_frame()._renderSemaphore;
-
-    submit.commandBufferCount = 1;
-    submit.pCommandBuffers = &cmd;
-
-    VK_CHECK(vkQueueSubmit(_graphicsQueue, 1, &submit, get_current_frame()._renderFence));
-
-    VkPresentInfoKHR presentInfo = {};
-    presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-    presentInfo.swapchainCount = 1;
-    presentInfo.pWaitSemaphores = &get_current_frame()._renderSemaphore;
-    presentInfo.waitSemaphoreCount = 1;
-    presentInfo.pSwapchains = &_swapchain;
-
-    presentInfo.pImageIndices = &swapchainImageIndex;
-
-    VK_CHECK(vkQueuePresentKHR(_graphicsQueue, &presentInfo));
-
-    _frameNumber++;
-}
-
-void run() {
-    SDL_Event e;
-    bool bQuit = false;
-
-    DEBUG("III started running III");
-
-    float xSize = 0;
-    float ySize = 0;
-    float xMove = 0;
-    float yMove = 0;
-    int currentObjectToDraw = 2;
-    char isVisible;
-
-    while (!bQuit)
-    {
-        draw();
-        while (SDL_PollEvent(&e) != 0)
-        {
-            if (e.type == SDL_QUIT) bQuit = true;
-            else if (e.type == SDL_KEYDOWN)
-            {
-                if(e.key.keysym.sym == SDLK_SPACE) // temp
-                    if(_render.sizePerArray[0] == 1)
-                        addToRenderArray(&_render,1, _pictures.size()-1, 0);
-                    else
-                        removeRenderObject(&_render,0,1,1);
-                else if(e.key.keysym.sym == SDLK_w)
-                    CBTStatus += 0.01;
-                else if(e.key.keysym.sym == SDLK_s)
-                    CBTStatus -= 0.01;
-
-            }
-            else if(e.type == SDL_MOUSEWHEEL)
-                    CBT += e.wheel.y < 0?0.01:-0.01;
-            else if(e.type == SDL_MOUSEBUTTONDOWN)
-                if(e.button.button == SDL_BUTTON_LEFT)
-                    printf("is it a float %f or an int %d",e.button.x,e.button.x);
-                
-            
-
-            if(currentObjectToDraw > 2)
-                currentObjectToDraw = 0;
-
-        }
-    }
-    DEBUG("III ran III");
-}
-
-//---------------------------------------------------------------------------------------------------------------------------------------------------
-
+#ifndef NOVKB
 void init_vulkan() //#0000ff
 {
     vkb::InstanceBuilder builder;
+    DEBUG("II started init:vulkan II");
 
     auto inst_ret = builder.set_app_name("MKTMultiApp")
         .request_validation_layers(true)//#aaaa00
-        .require_api_version(1, 1, 0)//#aaaa00
+        .require_api_version(1, 3, 216)//#aaaa00
         .use_default_debug_messenger()
 		.build();
+    DEBUG("created the builder");
 
     vkb::Instance vkb_inst = inst_ret.value();
 
@@ -309,7 +126,7 @@ void init_vulkan() //#0000ff
 
     vkb::PhysicalDeviceSelector selector{ vkb_inst };
 	vkb::PhysicalDevice physicalDevice = selector
-		.set_minimum_version(1, 1)
+		.set_minimum_version(1, 3)
 		.set_surface(_surface)
 		.select()
 		.value();
@@ -384,6 +201,422 @@ void init_swapchain() //#0000ff
 
     DEBUG("II init:swapchain II");
 }
+
+#else
+
+// char checkValidationLayerSupport() {
+//     uint32_t layerCount;
+//     vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
+
+//     VkLayerProperties * availableLayers = (VkLayerProperties*)malloc(layerCount*sizeof(VkLayerProperties));
+//     vkEnumerateInstanceLayerProperties(&layerCount, availableLayers);
+//     free(availableLayers);
+
+//     for (const char* layerName : validationLayers) {
+//     char layerFound = false;
+
+//     for (const auto& layerProperties : availableLayers) {
+//         if (MKTstrcmp(layerName, layerProperties.layerName) == 0) {
+//             layerFound = true;
+//             break;
+//         }
+//     }
+
+//     if (!layerFound) {
+//         return false;
+//     }
+// }
+
+// return true;
+// }
+
+typedef struct QueueFI {
+    uint32_t graphicsFamily;
+    char isOptional;
+} QueueFamilyIndices;
+
+
+QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device) {
+    QueueFamilyIndices indices;
+    indices.isOptional = true;
+    uint32_t queueFamilyCount = 0;
+    vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
+
+    VkQueueFamilyProperties * queueFamilies = (VkQueueFamilyProperties*)malloc(sizeof(VkQueueFamilyProperties)*queueFamilyCount);
+    vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies);
+
+    for (int i = 0; i < queueFamilyCount; i++)
+        if (queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+            indices.graphicsFamily = i;
+            indices.isOptional = false;
+        }
+
+    return indices;
+}
+
+char isDeviceSuitable(VkPhysicalDevice device) {
+    VkPhysicalDeviceProperties deviceProperties;
+    VkPhysicalDeviceFeatures deviceFeatures;
+    vkGetPhysicalDeviceProperties(device, &deviceProperties);
+    vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
+    QueueFamilyIndices indices = findQueueFamilies(device);
+
+    if(!indices.isOptional)
+    {
+    #ifdef BePicky
+    return deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU &&
+           deviceFeatures.geometryShader;
+    #else
+    return true;
+    #endif
+    } else {
+        return false;
+    }
+}
+
+void init_vulkan() //#0000ff
+{
+
+    VkApplicationInfo appInfo{};
+    appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+    appInfo.pApplicationName = "MKTMultiApp";
+    appInfo.applicationVersion = VK_MAKE_VERSION(0, 1, 0);
+    appInfo.pEngineName = "VentumEngine";
+    appInfo.engineVersion = VK_MAKE_VERSION(1, 8, 0);
+    appInfo.apiVersion = VK_API_VERSION_1_3;
+
+    VkInstanceCreateInfo createInfo{};
+    createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+    createInfo.pApplicationInfo = &appInfo;
+
+    createInfo.enabledExtensionCount = 0; //#ff0000
+    createInfo.ppEnabledExtensionNames = NULL;
+    createInfo.enabledLayerCount = 0;
+
+    VK_CHECK(vkCreateInstance(&createInfo, NULL, &_instance));
+
+    uint32_t extensionCount = 0;
+    vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
+
+    VkExtensionProperties * extensions = (VkExtensionProperties*)malloc(sizeof(VkExtensionProperties)*extensionCount);
+
+    vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, extensions);
+
+    uint32_t deviceCount = 0;
+    vkEnumeratePhysicalDevices(_instance, &deviceCount, nullptr);
+
+    if (deviceCount == 0) {
+        DEBUG("no GPU with vulkan support"); //error
+    }
+
+    VkPhysicalDevice * devices = (VkPhysicalDevice*)malloc(sizeof(VkPhysicalDevice)*deviceCount);
+    vkEnumeratePhysicalDevices(_instance, &deviceCount, devices);
+
+    for (int i = 0; i < deviceCount; i++) {
+        if (isDeviceSuitable(devices[i])) {
+            _chosenGPU = devices[i];
+            break;
+        }
+    }
+
+    if (_chosenGPU == VK_NULL_HANDLE) {
+        DEBUG("device is nonexistant");//error
+    }
+
+    QueueFamilyIndices indices = findQueueFamilies(_chosenGPU);
+
+    VkDeviceQueueCreateInfo queueCreateInfo = {};
+    queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+    queueCreateInfo.queueFamilyIndex = indices.graphicsFamily;
+    queueCreateInfo.queueCount = 1; //#df0000
+    float queuePriority = 1.0f;
+    queueCreateInfo.pQueuePriorities = &queuePriority;
+
+    VkPhysicalDeviceFeatures deviceFeatures = {};
+
+    VkDeviceCreateInfo DcreateInfo{};
+    DcreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    DcreateInfo.pQueueCreateInfos = &queueCreateInfo;
+    DcreateInfo.queueCreateInfoCount = 1;
+    DcreateInfo.pEnabledFeatures = &deviceFeatures;
+    DcreateInfo.enabledExtensionCount = 0;
+
+    // if (enableValidationLayers) {
+    //     createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
+    //     createInfo.ppEnabledLayerNames = validationLayers.data();
+    // } else {
+    //     createInfo.enabledLayerCount = 0;
+    // }
+
+    VK_CHECK(vkCreateDevice(_chosenGPU, &DcreateInfo, nullptr, &_device));
+
+    vkGetDeviceQueue(_device, indices.graphicsFamily, 0, &_graphicsQueue);
+
+    VmaAllocatorCreateInfo allocatorInfo = {};
+    allocatorInfo.physicalDevice = _chosenGPU;
+    allocatorInfo.device = _device;
+    allocatorInfo.instance = _instance;
+    vmaCreateAllocator(&allocatorInfo, &_allocator);
+
+    // #ifdef _WIN32
+    // VkWin32SurfaceCreateInfoKHR createInfo{};
+    // createInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+    // createInfo.hwnd = glfwGetWin32Window(_window);
+    // createInfo.hinstance = GetModuleHandle(nullptr);
+    // #elif __gnu_linux__
+
+    // #endif
+
+    SDL_Vulkan_CreateSurface(_window, _instance, &_surface);
+
+    _mainDeletionQueue.push_function([=]() {
+    vkDestroySwapchainKHR(_device, _swapchain, nullptr);
+    });
+
+    _depthFormat = VK_FORMAT_D32_SFLOAT;
+
+    VkExtent3D depthImageExtent = {
+        _windowExtent.width,
+        _windowExtent.height,
+        1
+    };
+
+    VkImageCreateInfo dimg_info = vkinit::image_create_info(_depthFormat, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, depthImageExtent);
+
+    VmaAllocationCreateInfo dimg_allocinfo = {};
+    dimg_allocinfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
+    dimg_allocinfo.requiredFlags = VkMemoryPropertyFlags(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+
+    vmaCreateImage(_allocator, &dimg_info, &dimg_allocinfo, &_depthImage._image, &_depthImage._allocation, nullptr);
+
+    VkImageViewCreateInfo dview_info = vkinit::imageview_create_info(_depthFormat, _depthImage._image, VK_IMAGE_ASPECT_DEPTH_BIT);
+
+    VK_CHECK(vkCreateImageView(_device, &dview_info, nullptr, &_depthImageView));
+
+    _mainDeletionQueue.push_function([=]() {
+        vkDestroyImageView(_device, _depthImageView, nullptr);
+        vmaDestroyImage(_allocator, _depthImage._image, _depthImage._allocation);
+    });
+    
+    free(devices);
+    free(extensions);
+}
+
+void init_swapchain() //#0000ff
+{
+
+}
+/*
+things that we will need:
+
+_instance
+_debug_messenger
+_surface
+_device
+_chosenGPU
+_graphicsQueue
+_graphicsQueueFamily
+
+_swapchain
+_swapchainImages
+_swapchainImageViews 
+_swapchainImageFormat
+
+
+
+_mainDeletionQueue.push_function([=]() {
+    vkDestroySwapchainKHR(_device, _swapchain, nullptr);
+});
+
+_depthFormat = VK_FORMAT_D32_SFLOAT;
+
+VkImageCreateInfo dimg_info = vkinit::image_create_info(_depthFormat, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, depthImageExtent);
+
+VmaAllocationCreateInfo dimg_allocinfo = {};
+dimg_allocinfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
+dimg_allocinfo.requiredFlags = VkMemoryPropertyFlags(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+
+vmaCreateImage(_allocator, &dimg_info, &dimg_allocinfo, &_depthImage._image, &_depthImage._allocation, nullptr);
+
+VkImageViewCreateInfo dview_info = vkinit::imageview_create_info(_depthFormat, _depthImage._image, VK_IMAGE_ASPECT_DEPTH_BIT);
+
+VK_CHECK(vkCreateImageView(_device, &dview_info, nullptr, &_depthImageView));
+
+_mainDeletionQueue.push_function([=]() {
+    vkDestroyImageView(_device, _depthImageView, nullptr);
+    vmaDestroyImage(_allocator, _depthImage._image, _depthImage._allocation);
+});
+
+
+
+VmaAllocatorCreateInfo allocatorInfo = {};
+allocatorInfo.physicalDevice = _chosenGPU;
+allocatorInfo.device = _device;
+allocatorInfo.instance = _instance;
+vmaCreateAllocator(&allocatorInfo, &_allocator);
+
+*/
+
+#endif
+
+void cleanup() {
+    if (_isInitialized) {
+        freeRenderArray(&_render);
+
+        vkWaitForFences(_device, 1, &get_current_frame()._renderFence, true, 1000000000);
+
+        _mainDeletionQueue.flush();
+
+        vkDestroySurfaceKHR(_instance, _surface, nullptr);
+
+        vkDestroyDevice(_device, nullptr);
+        vkDestroyInstance(_instance, nullptr);
+
+        SDL_DestroyWindow(_window);
+
+        DEBUG("III cleaned up III");
+    }
+}
+
+void draw() {
+    //it don't be drawing
+    VK_CHECK(vkWaitForFences(_device, 1, &get_current_frame()._renderFence, true, 1000000000));
+    VK_CHECK(vkResetFences(_device, 1, &get_current_frame()._renderFence));
+
+    uint32_t swapchainImageIndex;
+    VK_CHECK(vkAcquireNextImageKHR(_device, _swapchain, 1000000000, get_current_frame()._presentSemaphore, nullptr, &swapchainImageIndex));
+
+    VK_CHECK(vkResetCommandBuffer(get_current_frame()._mainCommandBuffer, 0));
+
+    VkCommandBuffer cmd = get_current_frame()._mainCommandBuffer;
+
+    VkCommandBufferBeginInfo cmdBeginInfo = {};
+    cmdBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    cmdBeginInfo.pNext = nullptr;
+
+    cmdBeginInfo.pInheritanceInfo = nullptr;
+    cmdBeginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+    VK_CHECK(vkBeginCommandBuffer(cmd, &cmdBeginInfo));
+
+    VkClearValue clearValue;
+    clearValue.color = {{0.0f, 0.0f, 1.0f, 1.0f}};
+    VkClearValue depthClear;
+    depthClear.depthStencil.depth = 1.f;
+
+    VkRenderPassBeginInfo rpInfo = {};
+    rpInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    rpInfo.pNext = nullptr;
+
+    rpInfo.renderPass = _renderPass;
+    rpInfo.renderArea.offset.x = 0;
+    rpInfo.renderArea.offset.y = 0;
+    rpInfo.renderArea.extent = _windowExtent;
+    rpInfo.framebuffer = _framebuffers[swapchainImageIndex];
+
+    rpInfo.clearValueCount = 2;
+
+    VkClearValue clearValues[] = {clearValue, depthClear};
+
+    rpInfo.pClearValues = &clearValues[0];
+
+    vkCmdBeginRenderPass(cmd, &rpInfo, VK_SUBPASS_CONTENTS_INLINE);
+    DEBUG("III before MKTDRAW III");
+
+//#00ff00
+//#00ff00
+        MKTDRAW(cmd);
+//#00ff00
+//#00ff00
+    DEBUG("III after MKTDRAW III");
+
+    vkCmdEndRenderPass(cmd);
+
+    VK_CHECK(vkEndCommandBuffer(cmd));
+
+    VkSubmitInfo submit = {};
+    submit.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submit.pNext = nullptr;
+
+    VkPipelineStageFlags waitStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+
+    submit.pWaitDstStageMask = &waitStage;
+
+    submit.waitSemaphoreCount = 1;
+    submit.pWaitSemaphores = &get_current_frame()._presentSemaphore;
+
+    submit.signalSemaphoreCount = 1;
+    submit.pSignalSemaphores = &get_current_frame()._renderSemaphore;
+
+    submit.commandBufferCount = 1;
+    submit.pCommandBuffers = &cmd;
+
+    VK_CHECK(vkQueueSubmit(_graphicsQueue, 1, &submit, get_current_frame()._renderFence));
+
+    VkPresentInfoKHR presentInfo = {};
+    presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+    presentInfo.swapchainCount = 1;
+    presentInfo.pWaitSemaphores = &get_current_frame()._renderSemaphore;
+    presentInfo.waitSemaphoreCount = 1;
+    presentInfo.pSwapchains = &_swapchain;
+
+    presentInfo.pImageIndices = &swapchainImageIndex;
+
+    VK_CHECK(vkQueuePresentKHR(_graphicsQueue, &presentInfo));
+
+    _frameNumber++;
+}
+
+void run() {
+    SDL_Event e;
+    bool bQuit = false;
+
+    DEBUG("III started running III");
+
+    float xSize = 0;
+    float ySize = 0;
+    float xMove = 0;
+    float yMove = 0;
+    int currentObjectToDraw = 2;
+    char isVisible;
+
+    while (!bQuit)
+    {
+        draw();
+    DEBUG("III is running III");
+        while (SDL_PollEvent(&e) != 0)
+        {
+            if (e.type == SDL_QUIT) bQuit = true;
+            else if (e.type == SDL_KEYDOWN)
+            {
+                if(e.key.keysym.sym == SDLK_SPACE) // temp
+                    if(_render.sizePerArray[0] == 1)
+                        addToRenderArray(&_render,1, _pictures.size()-1, 0);
+                    else
+                        removeRenderObject(&_render,0,1,1);
+                else if(e.key.keysym.sym == SDLK_w)
+                    CBTStatus += 0.01;
+                else if(e.key.keysym.sym == SDLK_s)
+                    CBTStatus -= 0.01;
+
+            }
+            else if(e.type == SDL_MOUSEWHEEL)
+                    CBT += e.wheel.y < 0?0.01:-0.01;
+            else if(e.type == SDL_MOUSEBUTTONDOWN)
+                if(e.button.button == SDL_BUTTON_LEFT)
+                    printf("is it a float %f or an int %d",e.button.x,e.button.x);
+                
+            
+
+            if(currentObjectToDraw > 2)
+                currentObjectToDraw = 0;
+
+        }
+    }
+    DEBUG("III ran III");
+}
+
+//---------------------------------------------------------------------------------------------------------------------------------------------------
 
 void init_commands()
 {
@@ -744,6 +977,65 @@ void init_pipelines() {
     _DiSPipeline = pipelineBuilder.build_pipeline(_device, _renderPass);
     // #ff0000
 
+    VkPipelineLayoutCreateInfo fQS_pipeline_layout_info = {};
+    fQS_pipeline_layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    fQS_pipeline_layout_info.pNext = nullptr;
+
+    fQS_pipeline_layout_info.flags = 0;
+    fQS_pipeline_layout_info.setLayoutCount = 1;
+    fQS_pipeline_layout_info.pSetLayouts = &_picturesSetLayout;
+
+    VkPushConstantRange fQSpush_constant;
+	fQSpush_constant.offset = 0;
+	fQSpush_constant.size = sizeof(AGPushConstants);
+	fQSpush_constant.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+
+	fQS_pipeline_layout_info.pPushConstantRanges = &fQSpush_constant;
+	fQS_pipeline_layout_info.pushConstantRangeCount = 1;
+
+    VK_CHECK(vkCreatePipelineLayout(_device, &fQS_pipeline_layout_info, nullptr, &_fQSPipelineLayout));
+
+    VertexInputDescription fQSvertexDescription = Vertex::getfQS_vertex_description();
+
+	pipelineBuilder._vertexInputInfo.pVertexAttributeDescriptions = fQSvertexDescription.attributes.data();
+	pipelineBuilder._vertexInputInfo.vertexAttributeDescriptionCount = fQSvertexDescription.attributes.size();
+
+	pipelineBuilder._vertexInputInfo.pVertexBindingDescriptions = fQSvertexDescription.bindings.data();
+	pipelineBuilder._vertexInputInfo.vertexBindingDescriptionCount = fQSvertexDescription.bindings.size();
+
+	pipelineBuilder._shaderStages.clear();
+
+    VkShaderModule fQSFragShader;
+    if (!load_shader_module("./shaders/DiS.frag.spv", &fQSFragShader))
+    {
+        DEBUG("fQS frag error");
+    }
+    else {
+        DEBUG("fQS frag loaded");
+    }
+
+
+    VkShaderModule fQSVertShader;
+	if (!load_shader_module("./shaders/DiS.vert.spv", &fQSVertShader))
+	{
+		DEBUG("Error when building the fQS vertex shader module");
+	}
+	else {
+		DEBUG("fQS vertex shader successfully loaded");
+	}
+
+	pipelineBuilder._shaderStages.push_back(
+		vkinit::pipeline_shader_stage_create_info(VK_SHADER_STAGE_VERTEX_BIT, fQSVertShader));
+
+	pipelineBuilder._shaderStages.push_back(
+		vkinit::pipeline_shader_stage_create_info(VK_SHADER_STAGE_FRAGMENT_BIT, fQSFragShader));
+
+    pipelineBuilder._pipelineLayout = _fQSPipelineLayout;
+
+    // #ff0000
+    _fQSPipeline = pipelineBuilder.build_pipeline(_device, _renderPass);
+    // #ff0000
+
     // ----------------------------------------
 
     VkPipelineLayoutCreateInfo AG_pipeline_layout_info = vkinit::pipeline_layout_create_info();
@@ -869,92 +1161,58 @@ void init_pipelines() {
 void load_meshes()
 {
     DEBUG("started loading meshes");
-    _triangleMesh._vertices.resize(3);
+    // _triangleMesh._vertices.resize(3);
 
-	_triangleMesh._vertices[0].position = { 1.f,1.f, 0.5f };
-	_triangleMesh._vertices[1].position = { -1.f,1.f, 0.5f };
-	_triangleMesh._vertices[2].position = { 0.f,-1.f, 0.5f };
+	// _triangleMesh._vertices[0].position = { 1.f,1.f, 0.5f };
+	// _triangleMesh._vertices[1].position = { -1.f,1.f, 0.5f };
+	// _triangleMesh._vertices[2].position = { 0.f,-1.f, 0.5f };
 
-	_triangleMesh._vertices[0].color = { 0.f,1.f, 0.0f };
-	_triangleMesh._vertices[1].color = { 0.f,1.f, 0.0f }; 
-	_triangleMesh._vertices[2].color = { 0.f,1.f, 0.0f };
-
-
-	_DUCKMesh.load_from_obj("./graphics/models/DUCK.obj");
+	// _triangleMesh._vertices[0].color = { 0.f,1.f, 0.0f };
+	// _triangleMesh._vertices[1].color = { 0.f,1.f, 0.0f }; 
+	// _triangleMesh._vertices[2].color = { 0.f,1.f, 0.0f };
 
 
-    upload_mesh(_triangleMesh);
-	upload_mesh(_DUCKMesh);
 
-	_meshes["DUCK"] = _DUCKMesh;
-	_meshes["triangle"] = _triangleMesh;
+
+    // upload_mesh(_triangleMesh);
+
+	// _meshes["triangle"] = _triangleMesh;
 }
 
 void load_AG()
 {
     DEBUG("started loading AG");
 
-    FILE * MKTFILE = fopen("./graphics/ArrayGraphics/00_DEFAULT_AG.MKTI","rb");
-
-    const char fileNames[32] = "./graphics/ArrayGraphics/.MKTAG";
-
-    if(MKTFILE != NULL)
-    {
-        fseek(MKTFILE, 0L, SEEK_END);
-        size_t fileSize = ftell(MKTFILE);
-        rewind(MKTFILE);
-        char * charArray = (char*)malloc(fileSize);
-        fread( charArray,1, fileSize, MKTFILE );
-        fclose( MKTFILE );
-
-        for(int i = 0; i < fileSize; i++)
-        {
-            if(charArray[i-1] == '\n' && charArray[i] != '{')
-            {
-                int sizeOfName = 0;
-                char * MKTAGName;
-                for(0; charArray[i+sizeOfName] != '\n'&& sizeOfName <= fileSize-i;sizeOfName++)0;
-                sizeOfName++;
-                MKTAGName = (char*)malloc(sizeOfName+30);
-                for(int a = 0; a < sizeOfName;a++)
-                    MKTAGName[a+25] = charArray[i+a];
-                for(int a = 0; a < 25;a++)
-                    MKTAGName[a] = fileNames[a];
-                for(int a = 0; a < 7;a++)
-                    MKTAGName[sizeOfName+a-
-                    #ifdef _WIN32
-                    2
-                    #elif __gnu_linux__
-                    1
-                    #endif
-                    +25] = fileNames[a+25];
-
-                if(DEBUG("Loaded an AG: "))
-                    printf("     %s\n",MKTAGName);
-                _HexAg = arrayGraphicsReader(MKTAGName);
-                _TAGA.push_back(_HexAg);
-                upload_AG(_TAGA[_TAGA.size()-1]);
-            }
-        }
-    } else {
-        printf("\nCannot find the 00_DEFAULT_AG.MKTI");
-    }
+    const char * MKTAGName = "./DataFiles/blackLine.MKTAG";
+    _HexAg = arrayGraphicsReader(MKTAGName);
+    _TAGA.push_back(_HexAg);
+    upload_AG(_TAGA[_TAGA.size()-1]);
+    printf("\nDEBUG: %f %f %f %f %f %f\n",_HexAg._vertices[0].position[0],_HexAg._vertices[0].position[1],_HexAg._vertices[0].position[2],_HexAg._vertices[1].position[0],_HexAg._vertices[1].position[1],_HexAg._vertices[1].position[2]);
 
     // MKTAG AG;
     // AGPushConstants AGPC;
     // char isVisible;
 
-    _defaultPictureRectangle._vertices.resize(6);
+    _defaultPictureRectangle._vertices.resize(4);
 
     _defaultPictureRectangle._vertices = {
         {{-1.0,-1.0,0.0},{0.0,0.0,0.0},{0.0,0.0}},
         {{1.0,-1.0,0.0},{0.0,0.0,0.0},{1.0,0.0}},
         {{-1.0,1.0,0.0},{0.0,0.0,0.0},{0.0,1.0}},
-
-        {{1.0,-1.0,0.0},{0.0,0.0,0.0},{1.0,0.0}},
-        {{-1.0,1.0,0.0},{0.0,0.0,0.0},{0.0,1.0}},
         {{1.0,1.0,0.0},{0.0,0.0,0.0},{1.0,1.0}}
     };
+
+    _defaultPictureRectangleIndex.array = (unsigned int *)malloc(sizeof(unsigned int *)*6);
+    _defaultPictureRectangleIndex.size = 6;
+
+    _defaultPictureRectangleIndex.array[0] = 0;
+    _defaultPictureRectangleIndex.array[1] = 1;
+    _defaultPictureRectangleIndex.array[2] = 2;
+    _defaultPictureRectangleIndex.array[3] = 0;
+    _defaultPictureRectangleIndex.array[4] = 2;
+    _defaultPictureRectangleIndex.array[5] = 3;
+
+    createIndexBuffer(_defaultPictureRectangleIndex.array,_defaultPictureRectangleIndex.size,&_defaultPictureRectangle.indexBuffer,&_defaultPictureRectangle.indexBufferMemory);
 
     const size_t bufferSize= _defaultPictureRectangle._vertices.size() * sizeof(MKTAPiC);
 	VkBufferCreateInfo stagingBufferInfo = {};
@@ -963,15 +1221,21 @@ void load_AG()
 	stagingBufferInfo.size = bufferSize;
 	stagingBufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
 
+    DEBUG("created staging buffer info");
+
 	VmaAllocationCreateInfo vmaallocInfo = {};
 	vmaallocInfo.usage = VMA_MEMORY_USAGE_CPU_ONLY;
 
 	AllocatedBuffer stagingBuffer;
 
+    DEBUG("before creating a buffer");
+
 	VK_CHECK(vmaCreateBuffer(_allocator, &stagingBufferInfo, &vmaallocInfo,
 		&stagingBuffer._buffer,
 		&stagingBuffer._allocation,
 		nullptr));
+
+    DEBUG("started memory mapping");
 
 	void* data;
 	vmaMapMemory(_allocator, stagingBuffer._allocation, &data);
@@ -1072,7 +1336,7 @@ void loadMenuAG()
             DEFAULTconstants.movement = {0.0-((_windowExtent.width*0.98)/_windowExtent.width),0.0-((_windowExtent.height*0.95)/_windowExtent.height),0.0};
             Modules[moduleNumber].icon.isVisible = 1;
             Modules[moduleNumber].icon.AGPC = DEFAULTconstants;
-        upload_AG(Modules[moduleNumber].icon.AG);
+            upload_AG(Modules[moduleNumber].icon.AG);
             moduleNumber++;
             free(MKTAGName);
         }
@@ -1622,6 +1886,8 @@ void upload_AG(MKTAG& AG)
 	});
     DEBUG("before unmapping");
 	vmaDestroyBuffer(_allocator, stagingBuffer._buffer, stagingBuffer._allocation);
+
+    createIndexBuffer(AG.indices,AG.sizeOfIndices,&AG.indexBuffer,&AG.indexBufferMemory);
 }
 
 void init_createTextureSampler()
@@ -1839,11 +2105,40 @@ void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyF
         DEBUG("allocated memory");
 
     vkBindBufferMemory(_device, buffer, bufferMemory, 0);
+        DEBUG("bound buffer memory");
 }
 
 void logoLoadingFunctionThatIsVeryImportant()
 {
-    MKTPic data = MKTPicReader("./graphics/MKTPhotos/logo.MKTP");
+    MKTPic data;
+    FILE *MKTFILE = fopen("./DataFiles/logo.MKTP", "rb" );
+	char *list;
+	fseek(MKTFILE,0L,SEEK_END);
+	size_t sizeOfFile = ftell(MKTFILE);
+	rewind(MKTFILE);
+	list = (char*)malloc(sizeOfFile);
+	fread( list,1, sizeOfFile, MKTFILE );
+
+    data.width = *(size_t*)list;
+    data.pixels = (MKTPix*)malloc(sizeOfFile-sizeof(size_t));
+
+    for(int i = 0; i < sizeOfFile-sizeof(size_t);i++)
+    {
+        if(i%4 == 0)
+            data.pixels[(i-(i%4))/4].R = list[i+sizeof(size_t)];
+        if(i%4 == 1)
+            data.pixels[(i-(i%4))/4].G = list[i+sizeof(size_t)];
+        if(i%4 == 2)
+            data.pixels[(i-(i%4))/4].B = list[i+sizeof(size_t)];
+        if(i%4 == 3)
+           data.pixels[(i-(i%4))/4].A = list[i+sizeof(size_t)];
+    }
+	
+    fclose( MKTFILE );
+
+    data.height = (sizeOfFile-sizeof(size_t))/sizeof(MKTPix)/data.width;
+
+
     VkDeviceSize imageSize = data.width * data.height * 4;
 
     VkBuffer stagingBuffer;
@@ -2217,6 +2512,8 @@ void MKTDRAW(VkCommandBuffer cmd)
     Mesh* lastMesh = nullptr;
     Material* lastMaterial = nullptr;
 
+    DEBUG("before drawing");
+
     for(int iLayer = 0; iLayer < _render.size;iLayer++)
     {
         for(int renderObject = 0; renderObject < _render.sizePerArray[iLayer];renderObject++)
@@ -2238,7 +2535,9 @@ void MKTDRAW(VkCommandBuffer cmd)
 
                         vkCmdBindVertexBuffers(cmd, 0, 1, &object->_vertexBuffer._buffer, &offset);
 
-                        vkCmdDraw(cmd, object->_vertices.size(), 1, 0, 0);
+                        vkCmdBindIndexBuffer(cmd, _AGA[fasterID].AG.indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+
+                        vkCmdDrawIndexed(cmd, object->_vertices.size(), 1, 0, 0, 0);
                     }
                 }
             if(modesEnabled&MKTDRAWPIC)
@@ -2258,9 +2557,11 @@ void MKTDRAW(VkCommandBuffer cmd)
 
                         vkCmdBindVertexBuffers(cmd, 0, 1, &object->_vertexBuffer._buffer, &offset);//#ff0000 problem
 
+                        vkCmdBindIndexBuffer(cmd, _defaultPictureRectangle.indexBuffer , 0, VK_INDEX_TYPE_UINT16);
+
                         vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _DiSPipelineLayout, 0, 1, &_currentPicturesDescriptor[fasterID], 0, nullptr);
 
-                        vkCmdDraw(cmd, object->_vertices.size(), 1, 0, 0);
+                        vkCmdDrawIndexed(cmd, object->_vertices.size(), 1, 0, 0,0);
                     }
                 }
             if(modesEnabled&MKTDRAW3D)
@@ -2292,12 +2593,68 @@ void MKTDRAW(VkCommandBuffer cmd)
                     }
                     vkCmdDraw(cmd, object.mesh->_vertices.size(), 1, 0, 0);
                 }
+            if(modesEnabled&MKTDRAWTEXT)
+                if(_render.arrayPointers[iLayer][renderObject].type == 4)
+                {
+                    int fasterID = _render.arrayPointers[iLayer][renderObject].ID;
+                    if(_TEXT[fasterID].isVisible)
+                    {
+                        TEXTPushConstant constants = _TEXT[fasterID].pushConstant;
+                        MKTAG * object = getFontAG(_TEXT[fasterID]);
+
+                        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _AGPipeline);
+
+                        VkDeviceSize offset = 0;
+
+                        vkCmdPushConstants(cmd, _fQSPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(AGPushConstants), &constants);
+
+                        vkCmdBindVertexBuffers(cmd, 0, 1, &object->_vertexBuffer._buffer, &offset);
+
+                        vkCmdBindIndexBuffer(cmd, object->indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+
+                        vkCmdDrawIndexed(cmd, object->_vertices.size(), 1, 0, 0, 0);
+                    }
+                }
+            
         }
     }
 
+    DEBUG("after drawing content");
+
     if(modesEnabled&MKTDRAWMENU)
         drawMenu(cmd,Modules, sizeOfModules);
+    DEBUG("after drawing menu");
     return;
+}
+
+void createIndexBuffer(unsigned int * indices,size_t sizeOfIndices,VkBuffer * indexBuffer, VkDeviceMemory * indexBufferMemory)
+{
+    VkDeviceSize bufferSize = sizeof(indices[0]) * sizeOfIndices;
+
+    VkBuffer stagingBuffer;
+    VkDeviceMemory stagingBufferMemory;
+    createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+
+    void* data;
+    vkMapMemory(_device, stagingBufferMemory, 0, bufferSize, 0, &data);
+    memcpy(data, indices, (size_t) bufferSize);
+    vkUnmapMemory(_device, stagingBufferMemory);
+        DEBUG("created the staging index buffer");
+    createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, *indexBuffer, *indexBufferMemory);
+
+    copyBuffer(stagingBuffer, *indexBuffer, bufferSize);
+        DEBUG("created index buffer");
+
+    vkDestroyBuffer(_device, stagingBuffer, nullptr);
+    vkFreeMemory(_device, stagingBufferMemory, nullptr);
+    // error add cleanup
+    return;
+}
+
+MKTAG * getFontAG(MKTEXT input)
+{
+    MKTAG * toReturn = (MKTAG*)malloc(sizeof(MKTAG));
+    return toReturn;
 }
 
 void drawMenu(VkCommandBuffer cmd,GL * menuStuff, size_t sizeOfMenuStuff)
@@ -2315,12 +2672,15 @@ void drawMenu(VkCommandBuffer cmd,GL * menuStuff, size_t sizeOfMenuStuff)
             VkDeviceSize offset = 0;
                         
             vkCmdBindVertexBuffers(cmd, 0, 1, &Modules[i].icon.AG._vertexBuffer._buffer, &offset);
+            
+            vkCmdBindIndexBuffer(cmd, Modules[i].icon.AG.indexBuffer, 0, VK_INDEX_TYPE_UINT16);
 
             vkCmdPushConstants(cmd, _AGPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(AGPushConstants), &Modules[i].icon.AGPC);
 
-            vkCmdDraw(cmd, Modules[i].icon.AG._vertices.size(), 1, 0, 0);
+            vkCmdDrawIndexed(cmd, Modules[i].icon.AG._vertices.size(), 1, 0, 0, 0);
         }
     }
+    DEBUG("after drawing icons");
 
     for(int i = 0; i < sizeOfMenuStuff;i++) // make it less than 18 lines per draw
     { 
@@ -2331,6 +2691,8 @@ void drawMenu(VkCommandBuffer cmd,GL * menuStuff, size_t sizeOfMenuStuff)
             VkDeviceSize offset = 0;
             vkCmdBindVertexBuffers(cmd, 0, 1, &_AGA[BLACKLINE_ID].AG._vertexBuffer._buffer, &offset);
 
+            vkCmdBindIndexBuffer(cmd, _AGA[BLACKLINE_ID].AG.indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+
             AGPushConstants BLC = _AGA[0].AGPC;
 
             BLC.movement.y = CBT+(float)(i*(CBTStatus*ratio)/40);
@@ -2339,7 +2701,7 @@ void drawMenu(VkCommandBuffer cmd,GL * menuStuff, size_t sizeOfMenuStuff)
             
             vkCmdPushConstants(cmd, _AGPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(AGPushConstants), &BLC);
 
-            vkCmdDraw(cmd, _AGA[BLACKLINE_ID].AG._vertices.size(), 1, 0, 0);
+            vkCmdDrawIndexed(cmd, _AGA[BLACKLINE_ID].AG._vertices.size(), 1, 0, 0, 0);
         }
     }
 }
@@ -2456,6 +2818,8 @@ int loadFile(char * filePath, char mode)
         0;
     else if(mode == 3) // data
         0;
+    else if(mode == 4) // text
+        0;
     return -1;
 }
 
@@ -2463,9 +2827,9 @@ MKTPic _MKT_loadImage(char * filePath,int * error)
 {
     int stringLenght;
     MKTPic returnPic;
-    for(stringLenght = 0; filePath[stringLenght] != 0;stringLenght++)printf("\ntwo things: %d %c",stringLenght, filePath[stringLenght]);
+    for(stringLenght = 0; filePath[stringLenght] != 0;stringLenght++)0;//printf("\ntwo things: %d %c",stringLenght, filePath[stringLenght]);
     int dotPlace;
-    for(dotPlace = 0; filePath[stringLenght-dotPlace] != '.';dotPlace++)printf("\ntwo things: %d %d %c",dotPlace,stringLenght, filePath[stringLenght-dotPlace]);
+    for(dotPlace = 0; filePath[stringLenght-dotPlace] != '.';dotPlace++)0;//printf("\ntwo things: %d %d %c",dotPlace,stringLenght, filePath[stringLenght-dotPlace]);
     FILE*MKTFILE = fopen("./files/files.MKTI","rb");
     if( MKTFILE != NULL )
     {

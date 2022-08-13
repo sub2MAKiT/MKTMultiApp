@@ -120,6 +120,9 @@
         "mktarraygraphics.h": "c",
         "cmdmode.h": "c",
         "mktpicture.h": "c",
-        "_render.h": "c"
+        "_render.h": "c",
+        "mktswapchaincreator.h": "c",
+        "types.h": "c",
+        "mktvkshoebelt.h": "c"
     }
 }

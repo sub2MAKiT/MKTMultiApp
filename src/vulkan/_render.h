@@ -2,7 +2,7 @@
 
 typedef struct MainRenderStruct {
     int ID;
-    char type; // 0 - AG, 1 - picture, 2 - object
+    char type; // 0 - AG, 1 - picture, 2 - object, 4 - text
 } DrawStruct;
 
 typedef struct MainRenderArray {

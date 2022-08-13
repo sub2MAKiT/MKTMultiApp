@@ -20,6 +20,7 @@ struct Vertex {
     static VertexInputDescription get_vertex_description();
     static VertexInputDescription getAG_vertex_description();
     static VertexInputDescription getPiC_vertex_description();
+    static VertexInputDescription getfQS_vertex_description();
 };
 
 struct Mesh {
@@ -42,12 +43,28 @@ typedef struct MKTAGA3 {
     glm::vec2 texCoord;
 } MKTAPiC;
 
+typedef struct MKTFQS3 {
+    glm::vec3 position;
+} MKTfQS;
+
 typedef struct arrayGraphic{ 
     std::vector<MKTAGA> _vertices;
     AllocatedBuffer _vertexBuffer;
+
+    unsigned int * indices;
+    size_t sizeOfIndices;
+
+    VkBuffer indexBuffer;
+    VkDeviceMemory indexBufferMemory;
 } MKTAG;
 
 typedef struct pictureGraphics{
     std::vector<MKTAPiC> _vertices;
+
+    unsigned int * indices;
+    size_t sizeOfIndices;
+
     AllocatedBuffer _vertexBuffer;
+    VkBuffer indexBuffer;
+    VkDeviceMemory indexBufferMemory;
 } MKTPiC;

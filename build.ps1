@@ -12,11 +12,12 @@ param (
     [switch]$buildFiles = $false,
     [switch]$buildModuleHandler = $false,
     [switch]$all = $false,
-    [switch]$modules = $false
+    [switch]$modules = $false,
+    [switch]$noVKB = $false
 )
 if($all)
 {
-    $DEBUG = $true
+    $DEBUG = $false
     $fast = $true
     $TESTDLL = $true
     $FULLDLL = $true
@@ -27,7 +28,8 @@ if($all)
     $DiSshaders = $true
     $commitFiles = $true
     $buildFiles = $true
-    $buildModuleHandler = $true
+    $buildModuleHandler = $true,
+    $noVKB = $true
 }
 if($modules)
 {
@@ -39,6 +41,7 @@ if($buildModuleHandler)
 {
     gcc ./MKTModuleHandler/MKTMH.c -shared -o ./MKTModuleHandler/MKTMH.dll
     cp ./MKTModuleHandler/MKTMH.dll ./build/lib/windows/
+    gcc ./MKTModuleHandler/testModule.c -shared -o ./simpleTestModulePackage/testModule.dll
 }
 if($buildFiles)
 {
@@ -77,4 +80,9 @@ if($FULLDLL)
 {
     gcc ./MAD/ArrayGraphicsLibrary/AG.c ./MAD/ArrayGraphicsLibrary/basicMKT.o -I C:/sdk/ -shared -o ./build/lib/windows/AG.dll
 }
-g++ $DEBUGS ./src/vulkan/_render.c ./src/cmdMode.c ./src/libraryLoader.c ./src/fileManagment/MKTarrayGraphics.c ./src/vulkan/vkB.o ./src/main.c -I C:/sdk/ -static-libgcc -static-libstdc++ -static ./src/vulkan/MKTAppEngine.cpp ./src/vulkan/init.cpp ./src/vulkan/MKTMesh.cpp -o ./build/main -I C:\sdk\include -L C:\sdk\lib -l SDL2 -l vulkan-1 -l SDL2main -l gdi32 -l user32 -l kernel32 $(If ($fast) {"-Ofast"} Else {""}) $(If ($DEBUG) {"-g"} Else {""})  -lmingw32 -lSDL2main -lSDL2 -lm -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lsetupapi -lversion -luuid && cd ./build/ && .\main.exe
+if ($noVKB) {
+    $noVKBS = "-DNOVKB"
+} else {
+    $noVKBS = ""
+}
+g++ $DEBUGS $noVKBS $(If ($noVKB) {"./src/vulkan/MKTVKShoebelt.c"} Else {"./src/vulkan/vkB.o"}) ./src/vulkan/_render.c ./src/cmdMode.c ./src/libraryLoader.c ./src/fileManagment/MKTarrayGraphics.c ./src/main.c -I C:/sdk/ -static-libgcc -static-libstdc++ -static ./src/vulkan/MKTAppEngine.cpp ./src/vulkan/init.cpp ./src/vulkan/MKTMesh.cpp -o ./build/main -I C:\sdk\include -L C:\sdk\lib -l SDL2 -l vulkan-1 -l SDL2main -l gdi32 -l user32 -l kernel32 $(If ($fast) {"-Ofast"} Else {""}) $(If ($DEBUG) {"-g"} Else {""})  -lmingw32 -lSDL2main -lSDL2 -lm -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lsetupapi -lversion -luuid && cd ./build/ && .\main.exe

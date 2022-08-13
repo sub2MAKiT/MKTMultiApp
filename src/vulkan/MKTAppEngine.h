@@ -7,6 +7,7 @@
 #include <iostream>
 #include "../libraryHeader.h"
 #include "./_render.h"
+#include "../utils.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -20,7 +21,11 @@
 #include "init.h"
 #include <fstream>
 
+#ifdef NOVKB
+#include "./MKTVKShoebelt.h"
+#else
 #include <vk-bootstrap/src/VkBootstrap.h>
+#endif
 
 #include "MKTMesh.h"
 #include <glm/glm.hpp>
@@ -29,6 +34,11 @@
 #include <unordered_map>
 
 constexpr unsigned int FRAME_OVERLAP = 2;
+
+typedef struct uintVertex {
+    unsigned int * array;
+    size_t size;
+} UINTV;
 
 struct MeshPushConstants {
     glm::vec4 data;
@@ -41,6 +51,20 @@ struct AGPushConstants {
     glm::vec3 movement;
     // glm::vec2 pivitPoint;
 };
+
+struct TEXTPushConstant {
+	glm::vec3 colour;
+	glm::mat4 transformation;
+	glm::vec3 movement;
+};
+
+typedef struct MKTEXT {
+    TEXTPushConstant pushConstant;
+    char * text;
+    size_t sizeOfText;
+    unsigned int font;
+    char isVisible;
+} MKTTEXT;
 
 struct DeletionQueue
 {
@@ -196,6 +220,8 @@ Mesh _triangleMesh;
 MKTAG _HexAg;
 VkPipelineLayout _DiSPipelineLayout;
 VkPipeline _DiSPipeline;
+VkPipelineLayout _fQSPipelineLayout;
+VkPipeline _fQSPipeline;
 int _selectedShader{0};
 DeletionQueue _mainDeletionQueue;
 VkPipelineLayout _meshPipelineLayout;
@@ -210,6 +236,7 @@ RenderArray _render;
 std::vector<sub2MAKiT> _AGA;
 std::vector<vPic> _pictures;
 std::vector<RenderObject> _renderables;
+std::vector<MKTTEXT> _TEXT;
 std::unordered_map<std::string,Material> _materials;
 std::unordered_map<std::string,Mesh> _meshes;
 Material* create_material(VkPipeline pipeline, VkPipelineLayout layout,const std::string& name);
@@ -259,7 +286,25 @@ void init_VentumEngineVariables();
 void updateSpecificPictureDescriptor(vPic * Picture, size_t picureNumber);
 float CBTStatus;
 float ratio;
+MKTAG * getFontAG(MKTEXT input);
+void createIndexBuffer(unsigned int * indices,size_t sizeOfIndices,VkBuffer * indexBuffer, VkDeviceMemory * indexBufferMemory);
+UINTV _defaultPictureRectangleIndex;
 #else
+extern UINTV _defaultPictureRectangleIndex;
+extern void createIndexBuffer(unsigned int * indices,size_t sizeOfIndices,VkBuffer * indexBuffer, VkDeviceMemory * indexBufferMemory);
+extern VkBuffer vertexBuffer;
+extern VkDeviceMemory vertexBufferMemory;
+extern VkBuffer indexBuffer;
+extern VkDeviceMemory indexBufferMemory;
+extern MKTAG * getFontAG(MKTEXT input);
+extern MKTAG * getFontAG(MKTEXT input);
+extern MKTAG * getFontAG(MKTEXT input);
+extern MKTAG * getFontAG(MKTEXT input);
+extern MKTAG * getFontAG(MKTEXT input);
+extern MKTAG * getFontAG(MKTEXT input);
+extern MKTAG * getFontAG(MKTEXT input);
+extern MKTAG * getFontAG(MKTEXT input);
+extern MKTAG * getFontAG(MKTEXT input);
 extern float ratio;
 extern float CBTStatus;
 extern void CreatePictureDescriptors(vPic * pPic,size_t index);
@@ -324,6 +369,8 @@ extern Mesh _triangleMesh;
 extern MKTAG _HexAg;
 extern VkPipelineLayout _DiSPipelineLayout;
 extern VkPipeline _DiSPipeline;
+extern VkPipelineLayout _fQSPipelineLayout;
+extern VkPipeline _fQSPipeline;
 extern int _selectedShader;
 extern DeletionQueue _mainDeletionQueue;
 extern VkPipelineLayout _meshPipelineLayout;
