@@ -5,6 +5,11 @@
 #define VMA_IMPLEMENTATION
 #include <VulkanMA/vk_mem_alloc.h>
 #include "../DEBUG.h"
+#ifdef _USE_GLFW
+#define VK_USE_PLATFORM_WIN32_KHR
+#define GLFW_INCLUDE_VULKAN
+#define GLFW_EXPOSE_NATIVE_WIN32 //#ff0000
+#endif
 
 // Some basic graphics:
 
@@ -31,6 +36,14 @@ do                                                              \
 
 void init() {
 
+    #ifndef _USE_GLFW
+
+    validationLayers = (const char**)malloc(sizeof(const char*));
+    
+    *validationLayers ={
+    "VK_LAYER_KHRONOS_validation"
+    };
+
     SDL_Init(SDL_INIT_VIDEO);
 
     SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_VULKAN);
@@ -43,6 +56,12 @@ void init() {
         _windowExtent.height, //#aaaa00
         window_flags //#aaaa00
     );
+    #else
+    glfwInit();\
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);\
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);\
+    _window = glfwCreateWindow(_windowExtent.width, _windowExtent.height, "Vulkan", nullptr, nullptr);
+    #endif
 
     init_vulkan(); //#0000ff
 
@@ -289,8 +308,14 @@ void init_vulkan() //#0000ff
     createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     createInfo.pApplicationInfo = &appInfo;
 
-    createInfo.enabledExtensionCount = 0; //#ff0000
-    createInfo.ppEnabledExtensionNames = NULL;
+    uint32_t glfwExtensionCount = 0;
+    const char** glfwExtensions;
+
+    glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+
+    createInfo.enabledExtensionCount = glfwExtensionCount;
+    createInfo.ppEnabledExtensionNames = glfwExtensions;
+
     createInfo.enabledLayerCount = 0;
 
     VK_CHECK(vkCreateInstance(&createInfo, NULL, &_instance));
@@ -356,6 +381,7 @@ void init_vulkan() //#0000ff
     allocatorInfo.physicalDevice = _chosenGPU;
     allocatorInfo.device = _device;
     allocatorInfo.instance = _instance;
+
     vmaCreateAllocator(&allocatorInfo, &_allocator);
 
     // #ifdef _WIN32
@@ -363,11 +389,17 @@ void init_vulkan() //#0000ff
     // createInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
     // createInfo.hwnd = glfwGetWin32Window(_window);
     // createInfo.hinstance = GetModuleHandle(nullptr);
+    // VK_CHECK(vkCreateWin32SurfaceKHR(instance, &createInfo, nullptr, &surface));
+
     // #elif __gnu_linux__
 
     // #endif
 
+    #ifdef _USE_GLFW
+    glfwCreateWindowSurface(_instance, _window, nullptr, &_surface);
+    #else
     SDL_Vulkan_CreateSurface(_window, _instance, &_surface);
+    #endif
 
     _mainDeletionQueue.push_function([=]() {
     vkDestroySwapchainKHR(_device, _swapchain, nullptr);
@@ -471,9 +503,12 @@ void cleanup() {
 
         vkDestroyDevice(_device, nullptr);
         vkDestroyInstance(_instance, nullptr);
-
+        #ifdef _USE_GLFW
+        glfwDestroyWindow(_window);
+        glfwTerminate();
+        #else
         SDL_DestroyWindow(_window);
-
+        #endif
         DEBUG("III cleaned up III");
     }
 }
@@ -568,6 +603,7 @@ void draw() {
 }
 
 void run() {
+    #ifndef _USE_GLFW
     SDL_Event e;
     bool bQuit = false;
 
@@ -613,6 +649,11 @@ void run() {
 
         }
     }
+    #else
+    while (!glfwWindowShouldClose(_window)) {
+        glfwPollEvents();
+    }
+    #endif
     DEBUG("III ran III");
 }
 
@@ -1179,6 +1220,124 @@ void load_meshes()
 	// _meshes["triangle"] = _triangleMesh;
 }
 
+
+
+// VMA_CALL_PRE VkResult VMA_CALL_POST MKTVulkanAllocDebugFunction(
+//     VmaAllocator allocator,
+//     const VkBufferCreateInfo* pBufferCreateInfo,
+//     const VmaAllocationCreateInfo* pAllocationCreateInfo,
+//     VkBuffer* pBuffer,
+//     VmaAllocation* pAllocation,
+//     VmaAllocationInfo* pAllocationInfo)
+// {
+//     DEBUG("Started allocation");
+//     VMA_ASSERT(allocator && pBufferCreateInfo && pAllocationCreateInfo && pBuffer && pAllocation);
+
+//     if(pBufferCreateInfo->size == 0)
+//     {
+//         return VK_ERROR_INITIALIZATION_FAILED;
+//     }
+//     if((pBufferCreateInfo->usage & VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT_COPY) != 0 &&
+//         !allocator->m_UseKhrBufferDeviceAddress)
+//     {
+//         VMA_ASSERT(0 && "Creating a buffer with VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT is not valid if VMA_ALLOCATOR_CREATE_BUFFER_DEVICE_ADDRESS_BIT was not used.");
+//         return VK_ERROR_INITIALIZATION_FAILED;
+//     }
+
+//     VMA_DEBUG_LOG("vmaCreateBuffer");
+//     DEBUG("After VMA_DEBUG_LOG");
+
+//     VMA_DEBUG_GLOBAL_MUTEX_LOCK
+
+//     *pBuffer = VK_NULL_HANDLE;
+//     *pAllocation = VK_NULL_HANDLE;
+
+//     DEBUG("testing ground");
+
+//     printf("\nthis is just chad %x\n",*allocator->GetVulkanFunctions().vkCreateBuffer);
+
+//     printf("\n0. %x",allocator->m_hDevice);
+//     printf("\n1. %x",pBufferCreateInfo);
+//     printf("\n2. %x",allocator->GetAllocationCallbacks());
+//     printf("\n3. %x",pBuffer);
+
+//     //this little cheeser is causing the problems (VKAPI_PTR *PFN_vkCreateBuffer)(VkDevice device, const VkBufferCreateInfo* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkBuffer* pBuffer)
+
+//     printf("\nthis is just a problem %x\n",(*allocator->GetVulkanFunctions().vkCreateBuffer)(
+//         allocator->m_hDevice,
+//         pBufferCreateInfo,
+//         allocator->GetAllocationCallbacks(),
+//         pBuffer));
+
+//     DEBUG("Before res assigment");
+
+//     // 1. Create VkBuffer.
+//     VkResult res = (*allocator->GetVulkanFunctions().vkCreateBuffer)(
+//         allocator->m_hDevice,
+//         pBufferCreateInfo,
+//         allocator->GetAllocationCallbacks(),
+//         pBuffer);
+
+//     DEBUG("Before Main \"IF\"");
+//     if(res >= 0)
+//     {
+//         // 2. vkGetBufferMemoryRequirements.
+//         VkMemoryRequirements vkMemReq = {};
+//         bool requiresDedicatedAllocation = false;
+//         bool prefersDedicatedAllocation  = false;
+//         allocator->GetBufferMemoryRequirements(*pBuffer, vkMemReq,
+//             requiresDedicatedAllocation, prefersDedicatedAllocation);
+
+//         // 3. Allocate memory using allocator.
+//         res = allocator->AllocateMemory(
+//             vkMemReq,
+//             requiresDedicatedAllocation,
+//             prefersDedicatedAllocation,
+//             *pBuffer, // dedicatedBuffer
+//             pBufferCreateInfo->usage, // dedicatedBufferUsage
+//             VK_NULL_HANDLE, // dedicatedImage
+//             *pAllocationCreateInfo,
+//             VMA_SUBALLOCATION_TYPE_BUFFER,
+//             1, // allocationCount
+//             pAllocation);
+//             DEBUG("MemoryAllocation");
+
+//         if(res >= 0)
+//         {
+//             // 3. Bind buffer with memory.
+//             if((pAllocationCreateInfo->flags & VMA_ALLOCATION_CREATE_DONT_BIND_BIT) == 0)
+//             {
+//                 res = allocator->BindBufferMemory(*pAllocation, 0, *pBuffer, VMA_NULL);
+//             }
+//             if(res >= 0)
+//             {
+//                 // All steps succeeded.
+//                 #if VMA_STATS_STRING_ENABLED
+//                     (*pAllocation)->InitBufferImageUsage(pBufferCreateInfo->usage);
+//                 #endif
+//                 if(pAllocationInfo != VMA_NULL)
+//                 {
+//                     allocator->GetAllocationInfo(*pAllocation, pAllocationInfo);
+//                 }
+
+//                 return VK_SUCCESS;
+//             }
+//             allocator->FreeMemory(
+//                 1, // allocationCount
+//                 pAllocation);
+//             *pAllocation = VK_NULL_HANDLE;
+//             (*allocator->GetVulkanFunctions().vkDestroyBuffer)(allocator->m_hDevice, *pBuffer, allocator->GetAllocationCallbacks());
+//             *pBuffer = VK_NULL_HANDLE;
+//             return res;
+//         }
+//         (*allocator->GetVulkanFunctions().vkDestroyBuffer)(allocator->m_hDevice, *pBuffer, allocator->GetAllocationCallbacks());
+//         *pBuffer = VK_NULL_HANDLE;
+//         return res;
+//     }
+//             DEBUG("end return");
+//     return res;
+// }
+
 void load_AG()
 {
     DEBUG("started loading AG");
@@ -1214,7 +1373,8 @@ void load_AG()
 
     createIndexBuffer(_defaultPictureRectangleIndex.array,_defaultPictureRectangleIndex.size,&_defaultPictureRectangle.indexBuffer,&_defaultPictureRectangle.indexBufferMemory);
 
-    const size_t bufferSize= _defaultPictureRectangle._vertices.size() * sizeof(MKTAPiC);
+    const size_t bufferSize = _defaultPictureRectangle._vertices.size() * sizeof(MKTAPiC);
+    printf("BS:%d %d\n",bufferSize, sizeof(MKTAPiC));
 	VkBufferCreateInfo stagingBufferInfo = {};
 	stagingBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 	stagingBufferInfo.pNext = nullptr;
@@ -1233,7 +1393,7 @@ void load_AG()
 	VK_CHECK(vmaCreateBuffer(_allocator, &stagingBufferInfo, &vmaallocInfo,
 		&stagingBuffer._buffer,
 		&stagingBuffer._allocation,
-		nullptr));
+		NULL));
 
     DEBUG("started memory mapping");
 

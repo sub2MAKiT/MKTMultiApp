@@ -14,9 +14,13 @@
 #elif __gnu_linux__
 #include <dlfcn.h>
 #endif
-
+#ifndef _USE_GLFW
 #include <SDL/SDL.h>
 #include <SDL/SDL_vulkan.h>
+#else
+#include <GLFW/glfw3native.h>
+#include <GLFW/glfw3.h>
+#endif
 
 #include "init.h"
 #include <fstream>
@@ -178,8 +182,14 @@ void removeFromRenderQueue(int ID);
 void init_fileConverter();
 char * charStringUnconstant(const char * whyNot);
 
-
 #ifdef _MKTENGINEINCLUDEGUARD_
+const char ** validationLayers;
+
+#ifdef MKT_DEBUG
+const bool enableValidationLayers = false;
+#else
+const bool enableValidationLayers = true;
+#endif
 uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 int loading_MKTP_image(MKTPic data);
 VkDevice _device;
@@ -191,7 +201,11 @@ void upload_AG(MKTAG& AG);
 bool _isInitialized{false};
 int _frameNumber {0};
 VkExtent2D _windowExtent {1700, 800};
+#ifndef _USE_GLFW
 struct SDL_Window* _window{nullptr};
+#else
+GLFWwindow* _window;
+#endif
 void init();
 void cleanup();
 void draw();
@@ -290,6 +304,13 @@ MKTAG * getFontAG(MKTEXT input);
 void createIndexBuffer(unsigned int * indices,size_t sizeOfIndices,VkBuffer * indexBuffer, VkDeviceMemory * indexBufferMemory);
 UINTV _defaultPictureRectangleIndex;
 #else
+extern const char ** validationLayers;
+
+// #ifdef MKT_DEBUG
+// extern const bool enableValidationLayers;
+// #else
+// extern const bool enableValidationLayers;
+// #endif
 extern UINTV _defaultPictureRectangleIndex;
 extern void createIndexBuffer(unsigned int * indices,size_t sizeOfIndices,VkBuffer * indexBuffer, VkDeviceMemory * indexBufferMemory);
 extern VkBuffer vertexBuffer;

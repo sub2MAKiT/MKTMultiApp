@@ -13,7 +13,8 @@ param (
     [switch]$buildModuleHandler = $false,
     [switch]$all = $false,
     [switch]$modules = $false,
-    [switch]$noVKB = $false
+    [switch]$noVKB = $false,
+    [switch]$GLFW = $false
 )
 if($all)
 {
@@ -85,4 +86,9 @@ if ($noVKB) {
 } else {
     $noVKBS = ""
 }
-g++ $DEBUGS $noVKBS $(If ($noVKB) {"./src/vulkan/MKTVKShoebelt.c"} Else {"./src/vulkan/vkB.o"}) ./src/vulkan/_render.c ./src/cmdMode.c ./src/libraryLoader.c ./src/fileManagment/MKTarrayGraphics.c ./src/main.c -I C:/sdk/ -static-libgcc -static-libstdc++ -static ./src/vulkan/MKTAppEngine.cpp ./src/vulkan/init.cpp ./src/vulkan/MKTMesh.cpp -o ./build/main -I C:\sdk\include -L C:\sdk\lib -l SDL2 -l vulkan-1 -l SDL2main -l gdi32 -l user32 -l kernel32 $(If ($fast) {"-Ofast"} Else {""}) $(If ($DEBUG) {"-g"} Else {""})  -lmingw32 -lSDL2main -lSDL2 -lm -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lsetupapi -lversion -luuid && cd ./build/ && .\main.exe
+if ($GLFW) {
+    $GLFWS = "-D_USE_GLFW"
+} else {
+    $GLFWS = ""
+}
+g++ $DEBUGS $GLFWS $noVKBS $(If ($noVKB) {"./src/vulkan/MKTVKShoebelt.c"} Else {"./src/vulkan/vkB.o"}) ./src/vulkan/_render.c ./src/cmdMode.c ./src/libraryLoader.c ./src/fileManagment/MKTarrayGraphics.c ./src/main.c -I C:/sdk/ -static-libgcc -static-libstdc++ -static ./src/vulkan/MKTAppEngine.cpp ./src/vulkan/init.cpp ./src/vulkan/MKTMesh.cpp -o ./build/main -I C:\sdk\include -L C:\sdk\lib -l SDL2 -l vulkan-1 -l SDL2main -l gdi32 -l user32 -l kernel32 $(If ($fast) {"-Ofast"} Else {""}) $(If ($DEBUG) {"-g"} Else {""})  -lmingw32 -lSDL2main -lSDL2 -lm -ldinput8 -ldxguid -ldxerr8 -luser32 -l glfw3 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lsetupapi -lversion -luuid && cd ./build/ && .\main.exe
