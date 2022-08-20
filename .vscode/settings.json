@@ -127,6 +127,7 @@
         "utils.h": "c",
         "init.h": "c",
         "glfw3native.h": "c",
-        "glfw3.h": "c"
+        "glfw3.h": "c",
+        "errorhandling.h": "c"
     }
 }
