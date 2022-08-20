@@ -1,19 +1,36 @@
 #pragma once
-#include "types.h"
+
+#define VK_CHECK(x)                                             \
+do                                                              \
+{                                                               \
+    VkResult err = x;                                           \
+    if (err)                                                    \
+    {                                                           \
+        printf("Detected Vulkan error: %d\n",err);                                      \
+        abort();                                                \
+    }                                                           \
+} while (0)
+
 #include <vector>
 #include <cstdio>
 #include <deque>
 #include <functional>
 #include <iostream>
+#include <fstream>
+
 #include "../libraryHeader.h"
 #include "./_render.h"
 #include "../utils.h"
+#include "init.h"
+#include "types.h"
+#include "MKTbuffer.h"
 
 #ifdef _WIN32
 #include <windows.h>
 #elif __gnu_linux__
 #include <dlfcn.h>
 #endif
+
 #ifndef _USE_GLFW
 #include <SDL/SDL.h>
 #include <SDL/SDL_vulkan.h>
@@ -21,9 +38,6 @@
 #include <GLFW/glfw3native.h>
 #include <GLFW/glfw3.h>
 #endif
-
-#include "init.h"
-#include <fstream>
 
 #ifdef NOVKB
 #include "./MKTVKShoebelt.h"
@@ -126,7 +140,8 @@ struct FrameData {
 	VkCommandPool _commandPool;
 	VkCommandBuffer _mainCommandBuffer;
 
-    AllocatedBuffer cameraBuffer;
+    VkBuffer _cameraBuffer;
+    VkDeviceMemory _cameraBufferMemory;
 
     VkDescriptorSet globalDescriptor;
 };
@@ -193,7 +208,6 @@ const bool enableValidationLayers = true;
 uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 int loading_MKTP_image(MKTPic data);
 VkDevice _device;
-VmaAllocator _allocator;
 MKTfileImporter * _MKT_fileTypes;
 size_t _MKT_fileTypesSupported;
 int imagesLoaded;
@@ -217,11 +231,13 @@ VkPhysicalDevice _chosenGPU;
 VkSurfaceKHR _surface;
 VkSwapchainKHR _swapchain;
 VkFormat _swapchainImageFormat;
+VkExtent2D _swapChainExtent;
 std::vector<VkImage> _swapchainImages;
-std::vector<VkImageView> _swapchainImageViews;
+VkImageView * _swapchainImageViews;
 VkSampler _textureSampler;
 VkQueue _graphicsQueue;
 uint32_t _graphicsQueueFamily;
+VkQueue _presentQueue;
 VkRenderPass _renderPass;
 std::vector<VkFramebuffer> _framebuffers;
 VkPipelineLayout _trianglePipelineLayout;
@@ -240,8 +256,10 @@ int _selectedShader{0};
 DeletionQueue _mainDeletionQueue;
 VkPipelineLayout _meshPipelineLayout;
 Mesh _DUCKMesh;
+VkImage _depthImage; //#ff0000
 VkImageView _depthImageView;
-AllocatedImage _depthImage;
+VkBuffer _depthImageBuffer;
+VkDeviceMemory _depthImageMemory;
 VkFormat _depthFormat;
 AGPushConstants _defaultPushConstants;
 std::vector<MKTAG> _TAGA;
@@ -259,7 +277,6 @@ Mesh* get_mesh(const std::string& name);
 void drawMenu(VkCommandBuffer cmd,GL * menuStuff, size_t sizeOfMenuStuff);
 FrameData _frames[FRAME_OVERLAP];
 FrameData& get_current_frame();
-AllocatedBuffer create_buffer(size_t allocSize, VkBufferUsageFlags usage, VmaMemoryUsage memoryUsage);
 VkDescriptorSetLayout _globalSetLayout;
 VkDescriptorPool _descriptorPool;
 size_t _currentPicturesDescriptorSize;
@@ -275,7 +292,6 @@ void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
 void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
 void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
 void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
-void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
 void CreatePictureDescriptors(vPic * pPic,size_t index);
 void logoLoadingFunctionThatIsVeryImportant();
 void MKTDRAW(VkCommandBuffer cmd);
@@ -303,8 +319,17 @@ float ratio;
 MKTAG * getFontAG(MKTEXT input);
 void createIndexBuffer(unsigned int * indices,size_t sizeOfIndices,VkBuffer * indexBuffer, VkDeviceMemory * indexBufferMemory);
 UINTV _defaultPictureRectangleIndex;
+char** deviceExtensions;
+size_t sizeOfDeviceExtensions;
+VkDeviceQueueCreateInfo * queueCreateInfos;
+size_t sizeOfUQF;
 #else
+extern VkQueue _presentQueue;
+extern VkDeviceQueueCreateInfo * queueCreateInfos;
+extern size_t sizeOfUQF;
 extern const char ** validationLayers;
+extern char** deviceExtensions;
+extern size_t sizeOfDeviceExtensions;
 
 // #ifdef MKT_DEBUG
 // extern const bool enableValidationLayers;
@@ -313,8 +338,6 @@ extern const char ** validationLayers;
 // #endif
 extern UINTV _defaultPictureRectangleIndex;
 extern void createIndexBuffer(unsigned int * indices,size_t sizeOfIndices,VkBuffer * indexBuffer, VkDeviceMemory * indexBufferMemory);
-extern VkBuffer vertexBuffer;
-extern VkDeviceMemory vertexBufferMemory;
 extern VkBuffer indexBuffer;
 extern VkDeviceMemory indexBufferMemory;
 extern MKTAG * getFontAG(MKTEXT input);
@@ -353,7 +376,6 @@ extern void updateSpecificPictureDescriptor(vPic * Picture, size_t picureNumber)
 extern uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 extern int loading_MKTP_image(MKTPic data);
 extern VkDevice _device;
-extern VmaAllocator _allocator;
 extern MKTfileImporter * _MKT_fileTypes;
 extern size_t _MKT_fileTypesSupported;
 extern int imagesLoaded;
@@ -373,8 +395,9 @@ extern VkPhysicalDevice _chosenGPU;
 extern VkSurfaceKHR _surface;
 extern VkSwapchainKHR _swapchain;
 extern VkFormat _swapchainImageFormat;
+extern VkExtent2D _swapChainExtent;
 extern std::vector<VkImage> _swapchainImages;
-extern std::vector<VkImageView> _swapchainImageViews;
+extern VkImageView * _swapchainImageViews;
 extern VkSampler _textureSampler;
 extern VkQueue _graphicsQueue;
 extern uint32_t _graphicsQueueFamily;
@@ -397,7 +420,8 @@ extern DeletionQueue _mainDeletionQueue;
 extern VkPipelineLayout _meshPipelineLayout;
 extern Mesh _DUCKMesh;
 extern VkImageView _depthImageView;
-extern AllocatedImage _depthImage;
+extern VkBuffer _depthImage;
+extern VkDeviceMemory _depthImageMemory;
 extern VkFormat _depthFormat;
 extern AGPushConstants _defaultPushConstants;
 extern std::vector<MKTAG> _TAGA;
@@ -414,7 +438,6 @@ extern Mesh* get_mesh(const std::string& name);
 extern void drawMenu(VkCommandBuffer cmd,GL * menuStuff, size_t sizeOfMenuStuff);
 extern FrameData _frames[FRAME_OVERLAP];
 extern FrameData& get_current_frame();
-extern AllocatedBuffer create_buffer(size_t allocSize, VkBufferUsageFlags usage, VmaMemoryUsage memoryUsage);
 extern VkDescriptorSetLayout _globalSetLayout;
 extern VkDescriptorPool _descriptorPool;
 extern size_t _currentPicturesDescriptorSize;
@@ -430,7 +453,6 @@ extern void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size
 extern void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
 extern void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
 extern void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
-extern void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
 #endif
 
 class PipelineBuilder {

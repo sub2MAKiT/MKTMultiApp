@@ -22,4 +22,12 @@ printf("\033[%d;40m[%d]" x "\033[0;40m\n",int((step % 6) + 1 + MKTfloor(float(((
 #define DEBUG(x)                                                \
 0
 #endif
+#ifdef MKT_R_DEBUG
+#define RDEBUG(x)              \
+printf("\033[%d;40m[%d]" x "\033[0;40m\n",int((step % 6) + 1 + MKTfloor(float(((step % 2) + 1)*1.5)) * 30),step);step++
+//assert(x);printf("\n");step++
+#else
+#define RDEBUG(x)                                                \
+0
+#endif
 #endif

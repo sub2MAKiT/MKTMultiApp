@@ -1,13 +1,13 @@
 #pragma once
 #include "types.h"
-#include <vector>
 #include <glm/vec3.hpp>
 #include <glm/vec2.hpp>
 
 struct VertexInputDescription {
-    std::vector<VkVertexInputBindingDescription> bindings;
-    std::vector<VkVertexInputAttributeDescription> attributes;
-
+    VkVertexInputBindingDescription * bindings;
+    size_t sizeOfBindings;
+    VkVertexInputAttributeDescription * attributes;
+    size_t sizeOfAttributes;
     VkPipelineVertexInputStateCreateFlags flags = 0;
 };
 
@@ -25,9 +25,11 @@ struct Vertex {
 
 struct Mesh {
 
-    std::vector<Vertex> _vertices;
+    Vertex * _vertices;
+    size_t _sizeOfVertices;
 
-    AllocatedBuffer _vertexBuffer;
+    VkBuffer _vertexBuffer;
+    VkDeviceMemory _vertexBufferMemory;
 
     bool load_from_obj(const char* filename);
 };
@@ -48,8 +50,11 @@ typedef struct MKTFQS3 {
 } MKTfQS;
 
 typedef struct arrayGraphic{ 
-    std::vector<MKTAGA> _vertices;
-    AllocatedBuffer _vertexBuffer;
+    MKTAGA * _vertices;
+    size_t _sizeOfVertices;
+
+    VkBuffer _vertexBuffer;
+    VkDeviceMemory _vertexBufferMemory;
 
     unsigned int * indices;
     size_t sizeOfIndices;
@@ -59,12 +64,15 @@ typedef struct arrayGraphic{
 } MKTAG;
 
 typedef struct pictureGraphics{
-    std::vector<MKTAPiC> _vertices;
+    MKTAPiC * _vertices;
+    size_t _sizeOfVertices;
+
+    VkBuffer _vertexBuffer;
+    VkDeviceMemory _vertexBufferMemory;
 
     unsigned int * indices;
     size_t sizeOfIndices;
 
-    AllocatedBuffer _vertexBuffer;
     VkBuffer indexBuffer;
     VkDeviceMemory indexBufferMemory;
 } MKTPiC;

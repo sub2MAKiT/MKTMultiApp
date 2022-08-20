@@ -17,7 +17,8 @@ MKTAG arrayGraphicsReader(const char * filePath)
 	fclose( MKTFILE );
 	size_t nVer = *(size_t*)list;
     MKTAG _AG;
-    _AG._vertices.resize(nVer);
+    _AG._vertices = (MKTAGA*)malloc(nVer*sizeof(MKTAGA));
+	_AG._sizeOfVertices = nVer;
 	for(int i = 8; i < nVer*6+8;i += 6)
 	{
 		_AG._vertices[(i-8)/6].position = { list[i-6],list[i-5],list[i-4] };

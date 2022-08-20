@@ -12,7 +12,8 @@ VertexInputDescription Vertex::get_vertex_description()
     mainBinding.stride = sizeof(Vertex);
     mainBinding.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
-    description.bindings.push_back(mainBinding);
+    description.bindings = (VkVertexInputBindingDescription*)malloc(sizeof(VkVertexInputBindingDescription));
+    *description.bindings = mainBinding;
 
     VkVertexInputAttributeDescription positionAttribute = {};
     positionAttribute.binding = 0;
@@ -31,10 +32,12 @@ VertexInputDescription Vertex::get_vertex_description()
     colorAttribute.location = 2;
     colorAttribute.format = VK_FORMAT_R32G32B32_SFLOAT;
     colorAttribute.offset = offsetof(Vertex, color);
+
+    description.attributes = (VkVertexInputAttributeDescription*)malloc(sizeof(VkVertexInputAttributeDescription)*3);
     
-    description.attributes.push_back(positionAttribute);
-    description.attributes.push_back(normalAttribute);
-    description.attributes.push_back(colorAttribute);
+    description.attributes[0] = positionAttribute;
+    description.attributes[1] = normalAttribute;
+    description.attributes[2] = colorAttribute;
     return description;
 }
 
@@ -47,7 +50,8 @@ VertexInputDescription Vertex::getAG_vertex_description()
     mainBinding.stride = sizeof(MKTAGA2);
     mainBinding.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
-    description.bindings.push_back(mainBinding);
+    description.bindings = (VkVertexInputBindingDescription*)malloc(sizeof(VkVertexInputBindingDescription));
+    *description.bindings = mainBinding;
 
     VkVertexInputAttributeDescription positionAttribute = {};
     positionAttribute.binding = 0;
@@ -61,8 +65,10 @@ VertexInputDescription Vertex::getAG_vertex_description()
     colorAttribute.format = VK_FORMAT_R32G32B32_SFLOAT;
     colorAttribute.offset = offsetof(MKTAGA2, color);
     
-    description.attributes.push_back(positionAttribute);
-    description.attributes.push_back(colorAttribute);
+    description.attributes = (VkVertexInputAttributeDescription*)malloc(sizeof(VkVertexInputAttributeDescription)*2);
+    
+    description.attributes[0] = positionAttribute;
+    description.attributes[1] = colorAttribute;
     return description;
 }
 
@@ -75,7 +81,8 @@ VertexInputDescription Vertex::getPiC_vertex_description()
     mainBinding.stride = sizeof(MKTAPiC);
     mainBinding.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
-    description.bindings.push_back(mainBinding);
+    description.bindings = (VkVertexInputBindingDescription*)malloc(sizeof(VkVertexInputBindingDescription));
+    *description.bindings = mainBinding;
 
     VkVertexInputAttributeDescription positionAttribute = {};
     positionAttribute.binding = 0;
@@ -95,9 +102,11 @@ VertexInputDescription Vertex::getPiC_vertex_description()
     texCoorAttribute.format = VK_FORMAT_R32G32_SFLOAT;
     texCoorAttribute.offset = offsetof(MKTAPiC, texCoord);
     
-    description.attributes.push_back(positionAttribute);
-    description.attributes.push_back(colorAttribute);
-    description.attributes.push_back(texCoorAttribute);
+    description.attributes = (VkVertexInputAttributeDescription*)malloc(sizeof(VkVertexInputAttributeDescription)*3);
+    
+    description.attributes[0] = positionAttribute;
+    description.attributes[1] = colorAttribute;
+    description.attributes[2] = texCoorAttribute;
     return description;
 }
 
@@ -110,7 +119,8 @@ VertexInputDescription Vertex::getfQS_vertex_description()
     mainBinding.stride = sizeof(MKTfQS);
     mainBinding.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
-    description.bindings.push_back(mainBinding);
+    description.bindings = (VkVertexInputBindingDescription*)malloc(sizeof(VkVertexInputBindingDescription));
+    *description.bindings = mainBinding;
 
     VkVertexInputAttributeDescription positionAttribute = {};
     positionAttribute.binding = 0;
@@ -118,7 +128,10 @@ VertexInputDescription Vertex::getfQS_vertex_description()
     positionAttribute.format = VK_FORMAT_R32G32B32_SFLOAT;
     positionAttribute.offset = offsetof(MKTfQS, position);
 
-    description.attributes.push_back(positionAttribute);
+    description.attributes = (VkVertexInputAttributeDescription*)malloc(sizeof(VkVertexInputAttributeDescription));
+    
+    *description.attributes = positionAttribute;
+
     return description;
 }
 
@@ -127,6 +140,9 @@ bool Mesh::load_from_obj(const char* filename)
 	tinyobj::attrib_t attrib;
 	std::vector<tinyobj::shape_t> shapes;
     std::vector<tinyobj::material_t> materials;
+
+    _sizeOfVertices = 0;
+    _vertices = (Vertex*)malloc(sizeof(Vertex));
 
 	std::string warn;
 	std::string err;
@@ -168,8 +184,10 @@ bool Mesh::load_from_obj(const char* filename)
 
                 new_vert.color = new_vert.normal;
 
+                _sizeOfVertices++;
+				_vertices = (Vertex*)realloc(_vertices,sizeof(Vertex)*_sizeOfVertices);
+                _vertices[_sizeOfVertices-1] = new_vert;
 
-				_vertices.push_back(new_vert);
 			}
 			index_offset += fv;
 		}
