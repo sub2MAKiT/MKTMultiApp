@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #endif
 #include <stdio.h>
-#include "DEBUG.h"
 #include "./vulkan/MKTAppEngine.h"
 
 #ifndef cmdModeDirectInclude

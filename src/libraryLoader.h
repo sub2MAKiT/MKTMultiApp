@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "./DEBUG.h"
-#include "./vulkan/MKTAppEngine.h"
-#include "./fileManagment/MKTarrayGraphics.h"
+#include <MKTAppEngine.h>
+#include <OutputTypes/MKTarrayGraphics.h>
 
 void loadMenuAG(char * MKTAGOGName, size_t sizeOfOGName,int moduleNumber);
 

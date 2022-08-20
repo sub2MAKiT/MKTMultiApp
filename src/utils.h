@@ -2,24 +2,27 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifndef MKTUTILSTHIRD
-extern char MKTstrcmp(char * a, char * b);
-extern char weakMKTstrcmp(char * a, char * b);
+unsigned char MKTstrcmp(char * a, char * b);
+unsigned char weakMKTstrcmp(char * a, char * b);
+
+#define MKTDOUBLE double
+
+long long MKTfloor(MKTDOUBLE input);
+
+#ifdef MKT_DEBUG
+#define DEBUG(x)              \
+printf("\033[%d;40m[%d]" x "\033[0;40m\n",int((step % 6) + 1 + MKTfloor(float(((step % 2) + 1)*1.5)) * 30),step);step++
+//assert(x);printf("\n");step++
 #else
-unsigned char MKTstrcmp(char * a, char * b)
-{
-    unsigned int i = 0;
-    while(a[i++]==b[i])
-        if(a[i]==0)
-            return b[i]==a[i];
-    return 0;
-}
-unsigned char weakMKTstrcmp(char * a, char * b)
-{
-    unsigned int i = 0;
-    while(a[++i]==b[i])
-        if(a[i]==0||b[i]==0)
-            return 1;
-    return 0;
-}
+#define DEBUG(x)                                                \
+0
+#endif
+
+#ifdef MKT_R_DEBUG
+#define RDEBUG(x)              \
+printf("\033[%d;40m[%d]" x "\033[0;40m\n",int((step % 6) + 1 + MKTfloor(float(((step % 2) + 1)*1.5)) * 30),step);step++
+//assert(x);printf("\n");step++
+#else
+#define RDEBUG(x)                                                \
+0
 #endif

@@ -124,6 +124,9 @@
         "mktswapchaincreator.h": "c",
         "types.h": "c",
         "mktvkshoebelt.h": "c",
-        "utils.h": "c"
+        "utils.h": "c",
+        "init.h": "c",
+        "glfw3native.h": "c",
+        "glfw3.h": "c"
     }
 }
