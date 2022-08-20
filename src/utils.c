@@ -1,5 +1,4 @@
 #include "utils.h"
-int step = 0;
 unsigned char MKTstrcmp(char * a, char * b)
 {
     unsigned int i = 0;

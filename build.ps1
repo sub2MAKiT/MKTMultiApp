@@ -15,10 +15,6 @@ param (
     [switch]$RDEBUG = $false
 )
 
-# Some usefull cleanup strings
-$VKINTERNAL = "-I ./src/vulkan"
-
-
 if($all)
 {
     $DEBUG = $false
@@ -90,5 +86,5 @@ if($RDEBUG)
 } else {
     $RDEBUGS = ""
 }
-# g++ $VKINTERNAL $DEBUGS $RDEBUGS $GLFWS $noVKBS ./src/vulkan/MKTVKShoebelt.c ./src/vulkan/MKTbuffer.c ./src/vulkan/_render.c ./src/cmdMode.c ./src/libraryLoader.c ./src/fileManagment/MKTarrayGraphics.c ./src/main.c -I C:/sdk/ -static-libgcc -static-libstdc++ -static ./src/vulkan/MKTAppEngine.cpp ./src/vulkan/init.cpp ./src/vulkan/MKTMesh.cpp -o ./build/main  && cd ./build/ && .\main.exe
-gcc $RDEBUGS $DEBUGS -I ./src/vulkan/ ./src/utils.c ./src/main.c ./src/cmdMode.c ./src/libraryLoader.c -L C:\sdk\lib -l SDL2 -l vulkan-1 -l SDL2main -l gdi32 -l user32 -l kernel32 $(If ($fast) {"-Ofast"} Else {""}) $(If ($DEBUG) {"-g"} Else {""})  -lmingw32 -lSDL2main -lSDL2 -lm -ldinput8 -ldxguid -ldxerr8 -luser32 -l glfw3 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lsetupapi -lversion -luuid -I C:\sdk\include -o ./build/main.exe >> error.log
+
+gcc $RDEBUGS $DEBUGS -I ./src/vulkan/ ./src/utils.c ./src/main.c ./src/vulkan/MKTAppEngine.c -L C:\sdk\lib -l SDL2 -l vulkan-1 -l SDL2main -l gdi32 -l user32 -l kernel32 $(If ($fast) {"-Ofast"} Else {""}) $(If ($DEBUG) {"-g"} Else {""})  -lmingw32 -lSDL2main -lSDL2 -lm -ldinput8 -ldxguid -ldxerr8 -luser32 -l glfw3 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lsetupapi -lversion -luuid -I C:\sdk\include -o ./build/main.exe >> error.log
