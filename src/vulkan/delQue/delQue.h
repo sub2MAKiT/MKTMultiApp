@@ -1,16 +1,30 @@
+#pragma once
 #include <stdlib.h>
+#include <stdarg.h>
+#include "../../outerDefine.h"
 
-struct DeletionQueue
-{
-    void * delQue;
-    size_t sizeOfDelQue;
+typedef struct DeletionQueueArguments {
+    char * argv;
+} DelQueArgv;
 
-    int * offsetDelQue;
-    size_t sizeOfOffsetDelQue;
+typedef struct delQueFunction {
+    void (*MKTDelQueueInputFunction)(void * input);
+} delQueFun;
 
-    void * argv;
-    size_t sizeOfArgv;
+typedef struct DeletionQueue {
+    delQueFun * delQue;
+    IntDex sizeOfDelQue;
 
-    void * offsetArgv;
-    size_t sizeOfOffsetArgv;
-};
+    DelQueArgv * argc;
+    IntDex sizeOfArgc;
+} MKTDelQue;
+
+void MKTcreateDelQueue();
+void MKTaddDelQueue(void * function,void * argv,IntDex sizeOfArgv);
+void MKTreturnDelQueue();
+
+
+#define DELQUEVARIABLES    {struct tempStruct{
+#define DELQUEVARIABLESDOT(function)        };void tempFunction(struct tempStruct * input){function(
+#define DELQUEVARIABLESVALUE            );}struct tempStruct tempInput = {
+#define COMMITDELQUE        };MKTaddDelQueue(&tempFunction,&tempInput,sizeof(struct tempStruct));printf("size: %d\n",sizeof(struct tempStruct));}

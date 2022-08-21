@@ -6,3 +6,6 @@
 
 # 00.00.02.00 - Basic error handling
 - Basic error handling
+
+# 00.00.03.00 - Basic error handling
+- Functional delQue
