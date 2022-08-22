@@ -48,6 +48,9 @@ void cleanup();
 void _VE_INIT_window(); // An init function for GLFW window creation
 void _VE_INIT_Instance(); // An init function for Instance creation
 void _VE_INIT_PhysicalDevice(); // An init function for picking the physical device
+void _VE_INIT_LogicalDevice(); // An init function for creating the logical device
+void _VE_INIT_WindowSurface(); // An init function for creating the window surface
+void _VE_INIT_Swapchain(); // An init function for creating the swapchain
 
 // GLOBAL VARIABLES
 
@@ -63,10 +66,21 @@ const char** glfwExtensions;
 // VK_INIT
 VkInstance _instance;
 VkPhysicalDevice _chosenGPU = VK_NULL_HANDLE;
+VkDevice _device;
+VkDeviceQueueCreateInfo * queueCreateInfos;
+IntDex sizeOfQueueCreateInfos;
+
+// VK_RUNTIME
+VkSurfaceKHR _surface;
+VkQueue _graphicsQueue;
+VkQueue _presentQueue;
+unsigned int _imageCount;
+VkSwapchainKHR _swapChain;
 
 // extensions
 MKTVstring _requiredExtensions;
 VkExtensionProperties * _extensions;
+MKTVstring _deviceExtensions;
 
 
 // validation layers
@@ -89,10 +103,22 @@ extern const char** glfwExtensions;
 // VK_INIT
 extern VkInstance _instance;
 extern VkPhysicalDevice _chosenGPU;
+extern VkDevice _device;
+extern VkDeviceQueueCreateInfo * queueCreateInfos;
+extern IntDex sizeOfQueueCreateInfos;
+
+// VK_RUNTIME
+extern VkSurfaceKHR _surface;
+extern VkQueue _graphicsQueue;
+extern VkQueue _presentQueue;
+extern unsigned int _imageCount;
+extern VkSwapchainKHR _swapChain;
 
 // extensions
 extern MKTVstring _requiredExtensions;
 extern VkExtensionProperties * _extensions;
+extern MKTVstring _deviceExtensions;
+
 
 
 // validation layers

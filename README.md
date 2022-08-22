@@ -30,6 +30,9 @@
 ### 00.00.08.00 - Queue families
 - Device picking function, now takes into account the Queue families support
 
+### 00.00.09.00 - Swapchain
+- Swapchain
+
 # ERRORS
 0. No errors
 1. System error
