@@ -9,3 +9,6 @@
 
 # 00.00.03.00 - Basic error handling
 - Functional delQue
+
+# 00.00.04.00 - Basic error handling
+- GLFW
