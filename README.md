@@ -27,6 +27,9 @@
 - Ability for VentumEngine to pick a GPU based on rating
 - Added the `101` error code - No physical devices found
 
+### 00.00.08.00 - Queue families
+- Device picking function, now takes into account the Queue families support
+
 # ERRORS
 0. No errors
 1. System error
