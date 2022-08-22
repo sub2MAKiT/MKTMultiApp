@@ -9,6 +9,8 @@ void init()
 
     _VE_INIT_Instance(); // #0000ff
 
+    _VE_INIT_PhysicalDevice(); // #0000ff
+
     DEBUG("III init III");
     DEBUG("III> init <III");
     return;

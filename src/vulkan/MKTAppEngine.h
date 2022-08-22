@@ -20,6 +20,11 @@ do                                                              \
 
 // STRUCTS
 
+typedef struct MKTDEVICERATING {
+    IntDex rating;
+    char isSuitable;
+} MKTdeviceRating;
+
 typedef struct MKTVOIDVECTOR {
     void * ptr;
     IntDex sizeOfPtr;
@@ -42,6 +47,7 @@ void cleanup();
 // INIT FUNCTIONS
 void _VE_INIT_window(); // An init function for GLFW window creation
 void _VE_INIT_Instance(); // An init function for Instance creation
+void _VE_INIT_PhysicalDevice(); // An init function for picking the physical device
 
 // GLOBAL VARIABLES
 
@@ -56,6 +62,7 @@ const char** glfwExtensions;
 
 // VK_INIT
 VkInstance _instance;
+VkPhysicalDevice _chosenGPU = VK_NULL_HANDLE;
 
 // extensions
 MKTVstring _requiredExtensions;
@@ -81,6 +88,7 @@ extern const char** glfwExtensions;
 
 // VK_INIT
 extern VkInstance _instance;
+extern VkPhysicalDevice _chosenGPU;
 
 // extensions
 extern MKTVstring _requiredExtensions;
