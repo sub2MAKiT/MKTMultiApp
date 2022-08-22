@@ -51,6 +51,7 @@ void _VE_INIT_PhysicalDevice(); // An init function for picking the physical dev
 void _VE_INIT_LogicalDevice(); // An init function for creating the logical device
 void _VE_INIT_WindowSurface(); // An init function for creating the window surface
 void _VE_INIT_Swapchain(); // An init function for creating the swapchain
+void _VE_INIT_ImageViews(); // An init function for creating the image views
 
 // GLOBAL VARIABLES
 
@@ -75,7 +76,15 @@ VkSurfaceKHR _surface;
 VkQueue _graphicsQueue;
 VkQueue _presentQueue;
 unsigned int _imageCount;
+
+// SWAPCHAIN
 VkSwapchainKHR _swapChain;
+VkImage * _swapChainImages;
+IntDex _sizeOfSwapChainImages;
+VkImageView * _swapChainImageViews;
+IntDex _sizeOfSwapChainImageViews;
+VkFormat _swapChainImageFormat;
+VkExtent2D _swapChainExtent;
 
 // extensions
 MKTVstring _requiredExtensions;
@@ -112,7 +121,14 @@ extern VkSurfaceKHR _surface;
 extern VkQueue _graphicsQueue;
 extern VkQueue _presentQueue;
 extern unsigned int _imageCount;
+// SWAPCHAIN
 extern VkSwapchainKHR _swapChain;
+extern VkImage * _swapChainImages;
+extern IntDex _sizeOfSwapChainImages;
+extern VkImageView * _swapChainImageViews;
+extern IntDex _sizeOfSwapChainImageViews;
+extern VkFormat _swapChainImageFormat;
+extern VkExtent2D _swapChainExtent;
 
 // extensions
 extern MKTVstring _requiredExtensions;

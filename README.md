@@ -33,6 +33,10 @@
 ### 00.00.09.00 - Swapchain
 - Swapchain
 
+### 00.00.10.00 - Swapchain Images
+- Swapchain Images
+- Swapchain Image Views
+
 # ERRORS
 0. No errors
 1. System error

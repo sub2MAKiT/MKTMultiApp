@@ -15,7 +15,9 @@ void init()
 
     _VE_INIT_LogicalDevice(); // #0000ff
 
-    _VE_INIT_Swapchain();
+    _VE_INIT_Swapchain(); // #0000ff
+
+    _VE_INIT_ImageViews(); // #0000ff
 
     DEBUG("III init III");
     DEBUG("III> init <III");
@@ -41,6 +43,10 @@ void cleanup()
     MKTreturnDelQueue();
     MKTreturnError("./errors.log");
 
+    for (IntDex i = 0; i < _sizeOfSwapChainImageViews; i++) {
+        vkDestroyImageView(_device, _swapChainImageViews[i], NULL);
+    }
+
     vkDestroySwapchainKHR(_device, _swapChain, NULL);
 
     vkDestroyDevice(_device, NULL);
@@ -53,6 +59,8 @@ void cleanup()
 
     glfwTerminate();
 
+    free(_swapChainImageViews);
+    free(_swapChainImages);
     free(queueCreateInfos);
     free(_requiredExtensions.pString);
     free(validationLayers.pString);
