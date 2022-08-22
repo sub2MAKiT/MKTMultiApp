@@ -10,5 +10,8 @@
 # 00.00.03.00 - Basic error handling
 - Functional delQue
 
-# 00.00.04.00 - Basic error handling
+# 00.00.04.00 - Basic GLFW implementation
 - GLFW
+
+# 00.00.05.00 - VkInstance creation
+- VkInstance
