@@ -23,6 +23,14 @@ void init()
 
     _VE_INIT_GraphicPipelines(); // #0000ff
 
+    _VE_INIT_Framebuffers(); // #0000ff
+
+    _VE_INIT_CommandPool(); // #0000ff
+
+    _VE_INIT_CommandBuffer(); // #0000ff
+
+    _VE_INIT_SyncObjects(); // #0000ff
+
     DEBUG("III init III");
     DEBUG("III> init <III");
     return;
@@ -33,8 +41,11 @@ void run()
     DEBUG("III run III");
 
     while (!glfwWindowShouldClose(_window)) {
+        _VE_RUN_drawFrame();
         glfwPollEvents();
     }
+
+    vkDeviceWaitIdle(_device);
 
     DEBUG("III> run <III");
     return;
@@ -49,6 +60,16 @@ void cleanup()
     MKTreturnError("./errors.log");
 
     DEBUG("II VK hard cleanup II");
+
+    vkDestroyCommandPool(_device, _commandPool, NULL);
+
+    vkDestroySemaphore(_device, imageAvailableSemaphore, NULL);
+    vkDestroySemaphore(_device, renderFinishedSemaphore, NULL);
+    vkDestroyFence(_device, inFlightFence, NULL);
+
+    for (IntDex i = 0; i < _sizeOfSwapChainFramebuffers;i++) {
+        vkDestroyFramebuffer(_device, _swapChainFramebuffers[i], NULL);
+    }
 
     vkDestroyRenderPass(_device, _renderPass, NULL);
 

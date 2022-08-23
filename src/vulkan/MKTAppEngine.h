@@ -68,6 +68,15 @@ void _VE_INIT_Swapchain(); // An init function for creating the swapchain
 void _VE_INIT_ImageViews(); // An init function for creating the image views
 void _VE_INIT_RenderPass(); // An init function for creating the renderpass
 void _VE_INIT_GraphicPipelines(); // An init function for creating the graphic pipelines
+void _VE_INIT_Framebuffers(); // An init function for creating the framebuffers
+void _VE_INIT_CommandPool(); // An init function for creating the command pool
+void _VE_INIT_CommandBuffer(); // An init function for creating the command buffer
+void _VE_INIT_SyncObjects(); // An init function for creating semaphores and fences
+
+
+// RUNTIME FUNCTION
+void _VE_RUN_recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
+void _VE_RUN_drawFrame();
 
 // GLOBAL VARIABLES
 
@@ -79,6 +88,10 @@ GLFWwindow * _window;
 uint32_t glfwExtensionCount = 0;
 const char** glfwExtensions;
 
+// TEMP
+VkSemaphore imageAvailableSemaphore;
+VkSemaphore renderFinishedSemaphore;
+VkFence inFlightFence;
 
 // VK_INIT
 VkInstance _instance;
@@ -93,6 +106,8 @@ VkQueue _graphicsQueue;
 VkQueue _presentQueue;
 unsigned int _imageCount;
 VkRenderPass _renderPass;
+VkCommandPool _commandPool;
+VkCommandBuffer _commandBuffer;
 
 // SWAPCHAIN
 VkSwapchainKHR _swapChain;
@@ -102,6 +117,8 @@ VkImageView * _swapChainImageViews;
 IntDex _sizeOfSwapChainImageViews;
 VkFormat _swapChainImageFormat;
 VkExtent2D _swapChainExtent;
+VkFramebuffer * _swapChainFramebuffers;
+IntDex _sizeOfSwapChainFramebuffers;
 
 // extensions
 MKTVstring _requiredExtensions;
@@ -129,6 +146,10 @@ extern GLFWwindow * _window;
 extern uint32_t glfwExtensionCount;
 extern const char** glfwExtensions;
 
+// TEMP
+extern VkSemaphore imageAvailableSemaphore;
+extern VkSemaphore renderFinishedSemaphore;
+extern VkFence inFlightFence;
 
 // VK_INIT
 extern VkInstance _instance;
@@ -143,6 +164,8 @@ extern VkQueue _graphicsQueue;
 extern VkQueue _presentQueue;
 extern unsigned int _imageCount;
 extern VkRenderPass _renderPass;
+extern VkCommandPool _commandPool;
+extern VkCommandBuffer _commandBuffer;
 
 // SWAPCHAIN
 extern VkSwapchainKHR _swapChain;
@@ -152,6 +175,8 @@ extern VkImageView * _swapChainImageViews;
 extern IntDex _sizeOfSwapChainImageViews;
 extern VkFormat _swapChainImageFormat;
 extern VkExtent2D _swapChainExtent;
+extern VkFramebuffer * _swapChainFramebuffers;
+extern IntDex _sizeOfSwapChainFramebuffers;
 
 // extensions
 extern MKTVstring _requiredExtensions;
