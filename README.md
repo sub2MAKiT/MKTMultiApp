@@ -43,6 +43,10 @@
 ### 00.00.12.00 - Runtime
 - Runtime
 
+### 00.00.13.00 - Dynamic
+- Dynamic init
+- Dynamic runtime
+
 # ERRORS
 0. No errors
 1. System error

@@ -51,6 +51,15 @@ typedef struct MKTMATERIAL {
     IntDex ID;
 } MKTmaterial;
 
+typedef struct MKTRUNTIMEKIT {
+
+    VkCommandBuffer commandBuffer;
+    VkSemaphore imageAvailableSemaphore;
+    VkSemaphore renderFinishedSemaphore;
+    VkFence inFlightFence;
+
+} MKTVKruntime;
+
 // FUNCTIONS
 
 // MAIN FUNCTIONS
@@ -73,10 +82,14 @@ void _VE_INIT_CommandPool(); // An init function for creating the command pool
 void _VE_INIT_CommandBuffer(); // An init function for creating the command buffer
 void _VE_INIT_SyncObjects(); // An init function for creating semaphores and fences
 
-
-// RUNTIME FUNCTION
+// RUNTIME FUNCTIONS
 void _VE_RUN_recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
 void _VE_RUN_drawFrame();
+
+// UTILS FUNCTIONS
+void _VE_UTILS_RecreateSwapChain(); // An Utils function for reacreating the swapchain (in case the window size changes etc.)
+void _VE_UTILS_CleanupSwapChain(); // An Utils function for cleaning up the swapchain (in case the swapchain is recreated)
+
 
 // GLOBAL VARIABLES
 
@@ -88,12 +101,8 @@ GLFWwindow * _window;
 uint32_t glfwExtensionCount = 0;
 const char** glfwExtensions;
 
-// TEMP
-VkSemaphore imageAvailableSemaphore;
-VkSemaphore renderFinishedSemaphore;
-VkFence inFlightFence;
-
 // VK_INIT
+int MAX_FRAMES_IN_FLIGHT = 2;
 VkInstance _instance;
 VkPhysicalDevice _chosenGPU = VK_NULL_HANDLE;
 VkDevice _device;
@@ -107,7 +116,12 @@ VkQueue _presentQueue;
 unsigned int _imageCount;
 VkRenderPass _renderPass;
 VkCommandPool _commandPool;
-VkCommandBuffer _commandBuffer;
+MKTVKruntime * _runtimeKit;
+IntDex _sizeOfRuntimeKit;
+VkCommandBuffer * _commandBuffers;
+IntDex _sizeOfCommandBuffers;
+IntDex _currentFrame = 0;
+char _framebufferResized = 0;
 
 // SWAPCHAIN
 VkSwapchainKHR _swapChain;
@@ -146,12 +160,8 @@ extern GLFWwindow * _window;
 extern uint32_t glfwExtensionCount;
 extern const char** glfwExtensions;
 
-// TEMP
-extern VkSemaphore imageAvailableSemaphore;
-extern VkSemaphore renderFinishedSemaphore;
-extern VkFence inFlightFence;
-
 // VK_INIT
+extern int MAX_FRAMES_IN_FLIGHT;
 extern VkInstance _instance;
 extern VkPhysicalDevice _chosenGPU;
 extern VkDevice _device;
@@ -165,7 +175,12 @@ extern VkQueue _presentQueue;
 extern unsigned int _imageCount;
 extern VkRenderPass _renderPass;
 extern VkCommandPool _commandPool;
-extern VkCommandBuffer _commandBuffer;
+extern MKTVKruntime * _runtimeKit;
+extern IntDex _sizeOfRuntimeKit;
+extern VkCommandBuffer * _commandBuffers;
+extern IntDex _sizeOfCommandBuffers;
+extern IntDex _currentFrame;
+extern char _framebufferResized;
 
 // SWAPCHAIN
 extern VkSwapchainKHR _swapChain;

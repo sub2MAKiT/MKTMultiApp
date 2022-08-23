@@ -63,10 +63,11 @@ void cleanup()
 
     vkDestroyCommandPool(_device, _commandPool, NULL);
 
-    vkDestroySemaphore(_device, imageAvailableSemaphore, NULL);
-    vkDestroySemaphore(_device, renderFinishedSemaphore, NULL);
-    vkDestroyFence(_device, inFlightFence, NULL);
-
+    for (size_t i = 0; i < _sizeOfRuntimeKit; i++) {
+        vkDestroySemaphore(_device, _runtimeKit[i].imageAvailableSemaphore, NULL);
+        vkDestroySemaphore(_device, _runtimeKit[i].renderFinishedSemaphore, NULL);
+        vkDestroyFence(_device, _runtimeKit[i].inFlightFence, NULL);
+    }
     for (IntDex i = 0; i < _sizeOfSwapChainFramebuffers;i++) {
         vkDestroyFramebuffer(_device, _swapChainFramebuffers[i], NULL);
     }
