@@ -37,9 +37,14 @@
 - Swapchain Images
 - Swapchain Image Views
 
+### 00.00.11.00 - Pipelines
+- Pipeline creation
+
 # ERRORS
 0. No errors
 1. System error
+2. Could not open file
+3. File empty
 
 100. Validation layers requested but not supported
 101. No physical devices found

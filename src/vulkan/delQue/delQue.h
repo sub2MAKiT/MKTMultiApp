@@ -25,9 +25,9 @@ void MKTreturnDelQueue();
 
 
 #define DELQUEVARIABLES    {struct tempStruct{
-#define DELQUEVARIABLESDOT(function)        };void tempFunction(struct tempStruct * input){function(
+#define DELQUEVARIABLESDOT(function)        };void temp ## function(struct tempStruct * input){function(
 #define DELQUEVARIABLESVALUE            );}struct tempStruct tempInput = {
-#define COMMITDELQUE        };MKTaddDelQueue(&tempFunction,&tempInput,sizeof(struct tempStruct));}
+#define COMMITDELQUE(function)         };MKTaddDelQueue(&temp ## function,&tempInput,sizeof(struct tempStruct));}
 
 // USAGE:
     // DELQUEVARIABLES

@@ -1,3 +1,4 @@
+#pragma once
 #include <../utils.h>
 #include <../outerDefine.h>
 #include <delQue/delQue.h>
@@ -37,6 +38,18 @@ typedef struct MKTSTRINGVECTOR {
     IntDex sizeOfString;
 } MKTVstring;
 
+typedef struct MKTMATERIAL {
+    VkShaderModule frag;
+    VkShaderModule vert;
+
+    VkPipelineShaderStageCreateInfo fragI;
+    VkPipelineShaderStageCreateInfo vertI;
+
+    VkPipelineLayout pipelineLayout;
+
+    IntDex ID;
+} MKTmaterial;
+
 // FUNCTIONS
 
 // MAIN FUNCTIONS
@@ -52,6 +65,7 @@ void _VE_INIT_LogicalDevice(); // An init function for creating the logical devi
 void _VE_INIT_WindowSurface(); // An init function for creating the window surface
 void _VE_INIT_Swapchain(); // An init function for creating the swapchain
 void _VE_INIT_ImageViews(); // An init function for creating the image views
+void _VE_INIT_GraphicPipelines(); // An init function for creating the graphic pipelines
 
 // GLOBAL VARIABLES
 
@@ -90,6 +104,10 @@ VkExtent2D _swapChainExtent;
 MKTVstring _requiredExtensions;
 VkExtensionProperties * _extensions;
 MKTVstring _deviceExtensions;
+
+// RENDER
+MKTmaterial * _REN_materials;
+IntDex _REN_sizeOfMaterials;
 
 
 // validation layers
@@ -135,7 +153,9 @@ extern MKTVstring _requiredExtensions;
 extern VkExtensionProperties * _extensions;
 extern MKTVstring _deviceExtensions;
 
-
+// RENDER
+extern MKTmaterial * _REN_materials;
+extern IntDex _REN_sizeOfMaterials;
 
 // validation layers
 extern const char enableValidationLayers;

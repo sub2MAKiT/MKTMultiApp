@@ -19,6 +19,8 @@ void init()
 
     _VE_INIT_ImageViews(); // #0000ff
 
+    _VE_INIT_GraphicPipelines(); // #0000ff
+
     DEBUG("III init III");
     DEBUG("III> init <III");
     return;
@@ -40,8 +42,11 @@ void cleanup()
 {
     DEBUG("III cleanup III");
 
+    DEBUG("II inside cleanup II");
     MKTreturnDelQueue();
     MKTreturnError("./errors.log");
+
+    DEBUG("II VK hard cleanup II");
 
     for (IntDex i = 0; i < _sizeOfSwapChainImageViews; i++) {
         vkDestroyImageView(_device, _swapChainImageViews[i], NULL);
@@ -58,6 +63,8 @@ void cleanup()
     glfwDestroyWindow(_window);
 
     glfwTerminate();
+
+    free(_REN_materials);
 
     free(_swapChainImageViews);
     free(_swapChainImages);

@@ -8,9 +8,10 @@
 char * testingP1;
 char * testingP2;
 
-void testing(char a,int b)
+int testing(char a,int b)
 {
     printf("it works %c%d\n",a,b);
+    return 0;
 }
 
 int main(int argc, char* argv[])
@@ -19,8 +20,6 @@ int main(int argc, char* argv[])
     MKTcreateDelQueue();
 
     DEBUG("IIII startup IIII");
-    if(argc < 3)
-        MKTerror(10);
 
     init();
 
