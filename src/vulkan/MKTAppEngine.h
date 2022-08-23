@@ -46,6 +46,7 @@ typedef struct MKTMATERIAL {
     VkPipelineShaderStageCreateInfo vertI;
 
     VkPipelineLayout pipelineLayout;
+    VkPipeline graphicsPipeline;
 
     IntDex ID;
 } MKTmaterial;
@@ -65,6 +66,7 @@ void _VE_INIT_LogicalDevice(); // An init function for creating the logical devi
 void _VE_INIT_WindowSurface(); // An init function for creating the window surface
 void _VE_INIT_Swapchain(); // An init function for creating the swapchain
 void _VE_INIT_ImageViews(); // An init function for creating the image views
+void _VE_INIT_RenderPass(); // An init function for creating the renderpass
 void _VE_INIT_GraphicPipelines(); // An init function for creating the graphic pipelines
 
 // GLOBAL VARIABLES
@@ -90,6 +92,7 @@ VkSurfaceKHR _surface;
 VkQueue _graphicsQueue;
 VkQueue _presentQueue;
 unsigned int _imageCount;
+VkRenderPass _renderPass;
 
 // SWAPCHAIN
 VkSwapchainKHR _swapChain;
@@ -139,6 +142,8 @@ extern VkSurfaceKHR _surface;
 extern VkQueue _graphicsQueue;
 extern VkQueue _presentQueue;
 extern unsigned int _imageCount;
+extern VkRenderPass _renderPass;
+
 // SWAPCHAIN
 extern VkSwapchainKHR _swapChain;
 extern VkImage * _swapChainImages;

@@ -1,39 +1,54 @@
 #include <pipeline/pipeline.h>
 
-void _MKT_LOAD_PIPELINE(const char * FP, IntDex materialIndex, char vert)
+void _MKT_LOAD_PIPELINE(const char * FPV,const char * FPF, IntDex materialIndex)
 {
-    FILE *MKTFILE = fopen(FP,"rb");
-    char *list;
-    long sizeOfFile;
-    if(MKTFILE != NULL)
+    FILE *MKTFILEV = fopen(FPV,"rb");
+    char *listV;
+    long sizeOfFileV;
+    if(MKTFILEV != NULL)
     {
-    fseek(MKTFILE, 0L, SEEK_END);
-    sizeOfFile = ftell(MKTFILE);
-    rewind(MKTFILE);
-    list = (char*)malloc(sizeOfFile);
-    if(list == NULL)
+    fseek(MKTFILEV, 0L, SEEK_END);
+    sizeOfFileV = ftell(MKTFILEV);
+    rewind(MKTFILEV);
+    listV = (char*)malloc(sizeOfFileV);
+    if(listV == NULL)
         MKTerror(3);
-    fread( list,1, sizeOfFile, MKTFILE );
-    fclose( MKTFILE );
+    fread( listV,1, sizeOfFileV, MKTFILEV );
+    fclose( MKTFILEV );
     } else {
         MKTerror(2);
     }
 
-    VkShaderModuleCreateInfo createInfo = {};
-    createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-
-    while((sizeOfFile/4)*4!=sizeOfFile)sizeOfFile++;
-
-    list = realloc(list,sizeOfFile);
-
-    createInfo.codeSize = sizeOfFile;
-    createInfo.pCode = (unsigned int*)list;
-
-    VkShaderModule shaderModule;
-    VK_CHECK(vkCreateShaderModule(_device, &createInfo, NULL, &shaderModule));
-
-    if(vert)
+    FILE *MKTFILEF = fopen(FPF,"rb");
+    char *listF;
+    long sizeOfFileF;
+    if(MKTFILEF != NULL)
     {
+    fseek(MKTFILEF, 0L, SEEK_END);
+    sizeOfFileF = ftell(MKTFILEF);
+    rewind(MKTFILEF);
+    listF = (char*)malloc(sizeOfFileF);
+    if(listF == NULL)
+        MKTerror(3);
+    fread( listF,1, sizeOfFileF, MKTFILEF );
+    fclose( MKTFILEF );
+    } else {
+        MKTerror(2);
+    }
+
+    {
+        VkShaderModuleCreateInfo createInfo = {};
+        createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+
+        listV = realloc(listV,sizeOfFileV);
+
+        createInfo.codeSize = sizeOfFileV;
+        createInfo.pCode = (unsigned int*)listV;
+
+        VkShaderModule shaderModule;
+        VK_CHECK(vkCreateShaderModule(_device, &createInfo, NULL, &shaderModule));
+
+
         _REN_materials[materialIndex].vert = shaderModule;
 
         DELQUEVARIABLES
@@ -51,8 +66,20 @@ void _MKT_LOAD_PIPELINE(const char * FP, IntDex materialIndex, char vert)
         vertShaderStageInfo.pName = "main";
 
         _REN_materials[materialIndex].vertI = vertShaderStageInfo;
+    }
 
-    } else {
+    {
+        VkShaderModuleCreateInfo createInfo = {};
+        createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+
+        listF = realloc(listF,sizeOfFileF);
+
+        createInfo.codeSize = sizeOfFileF;
+        createInfo.pCode = (unsigned int*)listF;
+
+        VkShaderModule shaderModule;
+        VK_CHECK(vkCreateShaderModule(_device, &createInfo, NULL, &shaderModule));
+
         _REN_materials[materialIndex].frag = shaderModule;
 
         DELQUEVARIABLES
@@ -70,7 +97,10 @@ void _MKT_LOAD_PIPELINE(const char * FP, IntDex materialIndex, char vert)
         fragShaderStageInfo.pName = "main";
 
         _REN_materials[materialIndex].fragI = fragShaderStageInfo;
+
     }
+
+
 
     IntDex sizeOfDynamicStates = 2;
     VkDynamicState * dynamicStates = malloc(sizeof(VkDynamicState)*sizeOfDynamicStates);
@@ -166,6 +196,41 @@ void _MKT_LOAD_PIPELINE(const char * FP, IntDex materialIndex, char vert)
 
     VK_CHECK(vkCreatePipelineLayout(_device, &pipelineLayoutInfo, NULL, &_REN_materials[materialIndex].pipelineLayout));
 
+    VkPipelineShaderStageCreateInfo shaderStages[2] = {_REN_materials[materialIndex].vertI, _REN_materials[materialIndex].fragI};
+
+    VkGraphicsPipelineCreateInfo pipelineInfo = {};
+    pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+    pipelineInfo.stageCount = 2;
+    pipelineInfo.pStages = shaderStages;
+
+    pipelineInfo.pVertexInputState = &vertexInputInfo;
+    pipelineInfo.pInputAssemblyState = &inputAssembly;
+    pipelineInfo.pViewportState = &viewportState;
+    pipelineInfo.pRasterizationState = &rasterizer;
+    pipelineInfo.pMultisampleState = &multisampling;
+    pipelineInfo.pDepthStencilState = NULL; // Optional
+    pipelineInfo.pColorBlendState = &colorBlending;
+    pipelineInfo.pDynamicState = &dynamicState;
+
+    pipelineInfo.layout = _REN_materials[materialIndex].pipelineLayout;
+
+    pipelineInfo.renderPass = _renderPass;
+    pipelineInfo.subpass = 0;
+
+    pipelineInfo.basePipelineHandle = VK_NULL_HANDLE; // Optional
+    pipelineInfo.basePipelineIndex = -1; // Optional
+
+    VK_CHECK(vkCreateGraphicsPipelines(_device, VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &_REN_materials[materialIndex].graphicsPipeline));
+
+    DELQUEVARIABLES
+    VkDevice a;VkPipeline b;const VkAllocationCallbacks* c;
+    DELQUEVARIABLESDOT(vkDestroyPipeline)
+    input->a,input->b,input->c
+    DELQUEVARIABLESVALUE
+    _device,_REN_materials[materialIndex].graphicsPipeline,NULL
+    COMMITDELQUE(vkDestroyPipeline)
+
+
     DELQUEVARIABLES
     VkDevice a;VkPipelineLayout b;const VkAllocationCallbacks* c;
     DELQUEVARIABLESDOT(vkDestroyPipelineLayout)
@@ -173,6 +238,9 @@ void _MKT_LOAD_PIPELINE(const char * FP, IntDex materialIndex, char vert)
     DELQUEVARIABLESVALUE
     _device,_REN_materials[materialIndex].pipelineLayout,NULL
     COMMITDELQUE(vkDestroyPipelineLayout)
+
+    free(listV);
+    free(listF);
 
     return;
 }

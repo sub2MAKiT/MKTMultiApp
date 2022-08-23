@@ -19,6 +19,8 @@ void init()
 
     _VE_INIT_ImageViews(); // #0000ff
 
+    _VE_INIT_RenderPass(); // #0000ff
+
     _VE_INIT_GraphicPipelines(); // #0000ff
 
     DEBUG("III init III");
@@ -47,6 +49,8 @@ void cleanup()
     MKTreturnError("./errors.log");
 
     DEBUG("II VK hard cleanup II");
+
+    vkDestroyRenderPass(_device, _renderPass, NULL);
 
     for (IntDex i = 0; i < _sizeOfSwapChainImageViews; i++) {
         vkDestroyImageView(_device, _swapChainImageViews[i], NULL);
