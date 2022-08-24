@@ -47,6 +47,9 @@
 - Dynamic init
 - Dynamic runtime
 
+### 00.00.14.00 - Triangle
+- Triangle
+
 # ERRORS
 0. No errors
 1. System error
@@ -55,3 +58,18 @@
 
 100. Validation layers requested but not supported
 101. No physical devices found
+102. Failed to find suitable memory type
+
+# Includes used
+1. <vulkan/vulkan.h> - **From Vulkan SDK**
+2. <stdio.h> - **From C standard library**
+3. <stdlib.h> - **From C standard library**
+4. <stdarg.h> - **From C standard library**
+
+# NonGLM indexes
+0. Vertex - vec2 pos; vec3 color
+
+# Problems
+1. delQue
+2. delQue in pipelines
+3. delQue in buffers

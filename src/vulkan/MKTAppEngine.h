@@ -4,6 +4,8 @@
 #include <delQue/delQue.h>
 #include <../errorHandling.h>
 #include <types.h>
+#include <utils/MKTbuffer.h>
+#include <goodLuckMate/glm.h>
 
 // MACROS
 
@@ -20,6 +22,28 @@ do                                                              \
 } while (0)
 
 // STRUCTS
+
+// GLM
+#define MKTGLMDOUBLE float
+
+typedef struct MKTRGBA {
+    MKTGLMDOUBLE r;
+    MKTGLMDOUBLE g;
+    MKTGLMDOUBLE b;
+    MKTGLMDOUBLE a;
+} MKTrgba;
+
+typedef struct MKTXY {
+    MKTGLMDOUBLE x;
+    MKTGLMDOUBLE y;
+} MKTxy;
+
+
+
+typedef struct MKTAGVertex { // i = 0
+    MKTxy pos;
+    MKTrgba colour;
+} AGVertex;
 
 typedef struct MKTDEVICERATING {
     IntDex rating;
@@ -81,6 +105,7 @@ void _VE_INIT_Framebuffers(); // An init function for creating the framebuffers
 void _VE_INIT_CommandPool(); // An init function for creating the command pool
 void _VE_INIT_CommandBuffer(); // An init function for creating the command buffer
 void _VE_INIT_SyncObjects(); // An init function for creating semaphores and fences
+void _VE_INIT_VE(); // An init function for VentumEngine variables
 
 // RUNTIME FUNCTIONS
 void _VE_RUN_recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
@@ -95,6 +120,11 @@ void _VE_UTILS_CleanupSwapChain(); // An Utils function for cleaning up the swap
 
 #ifdef _MKT_APP_ENGINE_THIRD_
 // Without the guard
+
+// TEMP
+VkBuffer vertexBuffer;
+VkDeviceSize offset;
+AGVertex * triangle;
 
 // GLFW
 GLFWwindow * _window;
@@ -154,6 +184,11 @@ MKTVstring validationLayers;
 
 #else
 // With the guard
+
+// TEMP
+extern VkBuffer vertexBuffer;
+extern VkDeviceSize offset;
+extern AGVertex * triangle;
 
 // GLFW
 extern GLFWwindow * _window;

@@ -31,6 +31,8 @@ void init()
 
     _VE_INIT_SyncObjects(); // #0000ff
 
+    _VE_INIT_VE(); // #0000ff
+
     DEBUG("III init III");
     DEBUG("III> init <III");
     return;

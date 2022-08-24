@@ -3,11 +3,7 @@ param (
     [switch]$fast = $false,
     [switch]$TESTDLL = $false,
     [switch]$FULLDLL = $false,
-    [switch]$Dshaders = $false,
-    [switch]$Cshaders = $false,
-    [switch]$Pshaders = $false,
-    [switch]$DSshaders = $false,
-    [switch]$DiSshaders = $false,
+    [switch]$AGshaders = $false,
     [switch]$commitFiles = $false,
     [switch]$buildFiles = $false,
     [switch]$buildModuleHandler = $false,
@@ -21,11 +17,7 @@ if($all)
     $fast = $true
     $TESTDLL = $true
     $FULLDLL = $true
-    $Dshaders = $true
-    $Cshaders = $true
-    $Pshaders = $true
-    $DSshaders = $true
-    $DiSshaders = $true
+    $AGshaders = $true
     $commitFiles = $true
     $buildFiles = $true
     $buildModuleHandler = $true
@@ -55,20 +47,8 @@ if ($DEBUG) {
 } else {
     $DEBUGS = ""
 }
-if ($Dshaders) {
-./shadersCompilation/shaders.bat
-}
-if ($Cshaders) {
-    ./shadersCompilation/Cshaders.bat
-}
-if ($Pshaders) {
-    ./shadersCompilation/PMshaders.bat
-}
-if ($DSshaders) {
-    ./shadersCompilation/DSshaders.bat
-}
-if ($DiSshaders) {
-    ./shadersCompilation/DiSshaders.bat
+if ($AGshaders) {
+./shadersCompilation/AGshaders.bat
 }
 if($TESTDLL)
 {
@@ -87,4 +67,4 @@ if($RDEBUG)
     $RDEBUGS = ""
 }
 
-gcc $RDEBUGS $DEBUGS -I ./src/vulkan/ ./src/vulkan/MKTAppEngineUtils.c ./src/vulkan/MKTAppEngineRun.c ./src/vulkan/pipeline/pipeline.c ./src/vulkan/MKTAppEngineInit.c ./src/vulkan/delQue/delQue.c ./src/errorHandling.c ./src/utils.c ./src/main.c ./src/vulkan/MKTAppEngine.c -L C:\sdk\lib -l SDL2 -l vulkan-1 -l SDL2main -l gdi32 -l user32 -l kernel32 $(If ($fast) {"-Ofast"} Else {""}) $(If ($DEBUG) {"-g"} Else {""})  -lmingw32 -lSDL2main -lSDL2 -lm -ldinput8 -ldxguid -ldxerr8 -luser32 -l glfw3 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lsetupapi -lversion -luuid -I C:\sdk\include -o ./build/main.exe >> error.log
+gcc $RDEBUGS $DEBUGS -I ./src/vulkan/ ./src/vulkan/utils/MKTbuffer.c ./src/vulkan/goodLuckMate/glm.c ./src/vulkan/MKTAppEngineUtils.c ./src/vulkan/MKTAppEngineRun.c ./src/vulkan/pipeline/pipeline.c ./src/vulkan/MKTAppEngineInit.c ./src/vulkan/delQue/delQue.c ./src/errorHandling.c ./src/utils.c ./src/main.c ./src/vulkan/MKTAppEngine.c -L C:\sdk\lib -l SDL2 -l vulkan-1 -l SDL2main -l gdi32 -l user32 -l kernel32 $(If ($fast) {"-Ofast"} Else {""}) $(If ($DEBUG) {"-g"} Else {""})  -lmingw32 -lSDL2main -lSDL2 -lm -ldinput8 -ldxguid -ldxerr8 -luser32 -l glfw3 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lsetupapi -lversion -luuid -I C:\sdk\include -o ./build/main.exe >> error.log

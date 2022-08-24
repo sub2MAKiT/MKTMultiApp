@@ -1,2 +1,0 @@
-C:\VulkanSDK\1.2.198.1\Bin\\glslc.exe .\src\vulkan\shaders\defaultShaders\DS.vert -o .\build\shaders\DS.vert.spv
-C:\VulkanSDK\1.2.198.1\Bin\\glslc.exe .\src\vulkan\shaders\defaultShaders\DS.frag -o .\build\shaders\DS.frag.spv

@@ -1,2 +1,0 @@
-C:\VulkanSDK\1.2.198.1\Bin\\glslc.exe .\src\vulkan\shaders\triangle\triangle.vert -o .\build\shaders\triangle.vert.spv
-C:\VulkanSDK\1.2.198.1\Bin\\glslc.exe .\src\vulkan\shaders\triangle\triangle.frag -o .\build\shaders\triangle.frag.spv
