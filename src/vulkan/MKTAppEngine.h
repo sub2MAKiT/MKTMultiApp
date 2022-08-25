@@ -50,6 +50,10 @@ typedef struct MKTMATERIAL {
     IntDex ID;
 } MKTmaterial;
 
+typedef struct MKTAGDESCRIPTOR {
+    MKTmatf2 input;
+} MKTAGdescriptor;
+
 typedef struct MKTRUNTIMEKIT {
 
     VkCommandBuffer commandBuffer;
@@ -62,6 +66,8 @@ typedef struct MKTRUNTIMEKIT {
 typedef struct MKTAG {
     AGVertex * vertices;
     IntDex sizeOfVertices;
+
+    MKTAGdescriptor descriptor;
     
     unsigned int * indices;
     IntDex sizeOfIndices;
