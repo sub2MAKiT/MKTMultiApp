@@ -66,11 +66,6 @@ void createVertexBuffer(IntDex sizeOfBuffer, void * inData, VkBuffer * buffer,Vk
     for(int i = 0; i < sizeOfBuffer; i++)
         *(char*)(data+i) = *(char*)(inData+i);
 
-    for(int i = 0; i < sizeOfBuffer/sizeof(float); i++)
-    {
-        printf("%d.DEBUG2: %f %f\n",i,*(float*)(data+(i*sizeof(float))),*(float*)(inData+(i*sizeof(float))));
-    }
-    
     vkUnmapMemory(_device, stagingBufferMemory);
 
     createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, buffer, bufferMemory);

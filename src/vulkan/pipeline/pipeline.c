@@ -171,22 +171,23 @@ void _MKT_LOAD_PIPELINE(const char * FPV,const char * FPF, IntDex materialIndex,
         vkDestroyShaderModule(_device, fragShaderModule, NULL);
         vkDestroyShaderModule(_device, vertShaderModule, NULL);
 
-    DELQUEVARIABLES
-    VkDevice a;VkPipeline b;const VkAllocationCallbacks* c;
-    DELQUEVARIABLESDOT(vkDestroyPipeline)
-    input->a,input->b,input->c
-    DELQUEVARIABLESVALUE
-    _device,_REN_materials[materialIndex].graphicsPipeline,NULL
-    COMMITDELQUE(vkDestroyPipeline)
+    // DELQUEVARIABLES
+    // VkDevice a;VkPipeline b;const VkAllocationCallbacks* c;
+    // DELQUEVARIABLESDOT(vkDestroyPipeline)
+    // input->a,input->b,input->c
+    // DELQUEVARIABLESVALUE
+    // _device,_REN_materials[materialIndex].graphicsPipeline,NULL
+    // COMMITDELQUE(vkDestroyPipeline)
 
 
-    DELQUEVARIABLES
-    VkDevice a;VkPipelineLayout b;const VkAllocationCallbacks* c;
-    DELQUEVARIABLESDOT(vkDestroyPipelineLayout)
-    input->a,input->b,input->c
-    DELQUEVARIABLESVALUE
-    _device,_REN_materials[materialIndex].pipelineLayout,NULL
-    COMMITDELQUE(vkDestroyPipelineLayout)
+    // DELQUEVARIABLES
+    // VkDevice a;VkPipelineLayout b;const VkAllocationCallbacks* c;
+    // DELQUEVARIABLESDOT(vkDestroyPipelineLayout)
+    // input->a,input->b,input->c
+    // DELQUEVARIABLESVALUE
+    // _device,_REN_materials[materialIndex].pipelineLayout,NULL
+    // COMMITDELQUE(vkDestroyPipelineLayout)
+
 
     free(listV);
     free(listF);

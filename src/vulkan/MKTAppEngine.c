@@ -58,10 +58,26 @@ void cleanup()
     DEBUG("III cleanup III");
 
     DEBUG("II inside cleanup II");
-    MKTreturnDelQueue();
+
+
+    // MKTreturnDelQueue();  temporary disabled
+
+
     MKTreturnError("./errors.log");
 
     DEBUG("II VK hard cleanup II");
+
+    vkFreeMemory(_device, triangle.vertexBufferMemory, NULL);
+    vkFreeMemory(_device, triangle.indexBufferMemory, NULL);
+    vkDestroyBuffer(_device, triangle.vertexBuffer, NULL);
+    vkDestroyBuffer(_device, triangle.indexBuffer, NULL);
+
+
+    for(int i = 0; i < _REN_sizeOfMaterials; i++)
+    {
+        vkDestroyPipeline(_device,_REN_materials[i].graphicsPipeline,NULL);
+        vkDestroyPipelineLayout(_device,_REN_materials[i].pipelineLayout,NULL);
+    }
 
     vkDestroyCommandPool(_device, _commandPool, NULL);
 
@@ -70,6 +86,7 @@ void cleanup()
         vkDestroySemaphore(_device, _runtimeKit[i].renderFinishedSemaphore, NULL);
         vkDestroyFence(_device, _runtimeKit[i].inFlightFence, NULL);
     }
+
     for (IntDex i = 0; i < _sizeOfSwapChainFramebuffers;i++) {
         vkDestroyFramebuffer(_device, _swapChainFramebuffers[i], NULL);
     }
