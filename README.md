@@ -58,6 +58,9 @@
 ### 00.01.01.00 - Cleanup
 - Cleanup
 
+### 00.01.02.00 - ArrayGraphics
+- ArrayGraphics
+
 # ERRORS
 0. No errors
 1. System error

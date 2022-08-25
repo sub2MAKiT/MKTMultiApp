@@ -67,11 +67,15 @@ void cleanup()
 
     DEBUG("II VK hard cleanup II");
 
-    vkFreeMemory(_device, triangle.vertexBufferMemory, NULL);
-    vkFreeMemory(_device, triangle.indexBufferMemory, NULL);
-    vkDestroyBuffer(_device, triangle.vertexBuffer, NULL);
-    vkDestroyBuffer(_device, triangle.indexBuffer, NULL);
-
+    for(IntDex i = 0; i < _REN_sizeOfAG; i++)
+    {
+        vkFreeMemory(_device, _REN_AG[i].vertexBufferMemory, NULL);
+        vkFreeMemory(_device, _REN_AG[i].indexBufferMemory, NULL);
+        vkDestroyBuffer(_device, _REN_AG[i].vertexBuffer, NULL);
+        vkDestroyBuffer(_device, _REN_AG[i].indexBuffer, NULL);
+        free(_REN_AG[i].vertices);
+        free(_REN_AG[i].indices);
+    }
 
     for(int i = 0; i < _REN_sizeOfMaterials; i++)
     {

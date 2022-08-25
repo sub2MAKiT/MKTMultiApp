@@ -1,4 +1,5 @@
 #pragma once
+#include <structs.h>
 #include <../utils.h>
 #include <../outerDefine.h>
 #include <delQue/delQue.h>
@@ -24,26 +25,6 @@ do                                                              \
 // STRUCTS
 
 // GLM
-#define MKTGLMDOUBLE float
-
-typedef struct MKTRGBA {
-    MKTGLMDOUBLE r;
-    MKTGLMDOUBLE g;
-    MKTGLMDOUBLE b;
-    MKTGLMDOUBLE a;
-} MKTrgba;
-
-typedef struct MKTXY {
-    MKTGLMDOUBLE x;
-    MKTGLMDOUBLE y;
-} MKTxy;
-
-
-
-typedef struct MKTAGVertex { // i = 0
-    MKTxy pos;
-    MKTrgba colour;
-} AGVertex;
 
 typedef struct MKTDEVICERATING {
     IntDex rating;
@@ -89,7 +70,7 @@ typedef struct MKTAG {
     VkDeviceMemory vertexBufferMemory;
     VkBuffer indexBuffer;
     VkDeviceMemory indexBufferMemory;
-} MKTag; 
+} MKTag;
 
 // FUNCTIONS
 
@@ -127,9 +108,6 @@ void _VE_UTILS_CleanupSwapChain(); // An Utils function for cleaning up the swap
 
 #ifdef _MKT_APP_ENGINE_THIRD_
 // Without the guard
-
-// TEMP
-MKTag triangle;
 
 // GLFW
 GLFWwindow * _window;
@@ -178,6 +156,9 @@ MKTVstring _deviceExtensions;
 MKTmaterial * _REN_materials;
 IntDex _REN_sizeOfMaterials;
 
+MKTag * _REN_AG;
+IntDex _REN_sizeOfAG;
+
 
 // validation layers
 #ifdef NDEBUG
@@ -189,9 +170,6 @@ MKTVstring validationLayers;
 
 #else
 // With the guard
-
-// TEMP
-extern MKTag triangle;
 
 // GLFW
 extern GLFWwindow * _window;
@@ -244,10 +222,13 @@ extern IntDex _REN_sizeOfMaterials;
 extern const char enableValidationLayers;
 extern MKTVstring validationLayers;
 
+extern MKTag * _REN_AG;
+extern IntDex _REN_sizeOfAG;
+
 #endif
 
 /* some helpfull errors to know
 * 1.
-* 2.
+* 2. -1073740940 - Heap corruption error (fun fact, is almost impossible to debug with gdb)
 * 3. -1073741510 - The physical resources of this disk have been exhausted.
 */
