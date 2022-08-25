@@ -1,0 +1,2 @@
+C:\VulkanSDK\1.2.198.1\Bin\\glslc.exe .\src\vulkan\shaders\AGShader\AGShader.vert -o .\build\shaders\AGShader.vert.spv
+C:\VulkanSDK\1.2.198.1\Bin\\glslc.exe .\src\vulkan\shaders\AGShader\AGShader.frag -o .\build\shaders\AGShader.frag.spv
