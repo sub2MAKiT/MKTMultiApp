@@ -36,6 +36,11 @@ void _MKT_LOAD_PIPELINE(const char * FPV,const char * FPF, IntDex materialIndex,
         MKTerror(2);
     }
 
+    VkShaderModule fragShaderModule;
+    VkShaderModule vertShaderModule;
+    VkPipelineShaderStageCreateInfo fragI;
+    VkPipelineShaderStageCreateInfo vertI;
+
     {
         VkShaderModuleCreateInfo createInfo = {};
         createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
@@ -49,15 +54,7 @@ void _MKT_LOAD_PIPELINE(const char * FPV,const char * FPF, IntDex materialIndex,
         VK_CHECK(vkCreateShaderModule(_device, &createInfo, NULL, &shaderModule));
 
 
-        _REN_materials[materialIndex].vert = shaderModule;
-
-        DELQUEVARIABLES
-        VkDevice a;VkShaderModule b;const VkAllocationCallbacks* c;
-        DELQUEVARIABLESDOT(vkDestroyShaderModule)
-        input->a,input->b,input->c
-        DELQUEVARIABLESVALUE
-        _device,_REN_materials[materialIndex].vert,NULL
-        COMMITDELQUE(vkDestroyShaderModule)
+        vertShaderModule = shaderModule;
 
         VkPipelineShaderStageCreateInfo vertShaderStageInfo = {};
         vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -65,7 +62,7 @@ void _MKT_LOAD_PIPELINE(const char * FPV,const char * FPF, IntDex materialIndex,
         vertShaderStageInfo.module = shaderModule;
         vertShaderStageInfo.pName = "main";
 
-        _REN_materials[materialIndex].vertI = vertShaderStageInfo;
+        vertI = vertShaderStageInfo;
     }
 
     {
@@ -80,15 +77,7 @@ void _MKT_LOAD_PIPELINE(const char * FPV,const char * FPF, IntDex materialIndex,
         VkShaderModule shaderModule;
         VK_CHECK(vkCreateShaderModule(_device, &createInfo, NULL, &shaderModule));
 
-        _REN_materials[materialIndex].frag = shaderModule;
-
-        DELQUEVARIABLES
-        VkDevice a;VkShaderModule b;const VkAllocationCallbacks* c;
-        DELQUEVARIABLESDOT(vkDestroyShaderModule)
-        input->a,input->b,input->c
-        DELQUEVARIABLESVALUE
-        _device,_REN_materials[materialIndex].frag,NULL
-        COMMITDELQUE(vkDestroyShaderModule)
+        fragShaderModule = shaderModule;
 
         VkPipelineShaderStageCreateInfo fragShaderStageInfo = {};
         fragShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -96,11 +85,11 @@ void _MKT_LOAD_PIPELINE(const char * FPV,const char * FPF, IntDex materialIndex,
         fragShaderStageInfo.module = shaderModule;
         fragShaderStageInfo.pName = "main";
 
-        _REN_materials[materialIndex].fragI = fragShaderStageInfo;
+        fragI = fragShaderStageInfo;
 
     }
 
-        VkPipelineShaderStageCreateInfo shaderStages[2] = {_REN_materials[materialIndex].vertI, _REN_materials[materialIndex].fragI};
+        VkPipelineShaderStageCreateInfo shaderStages[2] = {vertI, fragI};
 
         VkPipelineVertexInputStateCreateInfo vertexInputInfo = getInputDescription(0);
 
@@ -178,6 +167,9 @@ void _MKT_LOAD_PIPELINE(const char * FPV,const char * FPF, IntDex materialIndex,
         pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 
         VK_CHECK(vkCreateGraphicsPipelines(_device, VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &_REN_materials[materialIndex].graphicsPipeline));
+
+        vkDestroyShaderModule(_device, fragShaderModule, NULL);
+        vkDestroyShaderModule(_device, vertShaderModule, NULL);
 
     DELQUEVARIABLES
     VkDevice a;VkPipeline b;const VkAllocationCallbacks* c;

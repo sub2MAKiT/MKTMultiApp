@@ -63,12 +63,6 @@ typedef struct MKTSTRINGVECTOR {
 } MKTVstring;
 
 typedef struct MKTMATERIAL {
-    VkShaderModule frag;
-    VkShaderModule vert;
-
-    VkPipelineShaderStageCreateInfo fragI;
-    VkPipelineShaderStageCreateInfo vertI;
-
     VkPipelineLayout pipelineLayout;
     VkPipeline graphicsPipeline;
 
@@ -83,6 +77,19 @@ typedef struct MKTRUNTIMEKIT {
     VkFence inFlightFence;
 
 } MKTVKruntime;
+
+typedef struct MKTAG {
+    AGVertex * vertices;
+    IntDex sizeOfVertices;
+    
+    unsigned int * indices;
+    IntDex sizeOfIndices;
+
+    VkBuffer vertexBuffer;
+    VkDeviceMemory vertexBufferMemory;
+    VkBuffer indexBuffer;
+    VkDeviceMemory indexBufferMemory;
+} MKTag; 
 
 // FUNCTIONS
 
@@ -122,9 +129,7 @@ void _VE_UTILS_CleanupSwapChain(); // An Utils function for cleaning up the swap
 // Without the guard
 
 // TEMP
-VkBuffer vertexBuffer;
-VkDeviceSize offset;
-AGVertex * triangle;
+MKTag triangle;
 
 // GLFW
 GLFWwindow * _window;
@@ -186,9 +191,7 @@ MKTVstring validationLayers;
 // With the guard
 
 // TEMP
-extern VkBuffer vertexBuffer;
-extern VkDeviceSize offset;
-extern AGVertex * triangle;
+extern MKTag triangle;
 
 // GLFW
 extern GLFWwindow * _window;
