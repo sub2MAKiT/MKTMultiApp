@@ -633,6 +633,8 @@ void _VE_INIT_SyncObjects()
 
 void _VE_INIT_VE()
 {
+    DEBUG("II init:VEvariables II");
+
     _REN_sizeOfAG = 0;
     _REN_AG = malloc(sizeof(MKTag));
 
@@ -675,5 +677,7 @@ void _VE_INIT_VE()
     triangle.indices[5] = 3;
 
     _MKT_genAG(triangle.vertices,triangle.sizeOfVertices,triangle.indices,triangle.sizeOfIndices);
+
+    DEBUG("II> init:VEvariables <II");
     return;
 }

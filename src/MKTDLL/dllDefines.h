@@ -23,5 +23,5 @@ typedef struct functionInput {
 } funi;
 
 typedef struct cleanUpInput {
-    int * errorCode;
+    long int * errorCode;
 } cleanUpi;

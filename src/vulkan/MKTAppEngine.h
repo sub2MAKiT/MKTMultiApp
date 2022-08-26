@@ -234,7 +234,7 @@ extern IntDex _REN_sizeOfAG;
 #endif
 
 /* some helpfull errors to know
-* 1.
+* 1. -1073741819 - The "Dev can't use malloc correctly" error
 * 2. -1073740940 - Heap corruption error (fun fact, is almost impossible to debug with gdb)
 * 3. -1073741510 - The physical resources of this disk have been exhausted.
 */

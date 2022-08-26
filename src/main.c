@@ -2,22 +2,19 @@
 #include "externDefine.h"
 #include "utils.h"
 
-// vulkan
+#define MKTDYNAMICLIBRARYLOADING
 #include <MKTAppEngine.h>
+#include <../MKTDLL/MKTDLL.h>
 
 char * testingP1;
 char * testingP2;
-
-int testing(char a,int b)
-{
-    printf("it works %c%d\n",a,b);
-    return 0;
-}
 
 int main(int argc, char* argv[])
 {
     MKTsetupError();
     MKTcreateDelQueue();
+
+    loadLibaries;
 
     DEBUG("IIII startup IIII");
 
@@ -26,6 +23,8 @@ int main(int argc, char* argv[])
     run();
 
     cleanup();
+
+    unloadLibraries;
 
     DEBUG("IIII return IIII");
 

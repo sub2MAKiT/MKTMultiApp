@@ -130,6 +130,7 @@
         "glfw3.h": "c",
         "errorhandling.h": "c",
         "outerdefine.h": "c",
-        "externdefine.h": "c"
+        "externdefine.h": "c",
+        "dlldefines.h": "c"
     }
 }
