@@ -67,20 +67,20 @@ void cleanup()
 
     DEBUG("II VK hard cleanup II");
 
-    for(IntDex i = 0; i < _REN_sizeOfAG; i++)
+    for(IntDex i = 0; i < _ren_sizeOfAG; i++)
     {
-        vkFreeMemory(_device, _REN_AG[i].vertexBufferMemory, NULL);
-        vkFreeMemory(_device, _REN_AG[i].indexBufferMemory, NULL);
-        vkDestroyBuffer(_device, _REN_AG[i].vertexBuffer, NULL);
-        vkDestroyBuffer(_device, _REN_AG[i].indexBuffer, NULL);
-        free(_REN_AG[i].vertices);
-        free(_REN_AG[i].indices);
+        vkFreeMemory(_device, _ren_AG[i].vertexBufferMemory, NULL);
+        vkFreeMemory(_device, _ren_AG[i].indexBufferMemory, NULL);
+        vkDestroyBuffer(_device, _ren_AG[i].vertexBuffer, NULL);
+        vkDestroyBuffer(_device, _ren_AG[i].indexBuffer, NULL);
+        free(_ren_AG[i].vertices);
+        free(_ren_AG[i].indices);
     }
 
-    for(int i = 0; i < _REN_sizeOfMaterials; i++)
+    for(int i = 0; i < _ren_sizeOfMaterials; i++)
     {
-        vkDestroyPipeline(_device,_REN_materials[i].graphicsPipeline,NULL);
-        vkDestroyPipelineLayout(_device,_REN_materials[i].pipelineLayout,NULL);
+        vkDestroyPipeline(_device,_ren_materials[i].graphicsPipeline,NULL);
+        vkDestroyPipelineLayout(_device,_ren_materials[i].pipelineLayout,NULL);
     }
 
     vkDestroyCommandPool(_device, _commandPool, NULL);
@@ -113,7 +113,7 @@ void cleanup()
 
     glfwTerminate();
 
-    free(_REN_materials);
+    free(_ren_materials);
 
     free(_swapChainImageViews);
     free(_swapChainImages);

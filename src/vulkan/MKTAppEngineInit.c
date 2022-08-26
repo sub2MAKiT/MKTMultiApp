@@ -486,11 +486,11 @@ void _VE_INIT_GraphicPipelines()
 {
     DEBUG("II init:GraphicPipelines II");
 
-    _REN_materials = malloc(sizeof(MKTmaterial));
-    _REN_sizeOfMaterials = 1;
+    _ren_materials = malloc(sizeof(MKTmaterial));
+    _ren_sizeOfMaterials = 1;
 
     _MKT_LOAD_PIPELINE("shaders/AGShader.vert.spv","shaders/AGShader.frag.spv", 0,0);
-    // _REN_sizeOfMaterials++;
+    // _ren_sizeOfMaterials++;
 
     DEBUG("II> init:GraphicPipelines <II");
     return;
@@ -635,8 +635,8 @@ void _VE_INIT_VE()
 {
     DEBUG("II init:VEvariables II");
 
-    _REN_sizeOfAG = 0;
-    _REN_AG = malloc(sizeof(MKTag));
+    _ren_sizeOfAG = 0;
+    _ren_AG = malloc(sizeof(MKTag));
 
     MKTag triangle;
     triangle.vertices = malloc(sizeof(AGVertex)*4);

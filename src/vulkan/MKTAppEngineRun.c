@@ -40,16 +40,16 @@ void _VE_RUN_recordCommandBuffer(VkCommandBuffer commandBuffer, unsigned int ima
         scissor.extent = _swapChainExtent;
         vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
-        for(IntDex i = 0; i < _REN_sizeOfAG; i++)
+        for(IntDex i = 0; i < _ren_sizeOfAG; i++)
         {
 
-            vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _REN_materials[0].graphicsPipeline);
+            vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _ren_materials[0].graphicsPipeline);
 
-            vkCmdBindIndexBuffer(commandBuffer, _REN_AG[i].indexBuffer, 0, VK_INDEX_TYPE_UINT32);
+            vkCmdBindIndexBuffer(commandBuffer, _ren_AG[i].indexBuffer, 0, VK_INDEX_TYPE_UINT32);
 
-            vkCmdBindVertexBuffers(commandBuffer, 0, 1, &_REN_AG[i].vertexBuffer, &tempOffset);
+            vkCmdBindVertexBuffers(commandBuffer, 0, 1, &_ren_AG[i].vertexBuffer, &tempOffset);
 
-            vkCmdDrawIndexed(commandBuffer, _REN_AG[i].sizeOfIndices, 1, 0, 0, 0);
+            vkCmdDrawIndexed(commandBuffer, _ren_AG[i].sizeOfIndices, 1, 0, 0, 0);
 
         }
     vkCmdEndRenderPass(commandBuffer);

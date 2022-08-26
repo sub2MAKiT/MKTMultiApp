@@ -64,6 +64,9 @@
 ### 00.01.02.01 - MKTag patch
 - MKTag patch
 
+### 00.01.02.02 - C naming convencion patch
+- C naming convencion patch
+
 # ERRORS
 0. No errors
 1. System error

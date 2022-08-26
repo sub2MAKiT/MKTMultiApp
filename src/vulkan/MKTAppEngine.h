@@ -159,11 +159,11 @@ VkExtensionProperties * _extensions;
 MKTVstring _deviceExtensions;
 
 // RENDER
-MKTmaterial * _REN_materials;
-IntDex _REN_sizeOfMaterials;
+MKTmaterial * _ren_materials;
+IntDex _ren_sizeOfMaterials;
 
-MKTag * _REN_AG;
-IntDex _REN_sizeOfAG;
+MKTag * _ren_AG;
+IntDex _ren_sizeOfAG;
 
 
 // validation layers
@@ -221,15 +221,15 @@ extern VkExtensionProperties * _extensions;
 extern MKTVstring _deviceExtensions;
 
 // RENDER
-extern MKTmaterial * _REN_materials;
-extern IntDex _REN_sizeOfMaterials;
+extern MKTmaterial * _ren_materials;
+extern IntDex _ren_sizeOfMaterials;
 
 // validation layers
 extern const char enableValidationLayers;
 extern MKTVstring validationLayers;
 
-extern MKTag * _REN_AG;
-extern IntDex _REN_sizeOfAG;
+extern MKTag * _ren_AG;
+extern IntDex _ren_sizeOfAG;
 
 #endif
 

@@ -148,7 +148,7 @@ void _MKT_LOAD_PIPELINE(const char * FPV,const char * FPF, IntDex materialIndex,
         pipelineLayoutInfo.setLayoutCount = 0;
         pipelineLayoutInfo.pushConstantRangeCount = 0;
 
-        VK_CHECK(vkCreatePipelineLayout(_device, &pipelineLayoutInfo, NULL, &_REN_materials[materialIndex].pipelineLayout));
+        VK_CHECK(vkCreatePipelineLayout(_device, &pipelineLayoutInfo, NULL, &_ren_materials[materialIndex].pipelineLayout));
 
         VkGraphicsPipelineCreateInfo pipelineInfo = {};
         pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
@@ -161,12 +161,12 @@ void _MKT_LOAD_PIPELINE(const char * FPV,const char * FPF, IntDex materialIndex,
         pipelineInfo.pMultisampleState = &multisampling;
         pipelineInfo.pColorBlendState = &colorBlending;
         pipelineInfo.pDynamicState = &dynamicState;        
-        pipelineInfo.layout = _REN_materials[materialIndex].pipelineLayout;
+        pipelineInfo.layout = _ren_materials[materialIndex].pipelineLayout;
         pipelineInfo.renderPass = _renderPass;
         pipelineInfo.subpass = 0;
         pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 
-        VK_CHECK(vkCreateGraphicsPipelines(_device, VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &_REN_materials[materialIndex].graphicsPipeline));
+        VK_CHECK(vkCreateGraphicsPipelines(_device, VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &_ren_materials[materialIndex].graphicsPipeline));
 
         vkDestroyShaderModule(_device, fragShaderModule, NULL);
         vkDestroyShaderModule(_device, vertShaderModule, NULL);
@@ -176,7 +176,7 @@ void _MKT_LOAD_PIPELINE(const char * FPV,const char * FPF, IntDex materialIndex,
     // DELQUEVARIABLESDOT(vkDestroyPipeline)
     // input->a,input->b,input->c
     // DELQUEVARIABLESVALUE
-    // _device,_REN_materials[materialIndex].graphicsPipeline,NULL
+    // _device,_ren_materials[materialIndex].graphicsPipeline,NULL
     // COMMITDELQUE(vkDestroyPipeline)
 
 
@@ -185,7 +185,7 @@ void _MKT_LOAD_PIPELINE(const char * FPV,const char * FPF, IntDex materialIndex,
     // DELQUEVARIABLESDOT(vkDestroyPipelineLayout)
     // input->a,input->b,input->c
     // DELQUEVARIABLESVALUE
-    // _device,_REN_materials[materialIndex].pipelineLayout,NULL
+    // _device,_ren_materials[materialIndex].pipelineLayout,NULL
     // COMMITDELQUE(vkDestroyPipelineLayout)
 
 

@@ -1,38 +1,41 @@
 #include <fileLoading/AG.h>
 
-#define CURRENT _REN_sizeOfAG-1
+#define CURRENT _ren_sizeOfAG-1
 
 IntDex _MKT_genAG(AGVertex * inVertices,IntDex inSizeOfVertices,unsigned int * inIndices,IntDex inSizeOfIndices)
 {
-    _REN_sizeOfAG++;
-    _REN_AG = realloc(_REN_AG,_REN_sizeOfAG);
+    _ren_sizeOfAG++;
+    _ren_AG = realloc(_ren_AG,_ren_sizeOfAG);
 
-    _REN_AG[CURRENT].vertices = malloc(sizeof(AGVertex)*inSizeOfVertices);
-    _REN_AG[CURRENT].indices = malloc(sizeof(unsigned int)*inSizeOfIndices);
+    _ren_AG[CURRENT].vertices = malloc(sizeof(AGVertex)*inSizeOfVertices);
+    printf("inSizeV: %d\n",inSizeOfVertices);
+    printf("test %x\n",_ren_AG[CURRENT].indices);
+    _ren_AG[CURRENT].indices = malloc(sizeof(unsigned int)*inSizeOfIndices);
+    printf("test1 %x\n",_ren_AG[CURRENT].indices);
     
-    _REN_AG[CURRENT].sizeOfVertices = inSizeOfVertices;
-    _REN_AG[CURRENT].sizeOfIndices = inSizeOfIndices;
+    _ren_AG[CURRENT].sizeOfVertices = inSizeOfVertices;
+    printf("test2 %x\n",_ren_AG[CURRENT].indices);
+    _ren_AG[CURRENT].sizeOfIndices = inSizeOfIndices;
+    printf("test3 %x\n",_ren_AG[CURRENT].indices);
 
     for(IntDex i = 0; i < inSizeOfVertices;i++)
-        _REN_AG[CURRENT].vertices[i] = inVertices[i];
-
-    // DEBUG("I TEMP DEBUG I");
-    // printf("size: %d\n",inSizeOfIndices);
+    {
+        printf("%d.test4 %x\n",i,_ren_AG[CURRENT].indices);
+        _ren_AG[CURRENT].vertices[i] = inVertices[i];
+        printf("%d.test5 %x\n",i,_ren_AG[CURRENT].indices);
+    }
+    printf("test6 %x\n",_ren_AG[CURRENT].indices);
+    printf("test7 %x\n",_ren_AG[CURRENT].indices);
     for(IntDex i = 0; i < inSizeOfIndices;i++)
     {
-        // printf("%d.test: %d %d\n",i,inIndices[i]);
-        _REN_AG[CURRENT].indices[i] = inIndices[i];
-    // DEBUG("I TEMP DEBUG1 I");
+        _ren_AG[CURRENT].indices[i] = inIndices[i];
     }
-    DEBUG("I TEMP DEBUG I");
 
     free(inVertices);
     free(inIndices);
-    DEBUG("I TEMP DEBUG I");
 
-    createVertexBuffer(sizeof(AGVertex)*_REN_AG[CURRENT].sizeOfVertices, _REN_AG[CURRENT].vertices, &_REN_AG[CURRENT].vertexBuffer,&_REN_AG[CURRENT].vertexBufferMemory);
-    createIndexBuffer(_REN_AG[CURRENT].sizeOfIndices, _REN_AG[CURRENT].indices, &_REN_AG[CURRENT].indexBuffer,&_REN_AG[CURRENT].indexBufferMemory);
-    DEBUG("I TEMP DEBUG I");
+    createVertexBuffer(sizeof(AGVertex)*_ren_AG[CURRENT].sizeOfVertices, _ren_AG[CURRENT].vertices, &_ren_AG[CURRENT].vertexBuffer,&_ren_AG[CURRENT].vertexBufferMemory);
+    createIndexBuffer(_ren_AG[CURRENT].sizeOfIndices, _ren_AG[CURRENT].indices, &_ren_AG[CURRENT].indexBuffer,&_ren_AG[CURRENT].indexBufferMemory);
 
 
 
