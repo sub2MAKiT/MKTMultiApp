@@ -72,9 +72,7 @@ typedef struct MKTAG {
     IntDex sizeOfIndices;
     unsigned int * indices; // THIS SOMEHOW OVERWRITES EVERYTHING AFTER IT
 
-        IntDex padding;
-    VkBuffer paddingBuffer; // don't even ask
-    VkDeviceMemory paddingBufferMemory;
+    char padding[16];
 
     VkBuffer vertexBuffer;
     VkDeviceMemory vertexBufferMemory;
@@ -104,6 +102,8 @@ void _VE_INIT_CommandPool(); // An init function for creating the command pool
 void _VE_INIT_CommandBuffer(); // An init function for creating the command buffer
 void _VE_INIT_SyncObjects(); // An init function for creating semaphores and fences
 void _VE_INIT_VE(); // An init function for VentumEngine variables
+
+void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 
 // RUNTIME FUNCTIONS
 void _VE_RUN_recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);

@@ -6,9 +6,6 @@
 #include <MKTAppEngine.h>
 #include <../MKTDLL/MKTDLL.h>
 
-char * testingP1;
-char * testingP2;
-
 int main(int argc, char* argv[])
 {
     MKTsetupError();

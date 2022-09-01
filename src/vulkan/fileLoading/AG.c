@@ -8,24 +8,14 @@ IntDex _MKT_genAG(AGVertex * inVertices,IntDex inSizeOfVertices,unsigned int * i
     _ren_AG = realloc(_ren_AG,_ren_sizeOfAG);
 
     SAFEMALLOC(_ren_AG[CURRENT].vertices,(sizeof(AGVertex)*inSizeOfVertices));
-    printf("inSizeV: %d\n",inSizeOfVertices);
-    printf("test %x\n",_ren_AG[CURRENT].indices);
     SAFEMALLOC(_ren_AG[CURRENT].indices,(sizeof(unsigned int)*inSizeOfIndices));
-    printf("test1 %x\n",_ren_AG[CURRENT].indices);
     
     _ren_AG[CURRENT].sizeOfVertices = inSizeOfVertices;
-    printf("test2 %x\n",_ren_AG[CURRENT].indices);
     _ren_AG[CURRENT].sizeOfIndices = inSizeOfIndices;
-    printf("test3 %x\n",_ren_AG[CURRENT].indices);
 
     for(IntDex i = 0; i < inSizeOfVertices;i++)
-    {
-        printf("%d.test4 %x\n",i,_ren_AG[CURRENT].indices);
         _ren_AG[CURRENT].vertices[i] = inVertices[i];
-        printf("%d.test5 %x\n",i,_ren_AG[CURRENT].indices);
-    }
-    printf("test6 %x\n",_ren_AG[CURRENT].indices);
-    printf("test7 %x\n",_ren_AG[CURRENT].indices);
+        
     for(IntDex i = 0; i < inSizeOfIndices;i++)
     {
         _ren_AG[CURRENT].indices[i] = inIndices[i];

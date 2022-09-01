@@ -237,7 +237,7 @@ MKTdeviceRating pickDeviceRating(VkPhysicalDevice device) {
     return DR;
 }
 
-static void framebufferResizeCallback(GLFWwindow* window, int width, int height) {
+void framebufferResizeCallback(GLFWwindow* window, int width, int height) {
     // auto app = reinterpret_cast<HelloTriangleApplication*>(glfwGetWindowUserPointer(window));
     _framebufferResized = 1;
 }
