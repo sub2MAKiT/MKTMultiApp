@@ -5,8 +5,8 @@
 
 #define _MKT_EVER_Release 0
 #define _MKT_EVER_Major 1
-#define _MKT_EVER_Minor 2
-#define _MKT_EVER_Patch 3
+#define _MKT_EVER_Minor 3
+#define _MKT_EVER_Patch 0
 
 #define _MKT_MVER_Release 0
 #define _MKT_MVER_Major 0

@@ -72,6 +72,11 @@
 - padding buffers
 - fixed the main buffer error
 
+### 00.01.03.00 - fileloading 1
+- AG fileloading
+- fixed the heap corruption AG error
+
+
 # ERRORS
 0. No errors
 1. System error

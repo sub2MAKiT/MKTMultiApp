@@ -64,15 +64,11 @@ typedef struct MKTRUNTIMEKIT {
 } MKTVKruntime;
 
 typedef struct MKTAG {
-    AGVertex * vertices;
+    AGVertex * vertices; // THIS SOMEHOW is mallocated to the address of indices pointer
     IntDex sizeOfVertices;
 
-    MKTAGdescriptor descriptor;
-
     IntDex sizeOfIndices;
-    unsigned int * indices; // THIS SOMEHOW OVERWRITES EVERYTHING AFTER IT
-
-    char padding[16];
+    unsigned int * indices; 
 
     VkBuffer vertexBuffer;
     VkDeviceMemory vertexBufferMemory;

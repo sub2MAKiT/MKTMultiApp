@@ -55,13 +55,16 @@ MKTmodule getEntryAddress(FUNHANDLE libraryToLoad);
 // for windows
 
 char * windowsDLLLoading();
-#define unloadLibraries cleanUpi tempCleanUpI; tempCleanUpI.errorCode = _errors; for(int i = 0; i < Shmodules;i++)(*_MKT_MODULES[i].cleanUp)(tempCleanUpI); for(int i = 0; i < Shmodules;i++)FreeLibrary(hmodules[i])
+#define unloadLibraries cleanUpi tempCleanUpI; tempCleanUpI.errorCode = _errors; for(int i = 0; i < Shmodules;i++)(*_MKT_MODULES[i].cleanUp)(tempCleanUpI); for(int i = 0; i < Shmodules;i++)FreeLibrary(hmodules[i]);free(_MKT_MODULES)
 
 void getEntryAddress(FUNHANDLE libraryToLoad,MKTmodule * Module);
 #define loadLibaries windowsDLLLoading();\
+SAFEMALLOC(_MKT_MODULES,sizeof(MKTmodule)*_MKT_sizeOfMODULES);\
 for(int i = 0; i < _MKT_sizeOfMODULES;i++)\
-getEntryAddress(hmodules[i],&_MKT_MODULES[i]);
-
+getEntryAddress(hmodules[i],&_MKT_MODULES[i]);\
+initi temp = {10,10};\
+for(int i = 0; i < _MKT_sizeOfMODULES;i++)\
+(*_MKT_MODULES[i].init)(temp)
 
 
 #elif __APPLE__

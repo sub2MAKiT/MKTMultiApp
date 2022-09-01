@@ -655,45 +655,47 @@ void _VE_INIT_VE()
 
     SAFEMALLOC(_ren_AG,sizeof(MKTag));
 
-    MKTag triangle;
-    SAFEMALLOC(triangle.vertices,sizeof(AGVertex)*4);
-    triangle.vertices[0].pos.x = 0.0f;
-    triangle.vertices[0].pos.y = -0.5f;
-    triangle.vertices[0].colour.r = 1.0f;
-    triangle.vertices[0].colour.g = 0.0f;
-    triangle.vertices[0].colour.b = 0.0f;
-    triangle.vertices[0].colour.a = 1.0f;
-    triangle.vertices[1].pos.x = 0.5f;
-    triangle.vertices[1].pos.y = 0.5f;
-    triangle.vertices[1].colour.r = 0.0f;
-    triangle.vertices[1].colour.g = 1.0f;
-    triangle.vertices[1].colour.b = 0.0f;
-    triangle.vertices[1].colour.a = 1.0f;
-    triangle.vertices[2].pos.x = -0.5f;
-    triangle.vertices[2].pos.y = 0.5f;
-    triangle.vertices[2].colour.r = 0.0f;
-    triangle.vertices[2].colour.g = 0.0f;
-    triangle.vertices[2].colour.b = 1.0f;
-    triangle.vertices[2].colour.a = 1.0f;
-    triangle.vertices[3].pos.x = -0.5f;
-    triangle.vertices[3].pos.y = -0.5f;
-    triangle.vertices[3].colour.r = 0.0f;
-    triangle.vertices[3].colour.g = 1.0f;
-    triangle.vertices[3].colour.b = 1.0f;
-    triangle.vertices[3].colour.a = 1.0f;
+    // MKTag triangle;
+    // SAFEMALLOC(triangle.vertices,sizeof(AGVertex)*4);
+    // triangle.vertices[0].pos.x = 0.0f;
+    // triangle.vertices[0].pos.y = -0.5f;
+    // triangle.vertices[0].colour.r = 1.0f;
+    // triangle.vertices[0].colour.g = 0.0f;
+    // triangle.vertices[0].colour.b = 0.0f;
+    // triangle.vertices[0].colour.a = 1.0f;
+    // triangle.vertices[1].pos.x = 0.5f;
+    // triangle.vertices[1].pos.y = 0.5f;
+    // triangle.vertices[1].colour.r = 0.0f;
+    // triangle.vertices[1].colour.g = 1.0f;
+    // triangle.vertices[1].colour.b = 0.0f;
+    // triangle.vertices[1].colour.a = 1.0f;
+    // triangle.vertices[2].pos.x = -0.5f;
+    // triangle.vertices[2].pos.y = 0.5f;
+    // triangle.vertices[2].colour.r = 0.0f;
+    // triangle.vertices[2].colour.g = 0.0f;
+    // triangle.vertices[2].colour.b = 1.0f;
+    // triangle.vertices[2].colour.a = 1.0f;
+    // triangle.vertices[3].pos.x = -0.5f;
+    // triangle.vertices[3].pos.y = -0.5f;
+    // triangle.vertices[3].colour.r = 0.0f;
+    // triangle.vertices[3].colour.g = 1.0f;
+    // triangle.vertices[3].colour.b = 1.0f;
+    // triangle.vertices[3].colour.a = 1.0f;
 
-    SAFEMALLOC(triangle.indices,sizeof(unsigned int)*6);
-    triangle.sizeOfIndices = 6;
-    triangle.sizeOfVertices = 4;
+    // SAFEMALLOC(triangle.indices,sizeof(unsigned int)*6);
+    // triangle.sizeOfIndices = 6;
+    // triangle.sizeOfVertices = 4;
 
-    triangle.indices[0] = 0;
-    triangle.indices[1] = 1;
-    triangle.indices[2] = 2;
-    triangle.indices[3] = 0;
-    triangle.indices[4] = 2;
-    triangle.indices[5] = 3;
+    // triangle.indices[0] = 0;
+    // triangle.indices[1] = 1;
+    // triangle.indices[2] = 2;
+    // triangle.indices[3] = 0;
+    // triangle.indices[4] = 2;
+    // triangle.indices[5] = 3;
 
-    _MKT_genAG(triangle.vertices,triangle.sizeOfVertices,triangle.indices,triangle.sizeOfIndices);
+    // _MKT_genAG(triangle.vertices,triangle.sizeOfVertices,triangle.indices,triangle.sizeOfIndices);
+
+    _MKT_loadAG("./DataFiles/shape.MKTAG");
 
     DEBUG("II> init:VEvariables <II");
     return;
