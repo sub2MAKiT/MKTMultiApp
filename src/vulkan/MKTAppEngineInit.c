@@ -9,7 +9,10 @@ char checkValidationLayerSupport() {
     uint32_t layerCount;
     vkEnumerateInstanceLayerProperties(&layerCount, NULL);
 
-    VkLayerProperties * availableLayers = malloc(sizeof(VkLayerProperties)*layerCount);
+    VkLayerProperties * availableLayers;
+
+    SAFEMALLOC(availableLayers, (sizeof(VkLayerProperties)*layerCount));
+
     vkEnumerateInstanceLayerProperties(&layerCount, availableLayers);
 
     for (IntDex i = 0; i < validationLayers.sizeOfString; i++) {
@@ -60,7 +63,8 @@ SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device) {
     vkGetPhysicalDeviceSurfaceFormatsKHR(device, _surface, &formatCount, NULL);
 
     if (formatCount != 0) {
-        details.formats = malloc(sizeof(VkSurfaceFormatKHR)*formatCount);
+        SAFEMALLOC(details.formats, (sizeof(VkSurfaceFormatKHR)*formatCount));
+
         details.sizeOfFormats = formatCount;
         vkGetPhysicalDeviceSurfaceFormatsKHR(device, _surface, &formatCount, details.formats);
     }
@@ -69,7 +73,8 @@ SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device) {
     vkGetPhysicalDeviceSurfacePresentModesKHR(device, _surface, &presentModeCount, NULL);
 
     if (presentModeCount != 0) {
-        details.presentModes = malloc(sizeof(VkPresentModeKHR)*presentModeCount);
+        SAFEMALLOC(details.presentModes, (sizeof(VkPresentModeKHR)*presentModeCount));
+
         details.sizeOfPresentModes = presentModeCount;
         vkGetPhysicalDeviceSurfacePresentModesKHR(device, _surface, &presentModeCount, details.presentModes);
     }
@@ -84,7 +89,10 @@ QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device) {
     
     uint32_t queueFamilyCount = 0;
     vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, NULL);
-    VkQueueFamilyProperties * queueFamilies = malloc(sizeof(VkQueueFamilyProperties)*queueFamilyCount);
+    VkQueueFamilyProperties * queueFamilies;
+
+    SAFEMALLOC(queueFamilies,(sizeof(VkQueueFamilyProperties)*queueFamilyCount));
+
     vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies);
 
 
@@ -119,7 +127,10 @@ char checkDeviceExtensionsSupport(VkPhysicalDevice device)
     unsigned int extensionCount;
     vkEnumerateDeviceExtensionProperties(device, NULL, &extensionCount, NULL);
 
-    VkExtensionProperties * availableExtensions = malloc(sizeof(VkExtensionProperties)*extensionCount);
+    VkExtensionProperties * availableExtensions;
+
+    SAFEMALLOC(availableExtensions,sizeof(VkExtensionProperties)*extensionCount);
+
     vkEnumerateDeviceExtensionProperties(device, NULL, &extensionCount, availableExtensions);
 
     char found = 0;
@@ -198,7 +209,7 @@ MKTdeviceRating pickDeviceRating(VkPhysicalDevice device) {
 
     QueueFamilyIndices indices = findQueueFamilies(device);
 
-    queueCreateInfos = malloc(sizeof(VkDeviceQueueCreateInfo)*2);
+    SAFEMALLOC(queueCreateInfos, (sizeof(VkDeviceQueueCreateInfo)*2));
     sizeOfQueueCreateInfos = 2;
 
     unsigned int uniqueQueueFamilies[2] = {indices.graphicsFamily, indices.presentFamily};
@@ -255,7 +266,9 @@ void _VE_INIT_window()
 void _VE_INIT_Instance()
 {
     _deviceExtensions.sizeOfString = 1;
-    _deviceExtensions.pString = malloc(sizeof(MKTString));
+
+    SAFEMALLOC(_deviceExtensions.pString,sizeof(MKTString));
+
     _deviceExtensions.pString[0] = VK_KHR_SWAPCHAIN_EXTENSION_NAME;
 
     DEBUG("II init:instance II");
@@ -264,7 +277,7 @@ void _VE_INIT_Instance()
     }
 
     validationLayers.sizeOfString = 1;
-    validationLayers.pString = malloc(sizeof(MKTString));
+    SAFEMALLOC(validationLayers.pString,sizeof(MKTString));
     validationLayers.pString[0] = "VK_LAYER_KHRONOS_validation";
 
     VkApplicationInfo appInfo = {};
@@ -288,7 +301,7 @@ void _VE_INIT_Instance()
 
     glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 
-    _requiredExtensions.pString = malloc(sizeof(MKTString));
+    SAFEMALLOC(_requiredExtensions.pString,sizeof(MKTString));
 
     for(uint32_t i = 0; i < glfwExtensionCount; i++) {
         _requiredExtensions.sizeOfString = i+1;
@@ -302,7 +315,7 @@ void _VE_INIT_Instance()
     uint32_t extensionCount = 0;
     vkEnumerateInstanceExtensionProperties(NULL, &extensionCount, NULL);
 
-    _extensions = malloc(sizeof(VkExtensionProperties)*extensionCount);
+    SAFEMALLOC(_extensions, (sizeof(VkExtensionProperties)*extensionCount));
 
     vkEnumerateInstanceExtensionProperties(NULL, &extensionCount, _extensions);
 
@@ -322,7 +335,10 @@ void _VE_INIT_PhysicalDevice()
         MKTerror(101);
     }
 
-    VkPhysicalDevice * devices = malloc(sizeof(VkPhysicalDevice)*deviceCount);
+    VkPhysicalDevice * devices;
+
+    SAFEMALLOC(devices,(sizeof(VkPhysicalDevice)*deviceCount));
+
     vkEnumeratePhysicalDevices(_instance, &deviceCount, devices);
     
     IntDex currentRecord = 0;
@@ -441,7 +457,7 @@ void _VE_INIT_Swapchain()
     VK_CHECK(vkCreateSwapchainKHR(_device, &createInfo, NULL, &_swapChain));
 
     vkGetSwapchainImagesKHR(_device, _swapChain, &_imageCount, NULL);
-    _swapChainImages = malloc(sizeof(VkImage)*_imageCount);
+    SAFEMALLOC(_swapChainImages,(sizeof(VkImage)*_imageCount));
     vkGetSwapchainImagesKHR(_device, _swapChain, &_imageCount, _swapChainImages);
     _sizeOfSwapChainImages = _imageCount;
 
@@ -455,7 +471,7 @@ void _VE_INIT_Swapchain()
 void _VE_INIT_ImageViews()
 {
     DEBUG("II init:ImageViews II");
-    _swapChainImageViews = malloc(sizeof(VkImageView)*_sizeOfSwapChainImages);
+    SAFEMALLOC(_swapChainImageViews,sizeof(VkImageView)*_sizeOfSwapChainImages);
     _sizeOfSwapChainImageViews = _sizeOfSwapChainImages;
 
     for (size_t i = 0; i < _sizeOfSwapChainImages; i++) {
@@ -486,7 +502,7 @@ void _VE_INIT_GraphicPipelines()
 {
     DEBUG("II init:GraphicPipelines II");
 
-    _ren_materials = malloc(sizeof(MKTmaterial));
+    SAFEMALLOC(_ren_materials,sizeof(MKTmaterial));
     _ren_sizeOfMaterials = 1;
 
     _MKT_LOAD_PIPELINE("shaders/AGShader.vert.spv","shaders/AGShader.frag.spv", 0,0);
@@ -548,7 +564,7 @@ void _VE_INIT_Framebuffers()
     DEBUG("II init:Framebuffers II");
 
     _sizeOfSwapChainFramebuffers = _sizeOfSwapChainImageViews;
-    _swapChainFramebuffers = malloc(_sizeOfSwapChainImageViews*sizeof(VkFramebuffer));
+    SAFEMALLOC(_swapChainFramebuffers,(_sizeOfSwapChainImageViews*sizeof(VkFramebuffer)))
 
     for (size_t i = 0; i < _sizeOfSwapChainImageViews; i++) {
 
@@ -591,7 +607,7 @@ void _VE_INIT_CommandBuffer()
 
     _sizeOfCommandBuffers = MAX_FRAMES_IN_FLIGHT;
 
-    _commandBuffers = malloc(sizeof(VkCommandBuffer)*_sizeOfCommandBuffers);
+    SAFEMALLOC(_commandBuffers,(sizeof(VkCommandBuffer)*_sizeOfCommandBuffers));
 
     VkCommandBufferAllocateInfo allocInfo = {};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -610,7 +626,7 @@ void _VE_INIT_SyncObjects()
     DEBUG("II init:SyncObjects II");
 
     _sizeOfRuntimeKit = MAX_FRAMES_IN_FLIGHT;
-    _runtimeKit = malloc(sizeof(MKTVKruntime)*_sizeOfRuntimeKit);
+    SAFEMALLOC(_runtimeKit,(sizeof(MKTVKruntime)*_sizeOfRuntimeKit));
 
     VkSemaphoreCreateInfo semaphoreInfo = {};
     semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
@@ -636,10 +652,11 @@ void _VE_INIT_VE()
     DEBUG("II init:VEvariables II");
 
     _ren_sizeOfAG = 0;
-    _ren_AG = malloc(sizeof(MKTag));
+
+    SAFEMALLOC(_ren_AG,sizeof(MKTag));
 
     MKTag triangle;
-    triangle.vertices = malloc(sizeof(AGVertex)*4);
+    SAFEMALLOC(triangle.vertices,sizeof(AGVertex)*4);
     triangle.vertices[0].pos.x = 0.0f;
     triangle.vertices[0].pos.y = -0.5f;
     triangle.vertices[0].colour.r = 1.0f;
@@ -665,7 +682,7 @@ void _VE_INIT_VE()
     triangle.vertices[3].colour.b = 1.0f;
     triangle.vertices[3].colour.a = 1.0f;
 
-    triangle.indices = malloc(sizeof(unsigned int)*6);
+    SAFEMALLOC(triangle.indices,sizeof(unsigned int)*6);
     triangle.sizeOfIndices = 6;
     triangle.sizeOfVertices = 4;
 

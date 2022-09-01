@@ -11,6 +11,8 @@ unsigned int MKTClamp(unsigned int a,unsigned int b,unsigned int c);
 
 #define MKTDOUBLE double
 
+#define SAFEMALLOC(variable, size) variable = NULL; while(variable == NULL) variable = malloc(size);
+
 long long MKTfloor(MKTDOUBLE input);
 #ifdef MKT_DEBUG
 #define DEBUG(x)              \

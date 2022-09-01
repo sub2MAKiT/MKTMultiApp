@@ -68,9 +68,13 @@ typedef struct MKTAG {
     IntDex sizeOfVertices;
 
     MKTAGdescriptor descriptor;
-    
-    unsigned int * indices;
+
     IntDex sizeOfIndices;
+    unsigned int * indices; // THIS SOMEHOW OVERWRITES EVERYTHING AFTER IT
+
+        IntDex padding;
+    VkBuffer paddingBuffer; // don't even ask
+    VkDeviceMemory paddingBufferMemory;
 
     VkBuffer vertexBuffer;
     VkDeviceMemory vertexBufferMemory;
@@ -118,14 +122,14 @@ void _VE_UTILS_CleanupSwapChain(); // An Utils function for cleaning up the swap
 // GLFW
 GLFWwindow * _window;
 uint32_t glfwExtensionCount = 0;
-const char** glfwExtensions;
+const char** glfwExtensions = NULL;
 
 // VK_INIT
 int MAX_FRAMES_IN_FLIGHT = 2;
 VkInstance _instance;
 VkPhysicalDevice _chosenGPU = VK_NULL_HANDLE;
 VkDevice _device;
-VkDeviceQueueCreateInfo * queueCreateInfos;
+VkDeviceQueueCreateInfo * queueCreateInfos = NULL;
 IntDex sizeOfQueueCreateInfos;
 
 // VK_RUNTIME
@@ -135,34 +139,34 @@ VkQueue _presentQueue;
 unsigned int _imageCount;
 VkRenderPass _renderPass;
 VkCommandPool _commandPool;
-MKTVKruntime * _runtimeKit;
+MKTVKruntime * _runtimeKit = NULL;
 IntDex _sizeOfRuntimeKit;
-VkCommandBuffer * _commandBuffers;
+VkCommandBuffer * _commandBuffers = NULL;
 IntDex _sizeOfCommandBuffers;
 IntDex _currentFrame = 0;
 char _framebufferResized = 0;
 
 // SWAPCHAIN
 VkSwapchainKHR _swapChain;
-VkImage * _swapChainImages;
+VkImage * _swapChainImages = NULL;
 IntDex _sizeOfSwapChainImages;
-VkImageView * _swapChainImageViews;
+VkImageView * _swapChainImageViews = NULL;
 IntDex _sizeOfSwapChainImageViews;
 VkFormat _swapChainImageFormat;
 VkExtent2D _swapChainExtent;
-VkFramebuffer * _swapChainFramebuffers;
+VkFramebuffer * _swapChainFramebuffers = NULL;
 IntDex _sizeOfSwapChainFramebuffers;
 
 // extensions
 MKTVstring _requiredExtensions;
-VkExtensionProperties * _extensions;
+VkExtensionProperties * _extensions = NULL;
 MKTVstring _deviceExtensions;
 
 // RENDER
-MKTmaterial * _ren_materials;
+MKTmaterial * _ren_materials = NULL;
 IntDex _ren_sizeOfMaterials;
 
-MKTag * _ren_AG;
+MKTag * _ren_AG = NULL;
 IntDex _ren_sizeOfAG;
 
 

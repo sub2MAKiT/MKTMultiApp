@@ -2,7 +2,9 @@
 
 VkPipelineVertexInputStateCreateInfo getInputDescription(IntDex i) {
     VkPipelineVertexInputStateCreateInfo returnInfo = {};
-    VkVertexInputBindingDescription * bindingDescription = malloc(sizeof(VkVertexInputBindingDescription));
+    VkVertexInputBindingDescription * bindingDescription;
+
+    SAFEMALLOC(bindingDescription,(sizeof(VkVertexInputBindingDescription)));
 
     if(i == 0) // MKTAGVertex
     {
@@ -10,7 +12,9 @@ VkPipelineVertexInputStateCreateInfo getInputDescription(IntDex i) {
         bindingDescription->stride = sizeof(AGVertex);
         bindingDescription->inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
-        VkVertexInputAttributeDescription * attributeDescriptions = malloc(sizeof(VkVertexInputAttributeDescription)*2);
+        VkVertexInputAttributeDescription * attributeDescriptions;
+
+        SAFEMALLOC(attributeDescriptions,(sizeof(VkVertexInputAttributeDescription)*2));
 
         attributeDescriptions[0].binding = 0;
         attributeDescriptions[0].location = 0;

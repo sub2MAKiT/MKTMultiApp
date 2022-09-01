@@ -67,6 +67,11 @@
 ### 00.01.02.02 - C naming convencion patch
 - C naming convencion patch
 
+### 00.01.02.03 - fixing patch
+- SAFEMALLOC
+- padding buffers
+- fixed the main buffer error
+
 # ERRORS
 0. No errors
 1. System error

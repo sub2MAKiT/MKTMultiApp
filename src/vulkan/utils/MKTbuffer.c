@@ -61,7 +61,6 @@ void createVertexBuffer(IntDex sizeOfBuffer, void * inData, VkBuffer * buffer,Vk
 
     void* data;
     vkMapMemory(_device, stagingBufferMemory, 0, bufferSize, 0, &data);
-        // memcpy(data, inData, sizeOfBuffer);
 
     for(int i = 0; i < sizeOfBuffer; i++)
         *(char*)(data+i) = *(char*)(inData+i);

@@ -7,10 +7,10 @@ IntDex _MKT_genAG(AGVertex * inVertices,IntDex inSizeOfVertices,unsigned int * i
     _ren_sizeOfAG++;
     _ren_AG = realloc(_ren_AG,_ren_sizeOfAG);
 
-    _ren_AG[CURRENT].vertices = malloc(sizeof(AGVertex)*inSizeOfVertices);
+    SAFEMALLOC(_ren_AG[CURRENT].vertices,(sizeof(AGVertex)*inSizeOfVertices));
     printf("inSizeV: %d\n",inSizeOfVertices);
     printf("test %x\n",_ren_AG[CURRENT].indices);
-    _ren_AG[CURRENT].indices = malloc(sizeof(unsigned int)*inSizeOfIndices);
+    SAFEMALLOC(_ren_AG[CURRENT].indices,(sizeof(unsigned int)*inSizeOfIndices));
     printf("test1 %x\n",_ren_AG[CURRENT].indices);
     
     _ren_AG[CURRENT].sizeOfVertices = inSizeOfVertices;
