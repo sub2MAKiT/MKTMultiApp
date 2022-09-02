@@ -11,7 +11,7 @@ int main(int argc, char* argv[])
     MKTsetupError();
     // MKTcreateDelQueue();
 
-    // loadLibaries;
+    loadLibaries;
 
     DEBUG("IIII startup IIII");
 
@@ -21,7 +21,7 @@ int main(int argc, char* argv[])
 
     cleanup();
 
-    // unloadLibraries;
+    unloadLibraries;
 
     DEBUG("IIII return IIII");
 

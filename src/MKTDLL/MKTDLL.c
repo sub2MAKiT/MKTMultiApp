@@ -30,21 +30,31 @@ char * windowsDLLLoading()
             {
                 int sizeOfFP = 0;
                 for(int a = 0; charArray[i+a+1] != '\n' && a+i < sizeOfFile;a++)
-                sizeOfFP = a;
+                    sizeOfFP = a;
                 sizeOfFP++;
                 char * FFP = (char*)malloc(librariesPathLength+sizeOfFP+1);
                 for(int i = 0; i < librariesPathLength;i++)
-                FFP[i] = librariesPath[i];
+                    FFP[i] = librariesPath[i];
+
                 for(int a = 0; a < sizeOfFP; a++)
-                FFP[a+librariesPathLength] = charArray[i+a];
+                    FFP[a+librariesPathLength] = charArray[i+a];
+
                 const char extension[5] = ".dll";
                 sizeOfFP += 4;
+
                 FFP = (char*)realloc(FFP,sizeOfFP);
+
                 for(int a = 0; a < 4;a++)
-                FFP[librariesPathLength+sizeOfFP-4+a] = extension[a];
+                    FFP[librariesPathLength+sizeOfFP-4+a] = extension[a];
+                
                 FFP[librariesPathLength+sizeOfFP] = 0;
+
+                printf("\n%s",FFP);
+
                 FUNHANDLE hLib = LoadLibrary(FFP);
+                DEBUG("loaded");
                 if (hLib == NULL) { // not 100% sure if this errorHandling works, so :D
+                    DEBUG("error");
                     sizeOfNotLoaded += librariesPathLength+sizeOfFP;
                     notLoaded = (char*)realloc(notLoaded,sizeOfNotLoaded);
                     for(int a = 0; a < sizeOfFP; a++)
@@ -126,7 +136,9 @@ void * getEntryAddress(FUNHANDLE libraryToLoad)
                 FFP[librariesPathLength+sizeOfFP] = 0;
 
                 FUNHANDLE hLib = dlopen(FFP,RTLD_NOW);
+                DEBUG("loaded");
                 if (hLib == NULL) { // not 100% sure if this errorHandling works, so :D
+                    DEBUG("error");
                     sizeOfNotLoaded += librariesPathLength+sizeOfFP;
                     notLoaded = (char*)realloc(notLoaded,sizeOfNotLoaded);
                     for(int a = 0; a < sizeOfFP; a++)

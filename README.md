@@ -76,6 +76,8 @@
 - AG fileloading
 - fixed the heap corruption AG error
 
+### 00.01.04.00 - dll loading
+- Dll loading
 
 # ERRORS
 0. No errors
@@ -92,6 +94,7 @@
 2. <stdio.h> - **From C standard library**
 3. <stdlib.h> - **From C standard library**
 4. <stdarg.h> - **From C standard library**
+5. <windows.h> / <dlfcn.h> - **OS specific include**
 
 # NonGLM indexes
 0. Vertex - vec2 pos; vec3 color
