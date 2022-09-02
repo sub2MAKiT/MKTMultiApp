@@ -13,12 +13,22 @@ typedef struct MKTMODULE {
     IntDex sizeOfName;
 } MKTmodule;
 
+typedef struct MKTFILEMODULE {
+    MKTInfo * (*load)(char * FP);
+    char (*init)(char input);
+    char * FileName;
+    IntDex sizeOfFileName;
+    char type;
+} MKTfileModule;
+
 void loadMenuAG(char * MKTAGOGName, size_t sizeOfOGName,int moduleNumber);
 
 #ifndef MKTDYNAMICLIBRARYLOADING // header guard
 #define MKTDYNAMICLIBRARYLOADING
-MKTmodule * _MKT_modules;
-IntDex _MKT_sizeOfModules;
+extern MKTmodule * _MKT_modules;
+extern IntDex _MKT_sizeOfModules;
+extern MKTfileModule * _MKT_fileModules;
+extern IntDex _MKT_sizeOfFileModules;
 #ifdef __gnu_linux__
 // for linux
 #define FUNHANDLE void *
@@ -34,14 +44,17 @@ IntDex _MKT_sizeOfModules;
 // for, you guessed it, apple
 
 #endif // OS
+#else
+MKTmodule * _MKT_modules;
+IntDex _MKT_sizeOfModules;
+MKTfileModule * _MKT_fileModules;
+IntDex _MKT_sizeOfFileModules;
 #endif // MKTDYNAMICLIBRARYLOADING
 #ifdef _WIN32
 #define FUNHANDLE HMODULE
 #endif
 
 #ifndef MKT_DLL_LOADING
-extern MKTmodule * _MKT_modules;
-extern IntDex _MKT_sizeOfModules;
 extern long Shmodules; //  modules, more like shmodules am i right?
 extern FUNHANDLE * hmodules;
 #ifdef __gnu_linux__
@@ -61,8 +74,9 @@ GL getEntryAddress(FUNHANDLE libraryToLoad);
 // for windows
 void getEntryAddress(FUNHANDLE libraryToLoad,MKTmodule * Module);
 char * windowsDLLLoading();
+void windowsFileDLLLoading();
 
-#define loadLibaries windowsDLLLoading(); SAFEMALLOC(_MKT_modules,sizeof(MKTmodule)*Shmodules);for(int i = 0; i < Shmodules; i++) getEntryAddress(hmodules[i],&_MKT_modules[i]);_MKT_sizeOfModules = Shmodules;initi tempInit = {10,10};for(int i = 0; i < _MKT_sizeOfModules;i++) (*_MKT_modules[i].init)(tempInit);
+#define loadLibaries windowsFileDLLLoading(); windowsDLLLoading(); SAFEMALLOC(_MKT_modules,sizeof(MKTmodule)*Shmodules);for(int i = 0; i < Shmodules; i++) getEntryAddress(hmodules[i],&_MKT_modules[i]);_MKT_sizeOfModules = Shmodules;initi tempInit = {10,10};for(int i = 0; i < _MKT_sizeOfModules;i++) (*_MKT_modules[i].init)(tempInit);
 #define unloadLibraries cleanUpi tempCleanUp = {}; for(int i = 0; i < _MKT_sizeOfModules; i++) (*_MKT_modules[i].cleanUp)(tempCleanUp); for(int i = 0; i < Shmodules;i++)FreeLibrary(hmodules[i]); free(_MKT_modules)
 
 #elif __APPLE__

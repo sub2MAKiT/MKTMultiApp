@@ -1,6 +1,31 @@
 #include <fileLoading/AG.h>
+#include <../MKTDLL/MKTDLL.h>
 
 #define CURRENT _ren_sizeOfAG-1
+
+typedef struct posXYtemp {
+    float x;
+    float y;
+} posxytemp;
+
+typedef struct colourtemp {
+    float r;
+    float g;
+    float b;
+    float a;
+} colourRGBAtemp;
+
+typedef struct verticestemp {
+posxytemp pos;
+colourRGBAtemp colour;
+} verticetemp;
+
+typedef struct MKTAGtemp {
+    unsigned long long int sizeOfVertices;
+    unsigned long long int sizeOfIndices;
+    verticetemp * vertices;
+    unsigned int * indices;
+} MKTagFtemp;
 
 IntDex _MKT_genAG(AGVertex * inVertices,IntDex inSizeOfVertices,unsigned int * inIndices,IntDex inSizeOfIndices)
 {
@@ -31,34 +56,28 @@ IntDex _MKT_genAG(AGVertex * inVertices,IntDex inSizeOfVertices,unsigned int * i
 
 MKTag _MKT_openAG(char * FP)
 {
-    FILE * MKTFILE = fopen(FP,"rb");
-    float * list;
-    fseek(MKTFILE, 0L, SEEK_END);
-    long sizeOfFile = ftell(MKTFILE);
-    rewind(MKTFILE);
-    SAFEMALLOC(list,sizeOfFile);
-    fread( list,1, sizeOfFile, MKTFILE );
-    fclose(MKTFILE);
-
+    MKTagFtemp tempAGData;
+    MKTInfo * tempData;
     MKTag returnAG;
-    returnAG.sizeOfVertices = *(unsigned long long int*)(list);
-    SAFEMALLOC(returnAG.vertices,returnAG.sizeOfVertices*sizeof(float)*6);
-    for(int i = 0; i < returnAG.sizeOfVertices; i++) // xyrgba
-    {
-        returnAG.vertices[i].pos.x = list[2+i*6];
-        returnAG.vertices[i].pos.y = list[3+i*6];
-        returnAG.vertices[i].colour.r = list[4+i*6];
-        returnAG.vertices[i].colour.g = list[5+i*6];
-        returnAG.vertices[i].colour.b = list[6+i*6];
-        returnAG.vertices[i].colour.a = list[7+i*6];
-    }
+    unsigned long long int tempSize = 0;
+    for(int i = 0; i < _MKT_sizeOfFileModules;i++)
+        if(MKTstrcmp(MKTdissectFileType(&tempSize, FP), _MKT_fileModules[i].FileName))
+            tempData = (*_MKT_fileModules[i].load)(FP);
 
-    returnAG.sizeOfIndices = ((sizeOfFile-returnAG.sizeOfVertices*sizeof(float)*6)-8)/4;
+    tempAGData = *(MKTagFtemp*)tempData->data;
 
-    SAFEMALLOC(returnAG.indices,returnAG.sizeOfIndices*sizeof(unsigned int))
+    if(tempData->ID)
+        MKTerror(tempData->ID);
 
-    for(int i = 0; i < returnAG.sizeOfIndices; i++)
-        returnAG.indices[i] = *(unsigned int*)&list[i+returnAG.sizeOfVertices*6+2];
+    if(tempData->type != 1)
+        MKTerror(200);
+
+    free(tempData);
+
+    returnAG.vertices = (AGVertex*)tempAGData.vertices;
+    returnAG.sizeOfVertices = tempAGData.sizeOfVertices;
+    returnAG.sizeOfIndices = tempAGData.sizeOfIndices;
+    returnAG.indices = tempAGData.indices;
 
     return returnAG;
 }

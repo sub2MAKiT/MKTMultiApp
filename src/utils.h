@@ -8,6 +8,7 @@ unsigned char weakMKTstrcmp(char * a, char * b);
 unsigned char MKTCstrcmp(const char * a, char * b);
 unsigned char weakMKTCstrcmp(const char * a, char * b);
 unsigned int MKTClamp(unsigned int a,unsigned int b,unsigned int c);
+char * MKTdissectFileType(unsigned long long int * size, char * string);
 
 #define MKTDOUBLE double
 

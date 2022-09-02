@@ -1,10 +1,82 @@
 #define MKT_DLL_LOADING
 #include <../MKTDLL/MKTDLL.h>
+#include <../errorHandling.h>
 
 long Shmodules = 0;
 FUNHANDLE * hmodules = NULL;
 
+long fileShmodules = 0;
+FUNHANDLE * fileHmodules = NULL;
+
 #ifdef _WIN32
+
+#define CURRENTF _MKT_sizeOfFileModules-1
+
+void windowsFileDLLLoading()
+{
+    FILE * MKTFILE = fopen("./files/files.MKTI","rb");
+
+    fileShmodules = 0;
+    SAFEMALLOC(fileHmodules,sizeof(FUNHANDLE));
+    _MKT_sizeOfFileModules = 0;
+    SAFEMALLOC(_MKT_fileModules,sizeof(MKTfileModule));
+
+    if(MKTFILE != NULL)
+    {
+
+        char *charArray;
+        fseek(MKTFILE, 0L, SEEK_END);
+        long sizeOfFile = ftell(MKTFILE);
+        rewind(MKTFILE);
+        charArray = (char*)malloc(sizeOfFile);
+        sizeOfFile = fread( charArray,1, sizeOfFile, MKTFILE );
+        fclose( MKTFILE );
+
+        for(int i = 0; i < sizeOfFile; i++)
+        {
+            if(i == 0 || charArray[i-1] == '\n')
+            {
+                char buffer[100]; // in theory hardcoding this is a bad idea, in practice, realloc shenanigans would just slow it down.
+
+                _MKT_sizeOfFileModules++;
+                _MKT_fileModules = realloc(_MKT_fileModules,sizeof(MKTfileModule)*_MKT_sizeOfFileModules);
+
+                _MKT_fileModules[CURRENTF].FileName = malloc(1);
+
+                for(int a = 0; charArray[i+a-1] != ' '; a++)
+                {
+                    _MKT_fileModules[CURRENTF].sizeOfFileName = a+1;
+                    _MKT_fileModules[CURRENTF].FileName = realloc(_MKT_fileModules[CURRENTF].FileName,_MKT_fileModules[CURRENTF].sizeOfFileName);
+                    _MKT_fileModules[CURRENTF].FileName[a] = charArray[i+a]!=' '?charArray[i+a]:0;
+                }
+
+                snprintf(buffer,100,"./files/%s.dll",_MKT_fileModules[CURRENTF].FileName);
+                fileShmodules++;
+                fileHmodules = realloc(fileHmodules,fileShmodules*sizeof(FUNHANDLE));
+                fileHmodules[fileShmodules-1] = LoadLibrary(buffer);
+
+                typedef struct MKTFILEMODULE {
+                char type;
+                } MKTfileModule;
+
+                _MKT_fileModules[CURRENTF].load = (MKTInfo*(*)(char * FP))GetProcAddress(fileHmodules[fileShmodules-1], "load");
+                _MKT_fileModules[CURRENTF].init = (char(*)(char))GetProcAddress(fileHmodules[fileShmodules-1], "init");
+                _MKT_fileModules[CURRENTF].type = (*_MKT_fileModules[CURRENTF].init)(
+                    #ifdef MKT_DEBUG
+                    0b00000001
+                    #else
+                    0b00000000
+                    #endif
+                    );
+
+                }
+        }
+
+    } else
+        MKTerror(2);
+
+    return;
+}
 
 char * windowsDLLLoading()
 {

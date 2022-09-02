@@ -64,7 +64,7 @@ typedef struct MKTRUNTIMEKIT {
 } MKTVKruntime;
 
 typedef struct MKTAG {
-    AGVertex * vertices; // THIS SOMEHOW is mallocated to the address of indices pointer
+    AGVertex * vertices;
     IntDex sizeOfVertices;
 
     IntDex sizeOfIndices;

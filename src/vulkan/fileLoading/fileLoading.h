@@ -1,8 +1,4 @@
-#define MKTINFOV 0
-#define MKTAGV 1
-#define MKTAUDIOV 2
-#define MKTPICV 3
-#define MKTVIDV 4
+#include <../outerDefine.h>
 
 #include <stdio.h>
 #include <stdlib.h>

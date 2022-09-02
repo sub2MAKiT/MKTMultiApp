@@ -79,6 +79,10 @@
 ### 00.01.04.00 - dll loading
 - Dll loading
 
+### 00.01.05.00 - dynamic file dll loading
+- dynamic file dll loading
+- Added the `200` error code - Wrong file type loaded
+
 # ERRORS
 0. No errors
 1. System error
@@ -89,17 +93,11 @@
 101. No physical devices found
 102. Failed to find suitable memory type
 
+200. Wrong file type loaded
+
 # Includes used
 1. <vulkan/vulkan.h> - **From Vulkan SDK**
 2. <stdio.h> - **From C standard library**
 3. <stdlib.h> - **From C standard library**
 4. <stdarg.h> - **From C standard library**
 5. <windows.h> / <dlfcn.h> - **OS specific include**
-
-# NonGLM indexes
-0. Vertex - vec2 pos; vec3 color
-
-# Problems
-1. delQue
-2. delQue in pipelines
-3. delQue in buffers

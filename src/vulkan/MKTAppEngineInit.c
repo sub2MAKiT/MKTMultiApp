@@ -1,6 +1,6 @@
 #include <MKTAppEngine.h>
 #include <pipeline/pipeline.h>
-#include <fileLoading/AG.h>
+#include <fileLoading/fileLoading.h>
 
 //====================================HELPER FUNCTIONS=====================================
 
@@ -695,7 +695,7 @@ void _VE_INIT_VE()
 
     // _MKT_genAG(triangle.vertices,triangle.sizeOfVertices,triangle.indices,triangle.sizeOfIndices);
 
-    _MKT_loadAG("./DataFiles/shape.MKTAG");
+    loadFile("./DataFiles/shape.MKTAG",MKTAGV);
 
     DEBUG("II> init:VEvariables <II");
     return;
