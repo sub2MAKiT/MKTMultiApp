@@ -253,7 +253,7 @@ void _VE_INIT_window()
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API); // Disable creation of an OpenGL context
 
-    _window = glfwCreateWindow(800, 600, "pls subscribe", NULL, NULL); // create window
+    _window = glfwCreateWindow(_WindowS.width, _WindowS.height, "pls subscribe", NULL, NULL); // create window
     // glfwSetWindowUserPointer(_window, this);
     glfwSetFramebufferSizeCallback(_window, framebufferResizeCallback);
 
@@ -506,6 +506,8 @@ void _VE_INIT_GraphicPipelines()
     _ren_sizeOfMaterials = 1;
 
     _MKT_LOAD_PIPELINE("shaders/AGShader.vert.spv","shaders/AGShader.frag.spv", 0,0);
+
+    // _MKT_LOAD_PIPELINE("shaders/AGShader.vert.spv","shaders/AGShader.frag.spv", 0,0);
     // _ren_sizeOfMaterials++;
 
     DEBUG("II> init:GraphicPipelines <II");

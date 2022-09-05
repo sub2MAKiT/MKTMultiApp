@@ -67,18 +67,27 @@ void cleanup()
 
     DEBUG("II VK hard cleanup II");
 
+
     for(IntDex i = 0; i < _ren_sizeOfAG; i++)
     {
-        vkFreeMemory(_device, _ren_AG[i].vertexBufferMemory, NULL);
-        vkFreeMemory(_device, _ren_AG[i].indexBufferMemory, NULL);
+        for(int i = 0; i < _ren_AG[i].sizeOfUniformBuffers; i++)
+        {
+            vkDestroyBuffer(_device,  _ren_AG[i].uniformBuffers[i], NULL);
+            vkFreeMemory(_device,  _ren_AG[i].uniformBuffersMemory[i], NULL);
+        }
+
+        vkDestroyDescriptorPool(_device, _ren_AG[i].descriptorPool, NULL);
         vkDestroyBuffer(_device, _ren_AG[i].vertexBuffer, NULL);
         vkDestroyBuffer(_device, _ren_AG[i].indexBuffer, NULL);
+        vkFreeMemory(_device, _ren_AG[i].vertexBufferMemory, NULL);
+        vkFreeMemory(_device, _ren_AG[i].indexBufferMemory, NULL);
         free(_ren_AG[i].vertices);
         free(_ren_AG[i].indices);
     }
 
     for(int i = 0; i < _ren_sizeOfMaterials; i++)
     {
+        vkDestroyDescriptorSetLayout(_device, _ren_materials[i].descriptorSetLayout, NULL);
         vkDestroyPipeline(_device,_ren_materials[i].graphicsPipeline,NULL);
         vkDestroyPipelineLayout(_device,_ren_materials[i].pipelineLayout,NULL);
     }

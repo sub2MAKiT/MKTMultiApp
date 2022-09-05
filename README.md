@@ -69,19 +69,24 @@
 
 ### 00.01.02.03 - fixing patch
 - SAFEMALLOC
-- padding buffers
-- fixed the main buffer error
+- Padding buffers
+- Fixed the main buffer error
 
 ### 00.01.03.00 - fileloading 1
 - AG fileloading
-- fixed the heap corruption AG error
+- Fixed the heap corruption AG error
 
 ### 00.01.04.00 - dll loading
 - Dll loading
 
 ### 00.01.05.00 - dynamic file dll loading
-- dynamic file dll loading
+- Dynamic file dll loading
 - Added the `200` error code - Wrong file type loaded
+
+### 00.01.06.00 - AG descriptors
+- Created the AG descriptors
+- Started using the `<stdalign.h>` header
+- Modified the AGShader to use the AG descriptors
 
 # ERRORS
 0. No errors
@@ -100,4 +105,5 @@
 2. <stdio.h> - **From C standard library**
 3. <stdlib.h> - **From C standard library**
 4. <stdarg.h> - **From C standard library**
-5. <windows.h> / <dlfcn.h> - **OS specific include**
+5. <stdalign.h> - **From C standard library**
+6. <windows.h> / <dlfcn.h> - **OS specific include**

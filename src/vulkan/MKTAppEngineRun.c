@@ -49,6 +49,8 @@ void _VE_RUN_recordCommandBuffer(VkCommandBuffer commandBuffer, unsigned int ima
 
             vkCmdBindVertexBuffers(commandBuffer, 0, 1, &_ren_AG[i].vertexBuffer, &tempOffset);
 
+            vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _ren_materials[0].pipelineLayout, 0, 1, &_ren_AG[i].descriptorSets[_currentFrame], 0, NULL);
+
             vkCmdDrawIndexed(commandBuffer, _ren_AG[i].sizeOfIndices, 1, 0, 0, 0);
 
         }
@@ -111,5 +113,21 @@ void _VE_RUN_drawFrame()
     vkQueuePresentKHR(_presentQueue, &presentInfo);
 
     _currentFrame = (_currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+    return;
+}
+
+void _VE_RUN_updateDescriptors(void * data, IntDex dataSize, IntDex type, IntDex index)
+{
+    void* Odata;
+    if(type == 0)
+    {
+        for(int i = 0; i < _ren_AG[index].sizeOfUniformBuffers;i++)
+        {
+            vkMapMemory(_device, _ren_AG[index].uniformBuffersMemory[i], 0, dataSize, 0, &Odata);
+            for(IntDex i = 0; i < dataSize;i++)
+                *(char *)(Odata+i) = *(char *)(data+i);
+            vkUnmapMemory(_device, _ren_AG[index].uniformBuffersMemory[i]);
+        }
+    }
     return;
 }

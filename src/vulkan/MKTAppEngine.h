@@ -43,13 +43,6 @@ typedef struct MKTSTRINGVECTOR {
     IntDex sizeOfString;
 } MKTVstring;
 
-typedef struct MKTMATERIAL {
-    VkPipelineLayout pipelineLayout;
-    VkPipeline graphicsPipeline;
-
-    IntDex ID;
-} MKTmaterial;
-
 typedef struct MKTAGDESCRIPTOR {
     MKTmatf2 input;
 } MKTAGdescriptor;
@@ -63,12 +56,28 @@ typedef struct MKTRUNTIMEKIT {
 
 } MKTVKruntime;
 
+typedef struct MKTMATERIAL {
+    VkPipelineLayout pipelineLayout;
+    VkPipeline graphicsPipeline;
+    VkDescriptorSetLayout descriptorSetLayout;
+
+    IntDex ID;
+} MKTmaterial;
+
 typedef struct MKTAG {
     AGVertex * vertices;
     IntDex sizeOfVertices;
 
     IntDex sizeOfIndices;
     unsigned int * indices; 
+
+    VkBuffer * uniformBuffers;
+    VkDeviceMemory * uniformBuffersMemory;
+    IntDex sizeOfUniformBuffers;
+
+    VkDescriptorPool descriptorPool;
+    VkDescriptorSet * descriptorSets;
+    IntDex sizeOfDescriptorSets;
 
     VkBuffer vertexBuffer;
     VkDeviceMemory vertexBufferMemory;
@@ -104,6 +113,7 @@ void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 // RUNTIME FUNCTIONS
 void _VE_RUN_recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
 void _VE_RUN_drawFrame();
+void _VE_RUN_updateDescriptors(void * data, IntDex dataSize, IntDex type, IntDex index);
 
 // UTILS FUNCTIONS
 void _VE_UTILS_RecreateSwapChain(); // An Utils function for reacreating the swapchain (in case the window size changes etc.)
@@ -121,6 +131,7 @@ uint32_t glfwExtensionCount = 0;
 const char** glfwExtensions = NULL;
 
 // VK_INIT
+VkExtent2D _WindowS = {600,800};
 int MAX_FRAMES_IN_FLIGHT = 2;
 VkInstance _instance;
 VkPhysicalDevice _chosenGPU = VK_NULL_HANDLE;
@@ -183,6 +194,7 @@ extern uint32_t glfwExtensionCount;
 extern const char** glfwExtensions;
 
 // VK_INIT
+extern VkExtent2D _WindowS;
 extern int MAX_FRAMES_IN_FLIGHT;
 extern VkInstance _instance;
 extern VkPhysicalDevice _chosenGPU;
