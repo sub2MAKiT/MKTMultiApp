@@ -14,7 +14,7 @@
 
 #define _MKT_EVER_Release 0
 #define _MKT_EVER_Major 1
-#define _MKT_EVER_Minor 6
+#define _MKT_EVER_Minor 7
 #define _MKT_EVER_Patch 0
 
 #define _MKT_MVER_Release 0
