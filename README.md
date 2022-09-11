@@ -88,6 +88,9 @@
 - Started using the `<stdalign.h>` header
 - Modified the AGShader to use the AG descriptors
 
+### 00.01.07.00 - PiC
+- Added the `103` error code - Unsupported layout transition
+
 # ERRORS
 0. No errors
 1. System error
@@ -97,8 +100,9 @@
 100. Validation layers requested but not supported
 101. No physical devices found
 102. Failed to find suitable memory type
+103. Unsupported layout transition
 
-200. Wrong file type loaded
+104. Wrong file type loaded
 
 # Includes used
 1. <vulkan/vulkan.h> - **From Vulkan SDK**

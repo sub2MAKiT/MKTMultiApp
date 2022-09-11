@@ -38,8 +38,8 @@ typedef struct MKTMATF4 {
 } MKTmatf4;
 
 typedef struct defaultDescriptorAG {
-    float r; //4
-	alignas(16) MKTrgb movement; // 16 + 12
+    float r;
+	alignas(16) MKTrgb movement;
     alignas(16) MKTrgba colourModification;
     alignas(16) MKTrgba transformation;
 } AGDescriptor;
@@ -50,3 +50,8 @@ typedef struct MKTAGVertex { // i = 0
     MKTrgba colour;
 } AGVertex;
 
+typedef struct MKTPiCVertex { // i = 0
+    MKTxy pos;
+    MKTrgba colour;
+    MKTxy tex;
+} PiCVertex;

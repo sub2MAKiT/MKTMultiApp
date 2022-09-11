@@ -4,9 +4,10 @@
 void _MKT_LOAD_DESCRIPTORS(IntDex materialIndex, IntDex glmI)
 {
     VkDescriptorSetLayoutCreateInfo layoutInfo = {};
+    VkDescriptorSetLayoutBinding layoutBinding = {};
+    VkDescriptorSetLayoutBinding samplerLayoutBinding = {};
     if(glmI == 0)// MKTAG
     {
-        VkDescriptorSetLayoutBinding layoutBinding = {};
         layoutBinding.binding = 0;
         layoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
         layoutBinding.descriptorCount = 1;
@@ -16,12 +17,36 @@ void _MKT_LOAD_DESCRIPTORS(IntDex materialIndex, IntDex glmI)
         layoutInfo.bindingCount = 1;
         layoutInfo.pBindings = &layoutBinding;
     }
+    else if(glmI == 1)// MKTPiC
+    {
+        layoutBinding.binding = 0;
+        layoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        layoutBinding.descriptorCount = 1;
+        layoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+        layoutBinding.pImmutableSamplers = NULL;
+
+        samplerLayoutBinding.binding = 1;
+        samplerLayoutBinding.descriptorCount = 1;
+        samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        samplerLayoutBinding.pImmutableSamplers = NULL;
+        samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+        VkDescriptorSetLayoutBinding * bindings = malloc(sizeof(VkDescriptorSetLayoutBinding)*2);
+        bindings[0] = layoutBinding; 
+        bindings[1] = samplerLayoutBinding;
+        layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+        layoutInfo.bindingCount = 2;
+        layoutInfo.pBindings = bindings;
+    }
     VK_CHECK(vkCreateDescriptorSetLayout(_device, &layoutInfo, NULL, &_ren_materials[materialIndex].descriptorSetLayout));
     return;
 }
 
-void _MKT_LOAD_PIPELINE(const char * FPV,const char * FPF, IntDex materialIndex, IntDex glmI) //AG = 0
+void _MKT_LOAD_PIPELINE(const char * FPV,const char * FPF, IntDex glmI) //AG = 0
 {
+    _ren_sizeOfMaterials++;
+    _ren_materials = realloc(_ren_materials,_ren_sizeOfMaterials*sizeof(MKTmaterial));
+    IntDex materialIndex = _ren_sizeOfMaterials-1;
     FILE *MKTFILEV = fopen(FPV,"rb");
     char *listV;
     long sizeOfFileV;
@@ -162,7 +187,6 @@ void _MKT_LOAD_PIPELINE(const char * FPV,const char * FPF, IntDex materialIndex,
     dynamicState.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
     dynamicState.dynamicStateCount = 2;
     dynamicState.pDynamicStates = dynamicStates;
-
     _MKT_LOAD_DESCRIPTORS(materialIndex, glmI);
 
     VkPipelineLayoutCreateInfo pipelineLayoutInfo = {};

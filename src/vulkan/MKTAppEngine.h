@@ -85,6 +85,33 @@ typedef struct MKTAG {
     VkDeviceMemory indexBufferMemory;
 } MKTag;
 
+typedef struct MKTPIC {
+
+    PiCVertex * vertices;
+    IntDex sizeOfVertices;
+
+    IntDex sizeOfIndices;
+    unsigned int * indices; 
+
+    VkImageView textureImageView;
+    VkImage textureImage;
+    VkDeviceMemory textureImageMemory;
+
+    VkBuffer * uniformBuffers;
+    VkDeviceMemory * uniformBuffersMemory;
+    IntDex sizeOfUniformBuffers;
+
+    VkDescriptorPool descriptorPool;
+    VkDescriptorSet * descriptorSets;
+    IntDex sizeOfDescriptorSets;
+
+    VkBuffer vertexBuffer;
+    VkDeviceMemory vertexBufferMemory;
+    VkBuffer indexBuffer;
+    VkDeviceMemory indexBufferMemory;
+
+} MKTPiC;
+
 // FUNCTIONS
 
 // MAIN FUNCTIONS
@@ -106,6 +133,7 @@ void _VE_INIT_Framebuffers(); // An init function for creating the framebuffers
 void _VE_INIT_CommandPool(); // An init function for creating the command pool
 void _VE_INIT_CommandBuffer(); // An init function for creating the command buffer
 void _VE_INIT_SyncObjects(); // An init function for creating semaphores and fences
+void _VE_INIT_Sampler(); // An init function for creating semaphores and fences
 void _VE_INIT_VE(); // An init function for VentumEngine variables
 
 void framebufferResizeCallback(GLFWwindow* window, int width, int height);
@@ -138,6 +166,7 @@ VkPhysicalDevice _chosenGPU = VK_NULL_HANDLE;
 VkDevice _device;
 VkDeviceQueueCreateInfo * queueCreateInfos = NULL;
 IntDex sizeOfQueueCreateInfos;
+VkSampler _textureSampler;
 
 // VK_RUNTIME
 VkSurfaceKHR _surface;
@@ -176,6 +205,9 @@ IntDex _ren_sizeOfMaterials;
 MKTag * _ren_AG = NULL;
 IntDex _ren_sizeOfAG;
 
+MKTPiC * _ren_PiC = NULL;
+IntDex _ren_sizeOfPiC;
+
 
 // validation layers
 #ifdef NDEBUG
@@ -201,6 +233,7 @@ extern VkPhysicalDevice _chosenGPU;
 extern VkDevice _device;
 extern VkDeviceQueueCreateInfo * queueCreateInfos;
 extern IntDex sizeOfQueueCreateInfos;
+extern VkSampler _textureSampler;
 
 // VK_RUNTIME
 extern VkSurfaceKHR _surface;
@@ -242,6 +275,9 @@ extern MKTVstring validationLayers;
 
 extern MKTag * _ren_AG;
 extern IntDex _ren_sizeOfAG;
+
+extern MKTPiC * _ren_PiC;
+extern IntDex _ren_sizeOfPiC;
 
 #endif
 

@@ -503,12 +503,12 @@ void _VE_INIT_GraphicPipelines()
     DEBUG("II init:GraphicPipelines II");
 
     SAFEMALLOC(_ren_materials,sizeof(MKTmaterial));
-    _ren_sizeOfMaterials = 1;
+    _ren_sizeOfMaterials = 0;
 
-    _MKT_LOAD_PIPELINE("shaders/AGShader.vert.spv","shaders/AGShader.frag.spv", 0,0);
+    _MKT_LOAD_PIPELINE("shaders/AGShader.vert.spv","shaders/AGShader.frag.spv",0); // 0 = MKTAG
+    _MKT_LOAD_PIPELINE("shaders/PiCShader.vert.spv","shaders/PiCShader.frag.spv",1); // 1 = MKTPiC
 
     // _MKT_LOAD_PIPELINE("shaders/AGShader.vert.spv","shaders/AGShader.frag.spv", 0,0);
-    // _ren_sizeOfMaterials++;
 
     DEBUG("II> init:GraphicPipelines <II");
     return;
@@ -649,6 +649,35 @@ void _VE_INIT_SyncObjects()
     return;
 }
 
+void _VE_INIT_Sampler()
+{
+    DEBUG("II init:Sampler II");
+
+    VkSamplerCreateInfo samplerInfo = {};
+    samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+    samplerInfo.magFilter = VK_FILTER_LINEAR;
+    samplerInfo.minFilter = VK_FILTER_LINEAR;
+
+    samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+    samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+    samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+    samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
+    samplerInfo.unnormalizedCoordinates = VK_FALSE;
+    samplerInfo.compareEnable = VK_FALSE;
+    samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
+    samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+    samplerInfo.mipLodBias = 0.0f;
+    samplerInfo.minLod = 0.0f;
+    samplerInfo.maxLod = 0.0f;
+    samplerInfo.anisotropyEnable = VK_FALSE;
+    samplerInfo.maxAnisotropy = 1.0f;
+
+    VK_CHECK(vkCreateSampler(_device, &samplerInfo, NULL, &_textureSampler));
+
+    DEBUG("II> init:Sampler <II");
+    return;
+}
+
 void _VE_INIT_VE()
 {
     DEBUG("II init:VEvariables II");
@@ -657,45 +686,38 @@ void _VE_INIT_VE()
 
     SAFEMALLOC(_ren_AG,sizeof(MKTag));
 
-    // MKTag triangle;
-    // SAFEMALLOC(triangle.vertices,sizeof(AGVertex)*4);
-    // triangle.vertices[0].pos.x = 0.0f;
-    // triangle.vertices[0].pos.y = -0.5f;
-    // triangle.vertices[0].colour.r = 1.0f;
-    // triangle.vertices[0].colour.g = 0.0f;
-    // triangle.vertices[0].colour.b = 0.0f;
-    // triangle.vertices[0].colour.a = 1.0f;
-    // triangle.vertices[1].pos.x = 0.5f;
-    // triangle.vertices[1].pos.y = 0.5f;
-    // triangle.vertices[1].colour.r = 0.0f;
-    // triangle.vertices[1].colour.g = 1.0f;
-    // triangle.vertices[1].colour.b = 0.0f;
-    // triangle.vertices[1].colour.a = 1.0f;
-    // triangle.vertices[2].pos.x = -0.5f;
-    // triangle.vertices[2].pos.y = 0.5f;
-    // triangle.vertices[2].colour.r = 0.0f;
-    // triangle.vertices[2].colour.g = 0.0f;
-    // triangle.vertices[2].colour.b = 1.0f;
-    // triangle.vertices[2].colour.a = 1.0f;
-    // triangle.vertices[3].pos.x = -0.5f;
-    // triangle.vertices[3].pos.y = -0.5f;
-    // triangle.vertices[3].colour.r = 0.0f;
-    // triangle.vertices[3].colour.g = 1.0f;
-    // triangle.vertices[3].colour.b = 1.0f;
-    // triangle.vertices[3].colour.a = 1.0f;
+    MKTPiC triangle;
+    SAFEMALLOC(triangle.vertices,sizeof(PiCVertex)*4);
+    triangle.vertices[0] = (PiCVertex){{-0.5f, -0.5f}, {1.0f, 1.0f, 0.0f, 1.0f}, {0.0f, 0.0f}};
+    triangle.vertices[1] = (PiCVertex){{0.5f, -0.5f}, {1.0f, 1.0f, 0.0f, 1.0f}, {1.0f, 0.0f}};
+    triangle.vertices[2] = (PiCVertex){{0.5f, 0.5f}, {1.0f, 1.0f, 0.0f, 1.0f}, {0.0f, 1.0f}};
+    triangle.vertices[3] = (PiCVertex){{-0.5f, 0.5f}, {1.0f, 1.0f, 0.0f, 1.0f}, {1.0f, 1.0f}};
 
-    // SAFEMALLOC(triangle.indices,sizeof(unsigned int)*6);
-    // triangle.sizeOfIndices = 6;
-    // triangle.sizeOfVertices = 4;
 
-    // triangle.indices[0] = 0;
-    // triangle.indices[1] = 1;
-    // triangle.indices[2] = 2;
-    // triangle.indices[3] = 0;
-    // triangle.indices[4] = 2;
-    // triangle.indices[5] = 3;
+    SAFEMALLOC(triangle.indices,sizeof(unsigned int)*6);
+    triangle.sizeOfIndices = 6;
+    triangle.sizeOfVertices = 4;
+
+    triangle.indices[0] = 0;
+    triangle.indices[1] = 1;
+    triangle.indices[2] = 2;
+    triangle.indices[3] = 0;
+    triangle.indices[4] = 2;
+    triangle.indices[5] = 3;
 
     // _MKT_genAG(triangle.vertices,triangle.sizeOfVertices,triangle.indices,triangle.sizeOfIndices);
+
+    MKTPiCdata tempInputP;
+    tempInputP.w = 2;
+    tempInputP.h = 2;
+    tempInputP.pix = malloc(sizeof(MKTrgbaP)*4);
+
+    tempInputP.pix[0] = (MKTrgbaP){0.0,0.0,1.0,1.0};
+    tempInputP.pix[1] = (MKTrgbaP){0.0,0.0,1.0,1.0};
+    tempInputP.pix[2] = (MKTrgbaP){0.0,0.0,1.0,1.0};
+    tempInputP.pix[3] = (MKTrgbaP){0.0,0.0,1.0,1.0};
+
+    createTextureImage(tempInputP,triangle.vertices,triangle.sizeOfVertices,triangle.indices,triangle.sizeOfIndices);
 
     loadFile("./DataFiles/shape.MKTAG",MKTAGV);
 

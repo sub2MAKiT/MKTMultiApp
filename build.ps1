@@ -4,6 +4,7 @@ param (
     [switch]$TESTDLL = $false,
     [switch]$FULLDLL = $false,
     [switch]$AGshaders = $false,
+    [switch]$PiCshaders = $false,
     [switch]$commitFiles = $false,
     [switch]$buildFiles = $false,
     [switch]$buildModuleHandler = $false,
@@ -49,6 +50,9 @@ if ($DEBUG) {
 }
 if ($AGshaders) {
 ./shadersCompilation/AGshaders.bat
+}
+if ($PiCshaders) {
+./shadersCompilation/PiCshaders.bat
 }
 if($TESTDLL)
 {

@@ -1,0 +1,2 @@
+C:\VulkanSDK\1.2.198.1\Bin\\glslc.exe .\src\vulkan\shaders\PiCShader\PiCShader.vert -o .\build\shaders\PiCShader.vert.spv
+C:\VulkanSDK\1.2.198.1\Bin\\glslc.exe .\src\vulkan\shaders\PiCShader\PiCShader.frag -o .\build\shaders\PiCShader.frag.spv

@@ -31,6 +31,8 @@ void init()
 
     _VE_INIT_SyncObjects(); // #0000ff
 
+    _VE_INIT_Sampler(); // #0000ff
+
     _VE_INIT_VE(); // #0000ff
 
     DEBUG("III init III");
@@ -67,6 +69,14 @@ void cleanup()
 
     DEBUG("II VK hard cleanup II");
 
+    vkDestroySampler(_device, _textureSampler, NULL);
+
+    for(unsigned int i = 0; i < _ren_sizeOfPiC; i++)
+    {
+        vkDestroyImageView(_device, _ren_PiC[i].textureImageView, NULL);
+        vkDestroyImage(_device, _ren_PiC[i].textureImage, NULL);
+        vkFreeMemory(_device, _ren_PiC[i].textureImageMemory, NULL);
+    }
 
     for(IntDex i = 0; i < _ren_sizeOfAG; i++)
     {
