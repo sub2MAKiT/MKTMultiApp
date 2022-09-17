@@ -3,6 +3,7 @@
 
 void _MKT_LOAD_DESCRIPTORS(IntDex materialIndex, IntDex glmI)
 {
+    printf("material: %d %d\n",materialIndex, glmI);
     VkDescriptorSetLayoutCreateInfo layoutInfo = {};
     VkDescriptorSetLayoutBinding layoutBinding = {};
     VkDescriptorSetLayoutBinding samplerLayoutBinding = {};

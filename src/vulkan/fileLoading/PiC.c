@@ -2,7 +2,7 @@
 
 #define CURRENTP _ren_sizeOfPiC-1
 
-void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height) {
+void copyBufferToImage(VkBuffer buffer, VkImage * image, uint32_t width, uint32_t height) {
     VkCommandBuffer commandBuffer = beginSingleTimeCommands();
 
     VkBufferImageCopy region = {};
@@ -25,7 +25,7 @@ void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t 
     vkCmdCopyBufferToImage(
         commandBuffer,
         buffer,
-        image,
+        *image,
         VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
         1,
         &region
@@ -34,7 +34,7 @@ void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t 
     endSingleTimeCommands(commandBuffer);
 }
 
-void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout) {
+void transitionImageLayout(VkImage * image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout) {
     VkCommandBuffer commandBuffer = beginSingleTimeCommands();
 
     VkImageMemoryBarrier barrier = {};
@@ -43,7 +43,7 @@ void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayo
     barrier.newLayout = newLayout;
     barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
     barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-    barrier.image = image;
+    barrier.image = *image;
     barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
     barrier.subresourceRange.baseMipLevel = 0;
     barrier.subresourceRange.levelCount = 1;
@@ -96,11 +96,31 @@ void createTextureImage(MKTPiCdata input,PiCVertex * inVertices,IntDex inSizeOfV
 
     void* data;
     vkMapMemory(_device, stagingBufferMemory, 0, imageSize, 0, &data);
+    // for(int i = 0; i < input.w*input.h; i++)
+    //     printf("%d.next: %d %d %d %d\n",i,input.pix[i].r,input.pix[i].g,input.pix[i].b,input.pix[i].a);
+
+    // for(int i = 0; i < input.w*input.h*4; i += 4)
+        // printf("%d.next: %d %d %d %d\n",i/4,*(char*)(data+i),*(char*)(data+i+1),*(char*)(data+i+2),*(char*)(data+i+3));
+
+    char * tempO = data;
+    char * tempI = (char*)input.pix;
+
     for(int i = 0; i < input.w*input.h*4; i++)
-        *(char*)(data+i) = *(char*)(input.pix+i);
+        tempO[i] = tempI[i];
+
+
+    // data = (MKTrgbaP[4]){{0,0,255,255},{0,0,255,255},{0,0,255,255},{0,0,255,255}};
+
+    // for(int i = 0; i < input.w*input.h*4; i += 4)
+    //     printf("%d.next: %d %d %d %d\n",i/4,*(char*)(data+i),*(char*)(data+i+1),*(char*)(data+i+2),*(char*)(data+i+3));
+
+    // for(int i = 0; i < input.w*input.h*4; i += 4)
+    //     printf("%d.next: %d %d %d %d\n",i/4,*(char*)(data+i),*(char*)(data+i+1),*(char*)(data+i+2),*(char*)(data+i+3));
     vkUnmapMemory(_device, stagingBufferMemory);
 
     free(input.pix);
+
+
 
     VkImageCreateInfo imageInfo = {};
     imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -132,9 +152,9 @@ void createTextureImage(MKTPiCdata input,PiCVertex * inVertices,IntDex inSizeOfV
 
     vkBindImageMemory(_device, _ren_PiC[CURRENTP].textureImage, _ren_PiC[CURRENTP].textureImageMemory, 0);
 
-    transitionImageLayout(_ren_PiC[CURRENTP].textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-    copyBufferToImage(stagingBuffer, _ren_PiC[CURRENTP].textureImage, input.w, input.h);
-    transitionImageLayout(_ren_PiC[CURRENTP].textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    transitionImageLayout(&_ren_PiC[CURRENTP].textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+    copyBufferToImage(stagingBuffer, &_ren_PiC[CURRENTP].textureImage, input.w, input.h);
+    transitionImageLayout(&_ren_PiC[CURRENTP].textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
     vkDestroyBuffer(_device, stagingBuffer, NULL);
     vkFreeMemory(_device, stagingBufferMemory, NULL);
@@ -238,17 +258,49 @@ void createTextureImage(MKTPiCdata input,PiCVertex * inVertices,IntDex inSizeOfV
     _ren_PiC[CURRENTP].sizeOfVertices = inSizeOfVertices;
     _ren_PiC[CURRENTP].sizeOfIndices = inSizeOfIndices;
 
-    for(IntDex i = 0; i < inSizeOfVertices;i++)
-        _ren_PiC[CURRENTP].vertices[i] = inVertices[i];
+    // for(IntDex i = 0; i < inSizeOfVertices;i++)
+        // _ren_PiC[CURRENTP].vertices[i] = inVertices[i];
+
+    // for(int i = 0; i < 4; i++)
+        // printf("%d. %f %f %f %f %f %f\n",i,_ren_PiC[CURRENTP].vertices[i].pos.x,inVertices[i].pos.x,_ren_PiC[CURRENTP].vertices[i].colour.r,inVertices[i].colour.r,_ren_PiC[CURRENTP].vertices[i].tex.y,inVertices[i].tex.y);
 
     for(IntDex i = 0; i < inSizeOfIndices;i++)
         _ren_PiC[CURRENTP].indices[i] = inIndices[i];
 
+    char * tempII = (char*)inVertices;
+    char * tempOO = (char*)_ren_PiC[CURRENTP].vertices;
+
+    for(int i = 0; i < inSizeOfVertices*sizeof(PiCVertex); i++)
+        printf("%c",tempII[i]);
+
+    for(int i = 0; i < inSizeOfVertices*sizeof(PiCVertex); i++)
+        tempOO[i] = tempII[i];
+        printf("\n\n\n");
+
+    for(int i = 0; i < inSizeOfVertices*sizeof(PiCVertex); i++)
+        printf("%c",tempOO[i]);
+        printf("\n\nnew\n");
+
+    float * tempIII = (float*)inVertices;
+    float * tempOOO = (float*)_ren_PiC[CURRENTP].vertices;
+
+    for(int i = 0; i < 32; i++)
+        printf("%d. %f %f\n",i,tempOOO[i], tempIII[i]);
+
+
+    printf("size: %d\n",sizeof(PiCVertex));
+
+    printf("pointer one: %x\n",inVertices);
+
+    for(int i = 0; i < 6;i++)
+        printf("%d. %d\n",i,inIndices[i]);
+
+
+    createVertexBuffer(sizeof(PiCVertex)*_ren_PiC[CURRENTP].sizeOfVertices, inVertices, &_ren_PiC[CURRENTP].vertexBuffer,&_ren_PiC[CURRENTP].vertexBufferMemory);
+    createIndexBuffer(_ren_PiC[CURRENTP].sizeOfIndices, inIndices, &_ren_PiC[CURRENTP].indexBuffer,&_ren_PiC[CURRENTP].indexBufferMemory);
+
     free(inVertices);
     free(inIndices);
-
-    createVertexBuffer(sizeof(AGVertex)*_ren_PiC[CURRENTP].sizeOfVertices, _ren_PiC[CURRENTP].vertices, &_ren_PiC[CURRENTP].vertexBuffer,&_ren_PiC[CURRENTP].vertexBufferMemory);
-    createIndexBuffer(_ren_PiC[CURRENTP].sizeOfIndices, _ren_PiC[CURRENTP].indices, &_ren_PiC[CURRENTP].indexBuffer,&_ren_PiC[CURRENTP].indexBufferMemory);
-
+    
     return;
 }

@@ -59,7 +59,7 @@ void _VE_RUN_recordCommandBuffer(VkCommandBuffer commandBuffer, unsigned int ima
 
             vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _ren_materials[1].graphicsPipeline);
 
-            vkCmdBindIndexBuffer(commandBuffer,_ren_AG[i].indexBuffer, 0, VK_INDEX_TYPE_UINT32);
+            vkCmdBindIndexBuffer(commandBuffer,_ren_PiC[i].indexBuffer, 0, VK_INDEX_TYPE_UINT32);
 
             vkCmdBindVertexBuffers(commandBuffer, 0, 1, & _ren_PiC[i].vertexBuffer, &tempOffset);
 
