@@ -63,38 +63,19 @@ void createVertexBuffer(IntDex sizeOfBuffer, void * inData, VkBuffer * buffer,Vk
 {
     VkDeviceSize bufferSize = sizeOfBuffer;
 
-    printf("pointer two: %x\n",inData);
     VkBuffer stagingBuffer;
     VkDeviceMemory stagingBufferMemory;
     createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &stagingBuffer, &stagingBufferMemory);
 
-    void* data;
+    void * data;
     vkMapMemory(_device, stagingBufferMemory, 0, bufferSize, 0, &data);
-
-    char * tempO = data;
-    char * tempI = inData;
 
     float * tempOO = data;
     float * tempII = inData;
-    printf("pointer three: %x\n",tempII);
-
-    printf("sizeIn: %d\n",sizeOfBuffer);
-
-    // for(int i = 0; i < sizeOfBuffer; i++)
-        // printf("%c",tempI[i]);
-
-    // for(int i = 0; i < sizeOfBuffer; i++)
-        // tempO[i] = tempI[i];
-        // printf("\n\n\n");
-
-    // for(int i = 0; i < sizeOfBuffer; i++)
-        // printf("%c",tempO[i]);
 
     for(int i = 0; i < sizeOfBuffer/4; i++)
-    {
         tempOO[i] = tempII[i];
-        printf("%d.%f %f\n",i,tempOO[i],tempII[i]);
-    }
+
     vkUnmapMemory(_device, stagingBufferMemory);
 
     createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, buffer, bufferMemory);
@@ -121,11 +102,9 @@ void createIndexBuffer(IntDex numOfIndices, void * inData,VkBuffer * buffer,VkDe
     vkMapMemory(_device, stagingBufferMemory, 0, bufferSize, 0, &data);
     unsigned int * tempO = data;
     unsigned int * tempI = inData;
+
     for(int i = 0; i < numOfIndices; i++)
-    {
         tempO[i] = tempI[i];
-        printf("%d.indice: %d %d\n",i,tempI[i],tempO[i]);
-    }
 
     vkUnmapMemory(_device, stagingBufferMemory);
 

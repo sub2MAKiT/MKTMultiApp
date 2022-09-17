@@ -688,16 +688,10 @@ void _VE_INIT_VE()
 
     MKTPiC triangle;
     SAFEMALLOC(triangle.vertices,sizeof(PiCVertex)*4);
-    // triangle.vertices[0] = (PiCVertex){{-1.0f, -1.0f}, {1.0f, 1.0f, 0.0f, 1.0f}, {0.0f, 0.0f}};
-    // triangle.vertices[1] = (PiCVertex){{1.0f, -1.0f}, {1.0f, 1.0f, 0.0f, 1.0f}, {1.0f, 0.0f}};
-    // triangle.vertices[2] = (PiCVertex){{-1.0f, 1.0f}, {1.0f, 1.0f, 0.0f, 1.0f}, {0.0f, 1.0f}};
-    // triangle.vertices[3] = (PiCVertex){{1.0f, 0.0f}, {1.0f, 1.0f, 0.0f, 1.0f}, {1.0f, 1.0f}};
-
     triangle.vertices[0] = (PiCVertex){{1.0f, -1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}};
     triangle.vertices[1] = (PiCVertex){{1.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}};
     triangle.vertices[2] = (PiCVertex){{-1.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}};
     triangle.vertices[3] = (PiCVertex){{-1.0f, -1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}};
-
 
     SAFEMALLOC(triangle.indices,sizeof(unsigned int)*6);
     triangle.sizeOfIndices = 6;
@@ -710,17 +704,12 @@ void _VE_INIT_VE()
     triangle.indices[4] = 2;
     triangle.indices[5] = 3;
 
-    // _MKT_genAG(triangle.vertices,triangle.sizeOfVertices,triangle.indices,triangle.sizeOfIndices);
-
     MKTPiCdata tempInputP;
     tempInputP.w = 2;
     tempInputP.h = 2;
     tempInputP.pix = malloc(sizeof(MKTrgbaP)*4);
 
     float * tempF = (float*)triangle.vertices;
-
-    for(int i = 0; i < 32; i++)
-        printf("%d. %f\n",i,tempF[i]);
 
     tempInputP.pix[0] = (MKTrgbaP){255,255,0,255};
     tempInputP.pix[1] = (MKTrgbaP){0,0,255,255};

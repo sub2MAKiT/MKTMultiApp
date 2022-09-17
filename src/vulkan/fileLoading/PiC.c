@@ -96,26 +96,11 @@ void createTextureImage(MKTPiCdata input,PiCVertex * inVertices,IntDex inSizeOfV
 
     void* data;
     vkMapMemory(_device, stagingBufferMemory, 0, imageSize, 0, &data);
-    // for(int i = 0; i < input.w*input.h; i++)
-    //     printf("%d.next: %d %d %d %d\n",i,input.pix[i].r,input.pix[i].g,input.pix[i].b,input.pix[i].a);
-
-    // for(int i = 0; i < input.w*input.h*4; i += 4)
-        // printf("%d.next: %d %d %d %d\n",i/4,*(char*)(data+i),*(char*)(data+i+1),*(char*)(data+i+2),*(char*)(data+i+3));
-
     char * tempO = data;
     char * tempI = (char*)input.pix;
 
     for(int i = 0; i < input.w*input.h*4; i++)
         tempO[i] = tempI[i];
-
-
-    // data = (MKTrgbaP[4]){{0,0,255,255},{0,0,255,255},{0,0,255,255},{0,0,255,255}};
-
-    // for(int i = 0; i < input.w*input.h*4; i += 4)
-    //     printf("%d.next: %d %d %d %d\n",i/4,*(char*)(data+i),*(char*)(data+i+1),*(char*)(data+i+2),*(char*)(data+i+3));
-
-    // for(int i = 0; i < input.w*input.h*4; i += 4)
-    //     printf("%d.next: %d %d %d %d\n",i/4,*(char*)(data+i),*(char*)(data+i+1),*(char*)(data+i+2),*(char*)(data+i+3));
     vkUnmapMemory(_device, stagingBufferMemory);
 
     free(input.pix);
@@ -258,43 +243,8 @@ void createTextureImage(MKTPiCdata input,PiCVertex * inVertices,IntDex inSizeOfV
     _ren_PiC[CURRENTP].sizeOfVertices = inSizeOfVertices;
     _ren_PiC[CURRENTP].sizeOfIndices = inSizeOfIndices;
 
-    // for(IntDex i = 0; i < inSizeOfVertices;i++)
-        // _ren_PiC[CURRENTP].vertices[i] = inVertices[i];
-
-    // for(int i = 0; i < 4; i++)
-        // printf("%d. %f %f %f %f %f %f\n",i,_ren_PiC[CURRENTP].vertices[i].pos.x,inVertices[i].pos.x,_ren_PiC[CURRENTP].vertices[i].colour.r,inVertices[i].colour.r,_ren_PiC[CURRENTP].vertices[i].tex.y,inVertices[i].tex.y);
-
     for(IntDex i = 0; i < inSizeOfIndices;i++)
         _ren_PiC[CURRENTP].indices[i] = inIndices[i];
-
-    char * tempII = (char*)inVertices;
-    char * tempOO = (char*)_ren_PiC[CURRENTP].vertices;
-
-    for(int i = 0; i < inSizeOfVertices*sizeof(PiCVertex); i++)
-        printf("%c",tempII[i]);
-
-    for(int i = 0; i < inSizeOfVertices*sizeof(PiCVertex); i++)
-        tempOO[i] = tempII[i];
-        printf("\n\n\n");
-
-    for(int i = 0; i < inSizeOfVertices*sizeof(PiCVertex); i++)
-        printf("%c",tempOO[i]);
-        printf("\n\nnew\n");
-
-    float * tempIII = (float*)inVertices;
-    float * tempOOO = (float*)_ren_PiC[CURRENTP].vertices;
-
-    for(int i = 0; i < 32; i++)
-        printf("%d. %f %f\n",i,tempOOO[i], tempIII[i]);
-
-
-    printf("size: %d\n",sizeof(PiCVertex));
-
-    printf("pointer one: %x\n",inVertices);
-
-    for(int i = 0; i < 6;i++)
-        printf("%d. %d\n",i,inIndices[i]);
-
 
     createVertexBuffer(sizeof(PiCVertex)*_ren_PiC[CURRENTP].sizeOfVertices, inVertices, &_ren_PiC[CURRENTP].vertexBuffer,&_ren_PiC[CURRENTP].vertexBufferMemory);
     createIndexBuffer(_ren_PiC[CURRENTP].sizeOfIndices, inIndices, &_ren_PiC[CURRENTP].indexBuffer,&_ren_PiC[CURRENTP].indexBufferMemory);

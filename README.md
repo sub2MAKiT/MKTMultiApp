@@ -91,7 +91,6 @@
 ### 00.01.07.00 - PiC
 - Added the `103` error code - Unsupported layout transition
 - cleanup
-- undefined colour behaviour
 
 # ERRORS
 0. No errors

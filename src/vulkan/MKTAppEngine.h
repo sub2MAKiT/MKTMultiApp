@@ -147,7 +147,6 @@ void _VE_RUN_updateDescriptors(void * data, IntDex dataSize, IntDex type, IntDex
 void _VE_UTILS_RecreateSwapChain(); // An Utils function for reacreating the swapchain (in case the window size changes etc.)
 void _VE_UTILS_CleanupSwapChain(); // An Utils function for cleaning up the swapchain (in case the swapchain is recreated)
 
-
 // GLOBAL VARIABLES
 
 #ifdef _MKT_APP_ENGINE_THIRD_

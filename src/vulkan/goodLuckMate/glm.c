@@ -9,12 +9,13 @@ VkPipelineVertexInputStateCreateInfo getInputDescription(IntDex i) {
     if(i == 0) // MKTAGVertex
     {
         bindingDescription->binding = 0;
-        bindingDescription->stride = sizeof(AGVertex);
         bindingDescription->inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
         VkVertexInputAttributeDescription * attributeDescriptions;
 
         SAFEMALLOC(attributeDescriptions,(sizeof(VkVertexInputAttributeDescription)*2));
+
+        bindingDescription->stride = sizeof(AGVertex);
 
         attributeDescriptions[0].binding = 0;
         attributeDescriptions[0].location = 0;
@@ -31,10 +32,10 @@ VkPipelineVertexInputStateCreateInfo getInputDescription(IntDex i) {
         returnInfo.pVertexBindingDescriptions = bindingDescription;
         returnInfo.pVertexAttributeDescriptions = attributeDescriptions;
     }
-    else if(i == 1) // MKTAGVertex
+    else if(i == 1) // MKTPiCVertex
     {
         bindingDescription->binding = 0;
-        bindingDescription->stride = sizeof(AGVertex);
+        bindingDescription->stride = sizeof(PiCVertex);
         bindingDescription->inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
         VkVertexInputAttributeDescription * attributeDescriptions;
