@@ -107,8 +107,10 @@
 
 # Includes used
 1. <vulkan/vulkan.h> - **From Vulkan SDK**
-2. <stdio.h> - **From C standard library**
-3. <stdlib.h> - **From C standard library**
-4. <stdarg.h> - **From C standard library**
-5. <stdalign.h> - **From C standard library**
-6. <windows.h> / <dlfcn.h> - **OS specific include**
+2. <GLFW/glfw3.h> - **GLFW**
+3. <GLFW/glfw3native.h> - **GLFW**
+4. <stdio.h> - **From C standard library**
+5. <stdlib.h> - **From C standard library**
+6. <stdarg.h> - **From C standard library**
+7. <stdalign.h> - **From C standard library**
+8. <windows.h> / <dlfcn.h> - **OS specific include**
