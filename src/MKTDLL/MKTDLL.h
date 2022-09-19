@@ -23,15 +23,22 @@ typedef struct MKTFILEMODULE {
 
 void loadMenuAG(char * MKTAGOGName, size_t sizeOfOGName,int moduleNumber);
 
+#ifdef _WIN32
+#define FUNHANDLE HMODULE
+#elif __gnu_linux__
+#define FUNHANDLE void *
+#endif
+
 #ifndef MKTDYNAMICLIBRARYLOADING // header guard
 #define MKTDYNAMICLIBRARYLOADING
+extern long Shmodules; //  modules, more like shmodules am i right?
+extern FUNHANDLE * hmodules;
 extern MKTmodule * _MKT_modules;
 extern IntDex _MKT_sizeOfModules;
 extern MKTfileModule * _MKT_fileModules;
 extern IntDex _MKT_sizeOfFileModules;
 #ifdef __gnu_linux__
 // for linux
-#define FUNHANDLE void *
 #define librariesPathLength 12
 
 #elif _WIN32
@@ -49,26 +56,23 @@ MKTmodule * _MKT_modules;
 IntDex _MKT_sizeOfModules;
 MKTfileModule * _MKT_fileModules;
 IntDex _MKT_sizeOfFileModules;
+long Shmodules; //  modules, more like shmodules am i right?
+FUNHANDLE * hmodules;
 #endif // MKTDYNAMICLIBRARYLOADING
-#ifdef _WIN32
-#define FUNHANDLE HMODULE
-#endif
 
-#ifndef MKT_DLL_LOADING
-extern long Shmodules; //  modules, more like shmodules am i right?
-extern FUNHANDLE * hmodules;
 #ifdef __gnu_linux__
 // for linux
 
-void  *dlopen(const char *, int);
-void  *dlsym(void *, const char *);
-int    dlclose(void *);
-char  *dlerror(void);
+// #include <dlfcn.h>
 
-GL getEntryAddress(FUNHANDLE libraryToLoad);
-#define loadLibaries 0;
+void getEntryAddress(FUNHANDLE libraryToLoad,MKTmodule * Module);
+void * loadFileSharedObjects();
+void * loadSharedObjects();
 #define getEntryInLibrary(x) 0;
-#define unloadLibraries 0;
+
+#define loadLibaries loadSharedObjects(); SAFEMALLOC(_MKT_modules,sizeof(MKTmodule)*Shmodules);for(int i = 0; i < Shmodules; i++) getEntryAddress(hmodules[i],&_MKT_modules[i]);_MKT_sizeOfModules = Shmodules;initi tempInit = {10,10};for(int i = 0; i < _MKT_sizeOfModules;i++) (*_MKT_modules[i].init)(tempInit);
+#define unloadLibraries cleanUpi tempCleanUp = {}; for(int i = 0; i < _MKT_sizeOfModules; i++) (*_MKT_modules[i].cleanUp)(tempCleanUp);free(_MKT_modules)
+
 
 #elif _WIN32
 // for windows
@@ -87,4 +91,3 @@ void windowsFileDLLLoading();
 #define unloadLibraries 0;
 
 #endif // OS
-#endif // MKTDYNAMICLIBRARYLOADING

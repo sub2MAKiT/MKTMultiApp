@@ -174,7 +174,7 @@ VkExtent2D chooseSwapExtent(VkSurfaceCapabilitiesKHR * capabilities) {
 
 VkPresentModeKHR chooseSwapPresentMode(VkPresentModeKHR * availablePresentModes, IntDex sizeOfAvailablePresentModes) {
     for (IntDex i = 0; i < sizeOfAvailablePresentModes; i++) {
-        if (availablePresentModes[i] == VK_PRESENT_MODE_MAILBOX_KHR) {
+        if (availablePresentModes[i] == VK_PRESENT_MODE_MAILBOX_KHR) { //VK_PRESENT_MODE_FIFO_RELAXED_KHR
             return availablePresentModes[i];
         }
     }
@@ -216,9 +216,10 @@ MKTdeviceRating pickDeviceRating(VkPhysicalDevice device) {
 
     float queuePriority = 1.0f;
     for (int i = 0; i < 2; i++) {
+        printf("%d.test: %d\n",i,uniqueQueueFamilies[i]);
         VkDeviceQueueCreateInfo queueCreateInfo = {};
         queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-        queueCreateInfo.queueFamilyIndex = uniqueQueueFamilies[i];
+        queueCreateInfo.queueFamilyIndex = uniqueQueueFamilies[i]; // problems on linux
         queueCreateInfo.queueCount = 1;
         queueCreateInfo.pQueuePriorities = &queuePriority;
         queueCreateInfos[i] = queueCreateInfo;
@@ -688,7 +689,7 @@ void _VE_INIT_VE()
 
     _MKT_loadPiC("../logo/icon.MKTRAWPiC");
 
-    loadFile("./DataFiles/shape.MKTAG",MKTAGV);
+    // loadFile("./DataFiles/shape.MKTAG",MKTAGV);
 
     DEBUG("II> init:VEvariables <II");
     return;
