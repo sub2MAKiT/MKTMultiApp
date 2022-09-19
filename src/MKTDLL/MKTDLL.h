@@ -24,6 +24,8 @@ typedef struct MKTFILEMODULE {
 void loadMenuAG(char * MKTAGOGName, size_t sizeOfOGName,int moduleNumber);
 
 #ifdef _WIN32
+#include <windows.h>
+#define WIN32_LEAN_AND_MEAN
 #define FUNHANDLE HMODULE
 #elif __gnu_linux__
 #define FUNHANDLE void *
@@ -33,6 +35,8 @@ void loadMenuAG(char * MKTAGOGName, size_t sizeOfOGName,int moduleNumber);
 #define MKTDYNAMICLIBRARYLOADING
 extern long Shmodules; //  modules, more like shmodules am i right?
 extern FUNHANDLE * hmodules;
+extern long fileShmodules;
+extern FUNHANDLE * fileHmodules;
 extern MKTmodule * _MKT_modules;
 extern IntDex _MKT_sizeOfModules;
 extern MKTfileModule * _MKT_fileModules;
@@ -43,8 +47,6 @@ extern IntDex _MKT_sizeOfFileModules;
 
 #elif _WIN32
 // for windows
-#include <windows.h>
-#define WIN32_LEAN_AND_MEAN
 #define librariesPathLength 14
 
 #elif __APPLE__
@@ -56,8 +58,10 @@ MKTmodule * _MKT_modules;
 IntDex _MKT_sizeOfModules;
 MKTfileModule * _MKT_fileModules;
 IntDex _MKT_sizeOfFileModules;
-long Shmodules; //  modules, more like shmodules am i right?
-FUNHANDLE * hmodules;
+long Shmodules = 0; //  modules, more like shmodules am i right?
+FUNHANDLE * hmodules = NULL;
+long fileShmodules = 0;
+FUNHANDLE * fileHmodules = NULL;
 #endif // MKTDYNAMICLIBRARYLOADING
 
 #ifdef __gnu_linux__

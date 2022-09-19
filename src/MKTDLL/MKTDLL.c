@@ -2,13 +2,10 @@
 #include <../MKTDLL/MKTDLL.h>
 #include <../errorHandling.h>
 
+#ifdef _WIN32
+
 // long Shmodules = 0;
 // FUNHANDLE * hmodules = NULL;
-
-// long fileShmodules = 0;
-// FUNHANDLE * fileHmodules = NULL;
-
-#ifdef _WIN32
 
 #define CURRENTF _MKT_sizeOfFileModules-1
 

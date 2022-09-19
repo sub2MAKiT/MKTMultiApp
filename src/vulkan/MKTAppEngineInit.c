@@ -216,7 +216,6 @@ MKTdeviceRating pickDeviceRating(VkPhysicalDevice device) {
 
     float queuePriority = 1.0f;
     for (int i = 0; i < 2; i++) {
-        printf("%d.test: %d\n",i,uniqueQueueFamilies[i]);
         VkDeviceQueueCreateInfo queueCreateInfo = {};
         queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
         queueCreateInfo.queueFamilyIndex = uniqueQueueFamilies[i]; // problems on linux
