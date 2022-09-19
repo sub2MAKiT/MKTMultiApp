@@ -83,7 +83,7 @@ void transitionImageLayout(VkImage * image, VkFormat format, VkImageLayout oldLa
     endSingleTimeCommands(commandBuffer);
 }
 
-void createTextureImage(MKTPiCdata input,PiCVertex * inVertices,IntDex inSizeOfVertices,unsigned int * inIndices,IntDex inSizeOfIndices) 
+IntDex _MKT_genPiC(MKTPiCdata input,PiCVertex * inVertices,IntDex inSizeOfVertices,unsigned int * inIndices,IntDex inSizeOfIndices) 
 {
     _ren_sizeOfPiC++;
     _ren_PiC = realloc(_ren_PiC,_ren_sizeOfPiC*sizeof(MKTPiC));
@@ -250,5 +250,55 @@ void createTextureImage(MKTPiCdata input,PiCVertex * inVertices,IntDex inSizeOfV
     free(inVertices);
     free(inIndices);
     
-    return;
+    return CURRENTP;
+}
+
+MKTPiC _MKT_openPiC(char * FP)
+{
+    MKTPiC triangle;
+    SAFEMALLOC(triangle.vertices,sizeof(PiCVertex)*4);
+    triangle.vertices[0] = (PiCVertex){{1.0f, -1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}};
+    triangle.vertices[1] = (PiCVertex){{1.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}};
+    triangle.vertices[2] = (PiCVertex){{-1.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}};
+    triangle.vertices[3] = (PiCVertex){{-1.0f, -1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}};
+
+    SAFEMALLOC(triangle.indices,sizeof(unsigned int)*6);
+    triangle.sizeOfIndices = 6;
+    triangle.sizeOfVertices = 4;
+
+    triangle.indices[0] = 0;
+    triangle.indices[1] = 1;
+    triangle.indices[2] = 2;
+    triangle.indices[3] = 0;
+    triangle.indices[4] = 2;
+    triangle.indices[5] = 3;
+
+    FILE * MKTFILE = fopen(FP,"rb");
+    // FILE * MKTFILE = fopen("../logo/icon.MKTI","rb");
+
+    fseek(MKTFILE, 0L, SEEK_END);
+    unsigned long sizeOfFile = ftell(MKTFILE);
+    rewind(MKTFILE);
+    char * pixelArray = malloc(sizeOfFile);
+    fread( pixelArray,1, sizeOfFile, MKTFILE );
+    fclose(MKTFILE);
+
+    unsigned long long int tempWidth = *(unsigned long long int *)pixelArray;
+    unsigned long long int tempHeight = *(unsigned long long int *)(pixelArray+8);
+
+    for(int i = 0; i < sizeOfFile-16; i++)
+        pixelArray[i] = pixelArray[i+16];
+    
+    MKTPiCdata tempInputLoaded = {tempWidth,tempHeight,(MKTrgbaP*)(pixelArray)};
+
+    triangle._dataPiC = tempInputLoaded;
+
+    return triangle;
+}
+
+IntDex _MKT_loadPiC(char * FP)
+{
+    MKTPiC loaded = _MKT_openPiC(FP);
+
+    return _MKT_genPiC(loaded._dataPiC,loaded.vertices,loaded.sizeOfVertices,loaded.indices,loaded.sizeOfIndices);
 }

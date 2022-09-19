@@ -1,3 +1,6 @@
+# WIKI
+1. [MKTDLL](./wiki/MKTDLL.md)
+
 # VERSIONS
 
 ### 00.00.01.00 - Basic error handling
@@ -114,3 +117,10 @@
 6. <stdarg.h> - **From C standard library**
 7. <stdalign.h> - **From C standard library**
 8. <windows.h> / <dlfcn.h> - **OS specific include**
+
+![dependency hell](wiki/images/dependencyHell.png)
+
+# IDs
+
+0. AG
+1. PiC

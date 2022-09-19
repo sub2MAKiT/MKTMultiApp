@@ -1,5 +1,6 @@
 #pragma once
 #include <stdalign.h> // damn
+#include "../outerDefine.h"
 #define MKTGLMDOUBLE float
 
 typedef struct MKTRGBA {
@@ -55,3 +56,16 @@ typedef struct MKTPiCVertex { // i = 0
     MKTrgba colour;
     MKTxy tex;
 } PiCVertex;
+
+typedef struct MKTRGBAP {
+    unsigned char r;
+    unsigned char g;
+    unsigned char b;
+    unsigned char a;
+} MKTrgbaP;
+
+typedef struct MKTPICDATA {
+    IntDex w;
+    IntDex h;
+    MKTrgbaP * pix;
+} MKTPiCdata;

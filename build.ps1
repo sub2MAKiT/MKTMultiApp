@@ -61,7 +61,8 @@ if($TESTDLL)
 }
 if($FULLDLL)
 {
-    gcc ./MAD/ArrayGraphicsLibrary/AG.c ./MAD/ArrayGraphicsLibrary/basicMKT.o -I C:/sdk/ -shared -o ./build/lib/windows/AG.dll
+    # gcc ./MAD/ArrayGraphicsLibrary/AG.c ./MAD/ArrayGraphicsLibrary/basicMKT.o -I C:/sdk/ -shared -o ./build/lib/windows/AG.dll
+    gcc ./MKTfileConverters/PiC/RAW2PiC.c -I ./src/ -shared -o ./build/files/MKTRAWPiC.dll
 }
 
 if($RDEBUG)

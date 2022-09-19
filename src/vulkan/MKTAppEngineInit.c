@@ -686,37 +686,7 @@ void _VE_INIT_VE()
 
     SAFEMALLOC(_ren_AG,sizeof(MKTag));
 
-    MKTPiC triangle;
-    SAFEMALLOC(triangle.vertices,sizeof(PiCVertex)*4);
-    triangle.vertices[0] = (PiCVertex){{1.0f, -1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}};
-    triangle.vertices[1] = (PiCVertex){{1.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}};
-    triangle.vertices[2] = (PiCVertex){{-1.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}};
-    triangle.vertices[3] = (PiCVertex){{-1.0f, -1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}};
-
-    SAFEMALLOC(triangle.indices,sizeof(unsigned int)*6);
-    triangle.sizeOfIndices = 6;
-    triangle.sizeOfVertices = 4;
-
-    triangle.indices[0] = 0;
-    triangle.indices[1] = 1;
-    triangle.indices[2] = 2;
-    triangle.indices[3] = 0;
-    triangle.indices[4] = 2;
-    triangle.indices[5] = 3;
-
-    MKTPiCdata tempInputP;
-    tempInputP.w = 2;
-    tempInputP.h = 2;
-    tempInputP.pix = malloc(sizeof(MKTrgbaP)*4);
-
-    float * tempF = (float*)triangle.vertices;
-
-    tempInputP.pix[0] = (MKTrgbaP){255,255,0,255};
-    tempInputP.pix[1] = (MKTrgbaP){0,0,255,255};
-    tempInputP.pix[2] = (MKTrgbaP){0,255,0,255};
-    tempInputP.pix[3] = (MKTrgbaP){255,0,0,255};
-
-    createTextureImage(tempInputP,triangle.vertices,triangle.sizeOfVertices,triangle.indices,triangle.sizeOfIndices);
+    _MKT_loadPiC("../logo/icon.MKTRAWPiC");
 
     loadFile("./DataFiles/shape.MKTAG",MKTAGV);
 
