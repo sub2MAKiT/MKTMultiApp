@@ -70,11 +70,11 @@ FUNHANDLE * fileHmodules = NULL;
 // #include <dlfcn.h>
 
 void getEntryAddress(FUNHANDLE libraryToLoad,MKTmodule * Module);
-void * loadFileSharedObjects();
+void fileSOLoading();
 void * loadSharedObjects();
 #define getEntryInLibrary(x) 0;
 
-#define loadLibaries loadSharedObjects(); SAFEMALLOC(_MKT_modules,sizeof(MKTmodule)*Shmodules);for(int i = 0; i < Shmodules; i++) getEntryAddress(hmodules[i],&_MKT_modules[i]);_MKT_sizeOfModules = Shmodules;initi tempInit = {10,10};for(int i = 0; i < _MKT_sizeOfModules;i++) (*_MKT_modules[i].init)(tempInit);
+#define loadLibaries fileSOLoading(); loadSharedObjects(); SAFEMALLOC(_MKT_modules,sizeof(MKTmodule)*Shmodules);for(int i = 0; i < Shmodules; i++) getEntryAddress(hmodules[i],&_MKT_modules[i]);_MKT_sizeOfModules = Shmodules;initi tempInit = {10,10};for(int i = 0; i < _MKT_sizeOfModules;i++) (*_MKT_modules[i].init)(tempInit);
 #define unloadLibraries cleanUpi tempCleanUp = {}; for(int i = 0; i < _MKT_sizeOfModules; i++) (*_MKT_modules[i].cleanUp)(tempCleanUp);free(_MKT_modules)
 
 
