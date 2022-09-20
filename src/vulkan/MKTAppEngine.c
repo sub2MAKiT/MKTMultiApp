@@ -84,8 +84,8 @@ void cleanup()
         vkDestroyBuffer(_device, _ren_PiC[i].indexBuffer, NULL);
         vkFreeMemory(_device, _ren_PiC[i].vertexBufferMemory, NULL);
         vkFreeMemory(_device, _ren_PiC[i].indexBufferMemory, NULL);
-        free(_ren_PiC[i].vertices);
-        free(_ren_PiC[i].indices);
+        free(_ren_PiC[i]._dataPiC.vertices);
+        free(_ren_PiC[i]._dataPiC.indices);
 
 
         vkDestroyImageView(_device, _ren_PiC[i].textureImageView, NULL);

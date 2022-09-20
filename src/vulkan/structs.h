@@ -51,6 +51,13 @@ typedef struct MKTAGVertex { // i = 0
     MKTrgba colour;
 } AGVertex;
 
+typedef struct MKTAGDATA {
+    IntDex sizeOfVertices;
+    AGVertex * vertices;
+    IntDex sizeOfIndices;
+    unsigned int * indices;
+} MKTAGdata;
+
 typedef struct MKTPiCVertex { // i = 0
     MKTxy pos;
     MKTrgba colour;
@@ -68,4 +75,8 @@ typedef struct MKTPICDATA {
     IntDex w;
     IntDex h;
     MKTrgbaP * pix;
+    IntDex sizeOfVertices;
+    PiCVertex * vertices;
+    IntDex sizeOfIndices;
+    unsigned int * indices;
 } MKTPiCdata;

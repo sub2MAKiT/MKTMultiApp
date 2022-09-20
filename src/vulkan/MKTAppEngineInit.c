@@ -686,7 +686,7 @@ void _VE_INIT_VE()
 
     SAFEMALLOC(_ren_AG,sizeof(MKTag));
 
-    _MKT_loadPiC("../logo/icon.MKTRAWPiC");
+    loadFile("DataFiles/testlogo.MKTRAWPiC",MKTPICV);
 
     // loadFile("./DataFiles/shape.MKTAG",MKTAGV);
 

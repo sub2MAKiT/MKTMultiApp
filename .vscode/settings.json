@@ -131,6 +131,7 @@
         "errorhandling.h": "c",
         "outerdefine.h": "c",
         "externdefine.h": "c",
-        "dlldefines.h": "c"
+        "dlldefines.h": "c",
+        "*.m": "c"
     }
 }

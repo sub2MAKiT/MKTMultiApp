@@ -56,7 +56,6 @@ void _VE_RUN_recordCommandBuffer(VkCommandBuffer commandBuffer, unsigned int ima
         // }
         for(IntDex i = 0; i < _ren_sizeOfPiC; i++)
         {
-
             vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _ren_materials[1].graphicsPipeline);
 
             vkCmdBindIndexBuffer(commandBuffer,_ren_PiC[i].indexBuffer, 0, VK_INDEX_TYPE_UINT32);
@@ -65,7 +64,7 @@ void _VE_RUN_recordCommandBuffer(VkCommandBuffer commandBuffer, unsigned int ima
 
             vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _ren_materials[1].pipelineLayout, 0, 1, &_ren_PiC[i].descriptorSets[_currentFrame], 0, NULL);
 
-            vkCmdDrawIndexed(commandBuffer, _ren_PiC[i].sizeOfIndices, 1, 0, 0, 0);
+            vkCmdDrawIndexed(commandBuffer, _ren_PiC[i]._dataPiC.sizeOfIndices, 1, 0, 0, 0);
 
         }
         

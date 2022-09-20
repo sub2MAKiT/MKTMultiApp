@@ -89,12 +89,6 @@ typedef struct MKTPIC {
 
     MKTPiCdata _dataPiC; // will contain a garbage value during runtime, only for init purposes
 
-    PiCVertex * vertices;
-    IntDex sizeOfVertices;
-
-    IntDex sizeOfIndices;
-    unsigned int * indices; 
-
     VkImageView textureImageView;
     VkImage textureImage;
     VkDeviceMemory textureImageMemory;

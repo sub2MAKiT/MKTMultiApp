@@ -95,6 +95,10 @@
 - Added the `103` error code - Unsupported layout transition
 - cleanup
 
+### 00.01.08.00 - dynamic PiC loading and basic linux compatibility
+- Added the dynamic PiC loading
+- Vulkan linux compatibility
+
 # ERRORS
 0. No errors
 1. System error
