@@ -88,6 +88,8 @@ IntDex _MKT_genPiC(MKTPiCdata input)
 {
     _ren_sizeOfPiC++;
     _ren_PiC = realloc(_ren_PiC,_ren_sizeOfPiC*sizeof(MKTPiC));
+    // input.w = 4608;
+    // input.h = 8;
     VkDeviceSize imageSize = input.w * input.h * 4;
 
     VkBuffer stagingBuffer;
