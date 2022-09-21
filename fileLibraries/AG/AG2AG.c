@@ -17,7 +17,8 @@ MKTInfo * load(char * FP)
     MKTAGdata * outPut = malloc(sizeof(MKTAGdata));
 
     outPut->sizeOfVertices = *(unsigned long long int*)list;
-    outPut->sizeOfIndices = (sizeOfFile-((outPut->sizeOfVertices*24)-8))/sizeof(unsigned int);
+    outPut->sizeOfIndices = (sizeOfFile-((outPut->sizeOfVertices*24)+8))/sizeof(unsigned int);
+
 
     outPut->vertices = malloc(sizeof(AGVertex)*outPut->sizeOfVertices);
     outPut->indices = malloc(sizeof(unsigned int)*outPut->sizeOfIndices);
@@ -28,9 +29,10 @@ MKTInfo * load(char * FP)
     for(unsigned long long int i = 0; i < outPut->sizeOfIndices; i++)
         outPut->indices[i] = ((unsigned int*)(&((AGVertex*)(&list[8]))[outPut->sizeOfVertices-1]))[i];
 
-    output->data = list;
+    output->data = outPut;
     output->sizeOfData = sizeOfFile;
     output->type = 1;
+    output->ID = 0;
 
     return output;
 }

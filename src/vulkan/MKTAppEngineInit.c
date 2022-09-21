@@ -688,7 +688,7 @@ void _VE_INIT_VE()
 
     loadFile("DataFiles/testlogo.MKTRAWPiC",MKTPICV);
 
-    // loadFile("./DataFiles/shape.MKTAG",MKTAGV);
+    loadFile("./DataFiles/shape.MKTAG",MKTAGV);
 
     DEBUG("II> init:VEvariables <II");
     return;

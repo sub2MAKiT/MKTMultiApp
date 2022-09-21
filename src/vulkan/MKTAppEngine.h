@@ -69,7 +69,7 @@ typedef struct MKTAG {
     IntDex sizeOfVertices;
 
     IntDex sizeOfIndices;
-    unsigned int * indices; 
+    unsigned int * indices;
 
     VkBuffer * uniformBuffers;
     VkDeviceMemory * uniformBuffersMemory;

@@ -127,7 +127,7 @@ IntDex _MKT_genAG(AGVertex * inVertices,IntDex inSizeOfVertices,unsigned int * i
 
 MKTag _MKT_openAG(char * FP)
 {
-    MKTagFtemp tempAGData;
+    MKTAGdata tempAGData;
     MKTInfo * tempData;
     MKTag returnAG;
     unsigned long long int tempSize = 0;
@@ -135,7 +135,7 @@ MKTag _MKT_openAG(char * FP)
         if(MKTstrcmp(MKTdissectFileType(&tempSize, FP), _MKT_fileModules[i].FileName))
             tempData = (*_MKT_fileModules[i].load)(FP);
 
-    tempAGData = *(MKTagFtemp*)tempData->data;
+    tempAGData = *(MKTAGdata*)tempData->data;
 
     if(tempData->ID)
         MKTerror(tempData->ID);
@@ -150,12 +150,13 @@ MKTag _MKT_openAG(char * FP)
     returnAG.sizeOfIndices = tempAGData.sizeOfIndices;
     returnAG.indices = tempAGData.indices;
 
+    // free(tempData->data);
+
     return returnAG;
 }
 
 IntDex _MKT_loadAG(char * FP)
 {
     MKTag loaded = _MKT_openAG(FP);
-
     return _MKT_genAG(loaded.vertices,loaded.sizeOfVertices,loaded.indices,loaded.sizeOfIndices);
 }

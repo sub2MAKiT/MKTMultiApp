@@ -211,9 +211,6 @@ void fileSOLoading()
                     0b00000000
                     #endif
                     );
-
-                    printf("testing %d %s\n",_MKT_fileModules[CURRENTF].type,_MKT_fileModules[CURRENTF].FileName);
-
                 }
         }
 
