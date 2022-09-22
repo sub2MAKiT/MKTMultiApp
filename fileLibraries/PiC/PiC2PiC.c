@@ -1,5 +1,11 @@
 #include "../FILEDLL.m"
 
+#define CPSLOGIC(CPS,MAXCPS)         int * palette = (int*)&list[25];\
+        CPS * indicesData = (CPS*)&list[25+sizeOfFilteredPalette*sizeof(CPS)];\
+        for(unsigned long long int i = 0; i < outPut->w*outPut->h;i++)\
+            ((int*)outPut->pix)[i] = palette[indicesData[i]];
+
+
 MKTInfo * load(char * FP)
 {
     MKTInfo * output = malloc(sizeof(MKTInfo));
@@ -17,21 +23,29 @@ MKTInfo * load(char * FP)
     MKTPiCdata * outPut = malloc(sizeof(MKTPiCdata));
 
     unsigned char compressionIndex = list[0];
+    unsigned long long int sizeOfFilteredPalette = *(unsigned long long int*)&list[17];
+
+    printf("palette size: %d\n",sizeOfFilteredPalette);
     outPut->w = *(unsigned long long int*)&list[1];
     outPut->h = *(unsigned long long int*)&list[9];
     outPut->pix = malloc(outPut->w*outPut->h*sizeof(MKTrgbaP));
 
-    #define CPS unsigned char
-    #define MAXCPS 255
 
     if(compressionIndex == 4)
     {
-        int * palette = (int*)&list[17];
-        CPS * indicesData = (CPS*)&list[17+MAXCPS];
-
-        for(unsigned long long int i = 0; i < outPut->w*outPut->h;i++)
-            ((int*)outPut->pix)[i] = palette[indicesData[i]];
-
+        CPSLOGIC(unsigned char,255)
+    } else if(compressionIndex == 3)
+    {
+        CPSLOGIC(unsigned short,65535)
+    } else if(compressionIndex == 2)
+    {
+        CPSLOGIC(unsigned int,4294967295 )
+    } else if(compressionIndex == 1)
+    {
+        // CPSLOGIC(unsigned long long int,18446744073709551615)
+    } else if(compressionIndex == 0)
+    {
+        CPSLOGIC(unsigned char,255)
     }
 
 
