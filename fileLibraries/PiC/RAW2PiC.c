@@ -44,6 +44,8 @@ MKTInfo * load(char * FP)
     output->sizeOfData = sizeOfFile;
     output->type = 1;
 
+    free(list);
+
     return output;
 }
 

@@ -686,9 +686,11 @@ void _VE_INIT_VE()
 
     SAFEMALLOC(_ren_AG,sizeof(MKTag));
 
-    loadFile("DataFiles/testlogo.MKTRAWPiC",MKTPICV);
+    loadFile("../utils/test.MKTP",MKTPICV);
 
-    loadFile("./DataFiles/shape.MKTAG",MKTAGV);
+    // loadFile("DataFiles/testlogo.MKTRAWPiC",MKTPICV);
+
+    // loadFile("./DataFiles/shape.MKTAG",MKTAGV);
 
     DEBUG("II> init:VEvariables <II");
     return;

@@ -15,6 +15,7 @@ if ($DEBUG) {
 if($DLL)
 {
     gcc ./fileLibraries/PiC/RAW2PiC.c -I ./src/ $DEBUGG -shared -o ./build/files/MKTRAWPiC.dll
+    gcc ./fileLibraries/PiC/PiC2PiC.c -I ./src/ $DEBUGG -shared -o ./build/files/MKTP.dll
     gcc ./fileLibraries/AG/AG2AG.c -I ./src/ $DEBUGG -shared -o ./build/files/MKTAG.dll
 }
 if ($AGshaders) {

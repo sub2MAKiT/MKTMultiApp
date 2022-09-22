@@ -11,17 +11,27 @@ static unsigned long long int colourDifference(int pixelData, int expected)
 {
     unsigned long long int difference = 0;
 
-    // difference = (*(char*)&pixelData)-(*(char*)&expected)>0?(*(char*)&pixelData)-(*(char*)&expected):((*(char*)&pixelData)-(*(char*)&expected))*-1
-    // + (*(char*)&pixelData+1)-(*(char*)&expected)>0?(*(char*)&pixelData+1)-(*(char*)&expected):((*(char*)&pixelData+1)-(*(char*)&expected))*-1
-    // + (*(char*)&pixelData+2)-(*(char*)&expected)>0?(*(char*)&pixelData+2)-(*(char*)&expected):((*(char*)&pixelData+2)-(*(char*)&expected))*-1
-    // + (*(char*)&pixelData+3)-(*(char*)&expected)>0?(*(char*)&pixelData+3)-(*(char*)&expected):((*(char*)&pixelData+3)-(*(char*)&expected))*-1;
-
     char inputR = *((char*)&pixelData);
-    char inputG = *((char*)&pixelData);
-    char inputB = *((char*)&pixelData);
-    char inputA = *((char*)&pixelData);
+    char inputG = *((char*)&pixelData+1);
+    char inputB = *((char*)&pixelData+2);
+    char inputA = *((char*)&pixelData+3);
 
-    printf("R: %d G: %d B: %d A: %d\n",inputR,inputG,inputB,inputA);
+    char expectedR = *((char*)&expected);
+    char expectedG = *((char*)&expected+1);
+    char expectedB = *((char*)&expected+2);
+    char expectedA = *((char*)&expected+3);
+
+    difference += inputR-expectedR>0?inputR-expectedR:expectedR-inputR;
+    difference += inputG-expectedG>0?inputG-expectedG:expectedG-inputG;
+    difference += inputB-expectedB>0?inputB-expectedB:expectedB-inputB;
+    difference += inputA-expectedA>0?inputA-expectedA:expectedA-inputA;
+
+    // difference = *((char*)&pixelData)-*((char*)&expected)>0?*((char*)&pixelData)-*((char*)&expected):*((char*)&expected)-*((char*)&pixelData) +
+    // *((char*)&pixelData+1)-*((char*)&expected+1)>0?*((char*)&pixelData+1)-*((char*)&expected+1):*((char*)&expected+1)-*((char*)&pixelData+1) +
+    // *((char*)&pixelData+2)-*((char*)&expected+2)>0?*((char*)&pixelData+2)-*((char*)&expected+2):*((char*)&expected+2)-*((char*)&pixelData+2) +
+    // *((char*)&pixelData+3)-*((char*)&expected+3)>0?*((char*)&pixelData+3)-*((char*)&expected+3):*((char*)&expected+3)-*((char*)&pixelData+3);
+
+    // printf("R: %d G: %d B: %d A: %d\nR: %d G: %d B: %d A: %d\n%ld\n",inputR,inputG,inputB,inputA,expectedR,expectedG,expectedB,expectedA,difference);
     
     return difference;
 }
@@ -29,11 +39,21 @@ static unsigned long long int colourDifference(int pixelData, int expected)
 
 static unsigned long long int findBestN(int pixelData, paletteDataS * comp,unsigned long long int sizeOfFilteredPalette)
 {
-    // unsigned long long int 
-    // for(unsigned long long int i = 0; i < sizeOfFilteredPalette; i++)
-    // {
+    unsigned long long int smallestCD = colourDifference(comp[0].colour,pixelData);
+    unsigned long long int returnID = 0;
 
-    // }
+    for(unsigned long long int i = 0; i < sizeOfFilteredPalette; i++)
+    {
+        if(smallestCD > colourDifference(comp[i].colour,pixelData))
+        {
+            smallestCD = colourDifference(comp[i].colour,pixelData);
+            returnID = i;
+            if(smallestCD == 0)
+                return returnID;
+        }
+    }
+
+    return returnID;
 }
 
 int main(int argc, char ** argv)
@@ -45,7 +65,13 @@ int main(int argc, char ** argv)
         FILE * INFILE = fopen(argv[1],"rb");
         FILE * OUTFILE = fopen(argv[2],"wb");
 
-        unsigned char compressionIndex = argv[3][0]-'0';
+        unsigned char compressionIndex = argv[3][0]-'0'+argv[3][1]!=0?(argv[3][1]-'0')*10:0;
+
+        unsigned char interpolate = compressionIndex&8;
+
+        compressionIndex = compressionIndex&7;
+
+        printf("compression: %x %x\n",interpolate,compressionIndex);
 
         char *input;// #ff0000
         fseek(INFILE, 0L, SEEK_END);
@@ -62,8 +88,12 @@ int main(int argc, char ** argv)
 
         unsigned long long int biggestN = 0;
 
-        #define CPS char
-        #define MAXCPS 256
+        fwrite(&compressionIndex,sizeof(unsigned char),1,OUTFILE);
+        fwrite(&width,sizeof(unsigned long long int),1,OUTFILE);
+        fwrite(&height,sizeof(unsigned long long int),1,OUTFILE);
+
+        #define CPS unsigned char
+        #define MAXCPS 255
 
         if(compressionIndex == 4) // 0 - long long, 1 - long, 2 - int, 3 - short, 4 - char
         {
@@ -86,7 +116,6 @@ int main(int argc, char ** argv)
                         if(palette[a].n > biggestN)
                             biggestN = palette[a].n;
                         
-                        // fwrite(&a,sizeof(unsigned int),1,OUTFILE);
                         break;
                     }
                 }
@@ -135,19 +164,23 @@ int main(int argc, char ** argv)
                 filteredPalette[i] = palette[currentIndex];
             }
 
-            for(unsigned int i = 0; i < sizeOfFileteredPalette;i++)
-                printf("%d.%d %d\n",i,filteredPalette[i].n,filteredPalette[i].colour);
+            // for(unsigned int i = 0; i < sizeOfFileteredPalette;i++)
+                // printf("%d.%d %d\n",i,filteredPalette[i].n,filteredPalette[i].colour);
 
-            for(unsigned int i = 0; i < sizeOfFileteredPalette;i++)
-                printf("%d.%x %x %d\n",i,filteredPalette[i].colour,palette[i].colour,colourDifference(filteredPalette[i].colour,palette[i].colour));
+            // for(unsigned int i = 0; i < sizeOfFileteredPalette;i++)
+                // printf("%d.%x %x %d\n",i,filteredPalette[i].colour,palette[i].colour,colourDifference(filteredPalette[i].colour,palette[i].colour));
 
             printf("sizeOfFilteredPalette: %d\n",sizeOfFileteredPalette);
 
             free(palette);
 
+            for(unsigned long long int i = 0; i < sizeOfFileteredPalette; i++)
+                fwrite(&filteredPalette[i].colour,sizeof(int),1,OUTFILE);
+
             for(unsigned long long int i = 0; i < width*height; i++)
             {
                 CPS output = findBestN(pixelData[i],filteredPalette,sizeOfFileteredPalette);
+                // printf("%d.test %d %d %d %d\n",i,output,filteredPalette[output].colour,pixelData[i],colourDifference(filteredPalette[output].colour,pixelData[i]));
                 fwrite(&output,sizeof(CPS),1,OUTFILE);
             }
 

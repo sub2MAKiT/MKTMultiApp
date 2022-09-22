@@ -16,13 +16,25 @@ MKTInfo * load(char * FP)
 
     MKTPiCdata * outPut = malloc(sizeof(MKTPiCdata));
 
-    outPut->w = *(unsigned long long int*)&list[0];
-    outPut->h = *(unsigned long long int*)&list[8];
+    unsigned char compressionIndex = list[0];
+    outPut->w = *(unsigned long long int*)&list[1];
+    outPut->h = *(unsigned long long int*)&list[9];
     outPut->pix = malloc(outPut->w*outPut->h*sizeof(MKTrgbaP));
 
-    for(unsigned long long int i = 0; i < outPut->w*outPut->h*sizeof(MKTrgbaP);i++)
-        *((char*)(outPut->pix)+i) = list[i+16];
-    
+    #define CPS unsigned char
+    #define MAXCPS 255
+
+    if(compressionIndex == 4)
+    {
+        int * palette = (int*)&list[17];
+        CPS * indicesData = (CPS*)&list[17+MAXCPS];
+
+        for(unsigned long long int i = 0; i < outPut->w*outPut->h;i++)
+            ((int*)outPut->pix)[i] = palette[indicesData[i]];
+
+    }
+
+
     outPut->vertices = malloc(sizeof(PiCVertex)*4);
     outPut->vertices[0] = (PiCVertex){{1.0f, -1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}};
     outPut->vertices[1] = (PiCVertex){{1.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}};
@@ -43,6 +55,8 @@ MKTInfo * load(char * FP)
     output->data = outPut;
     output->sizeOfData = sizeOfFile;
     output->type = 1;
+
+    free(list);
 
     return output;
 }
