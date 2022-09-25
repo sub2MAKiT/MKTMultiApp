@@ -1,9 +1,16 @@
 #include "../FILEDLL.m"
 
 #define CPSLOGIC(CPS,MAXCPS)         int * palette = (int*)&list[25];\
-        CPS * indicesData = (CPS*)&list[25+sizeOfFilteredPalette*sizeof(CPS)];\
-        for(unsigned long long int i = 0; i < outPut->w*outPut->h;i++)\
-            ((int*)outPut->pix)[i] = palette[indicesData[i]];
+        CPS * indicesData = (CPS*)&list[25+sizeOfFilteredPalette*sizeof(CPS)*(MAXCPS==254?4:2)];/*#ff0000*/\ 
+        for(unsigned long long int i = 0, j = 0; i < outPut->w*outPut->h;i++, j++)\
+            if(indicesData[j] != MAXCPS)\
+                ((int*)outPut->pix)[i] = palette[indicesData[j]];\
+            else\
+            {\
+                for(unsigned long long int a = i; i-a < indicesData[j+1]; i++)\
+                    ((int*)outPut->pix)[i] = palette[indicesData[j+2]];\
+                    j+=2;\
+            }
 
 
 MKTInfo * load(char * FP)
@@ -33,10 +40,10 @@ MKTInfo * load(char * FP)
 
     if(compressionIndex == 4)
     {
-        CPSLOGIC(unsigned char,255)
+        CPSLOGIC(unsigned char,254)
     } else if(compressionIndex == 3)
     {
-        CPSLOGIC(unsigned short,65535)
+        CPSLOGIC(unsigned short,65534)
     } else if(compressionIndex == 2)
     {
         CPSLOGIC(unsigned int,4294967295 )

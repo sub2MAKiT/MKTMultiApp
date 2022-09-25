@@ -73,8 +73,8 @@ for(unsigned long long int i = 0; i < MAXCPS&&i<sizeOfNewPalette;i++)\
     }\
     if(currentIndex == 0 && sizeOfFileteredPalette != 0)\
         break;\
-        if(i%100==0)\
-    printf("%d.test2\n",i);\
+    if(i%100==0)\
+        printf("%d.test2 %d\n",i,sizeOfNewPalette);\
     sizeOfFileteredPalette++;\
     filteredPalette = realloc(filteredPalette,sizeOfFileteredPalette*sizeof(paletteDataS));\
     filteredPalette[i] = newPalette[currentIndex];\
@@ -83,13 +83,29 @@ free(newPalette);\
 fwrite(&sizeOfFileteredPalette,sizeof(unsigned long long int),1,OUTFILE);\
 for(unsigned long long int i = 0; i < sizeOfFileteredPalette; i++)\
     fwrite(&filteredPalette[i].colour,sizeof(int),1,OUTFILE);\
+CPS * outputFinal = malloc(sizeof(CPS)*width*height);\
+unsigned long long int sizeOfOutputFinal = width*height;\
 for(unsigned long long int i = 0; i < width*height; i++)\
+    outputFinal[i] = findBestN(pixelData[i],filteredPalette,sizeOfFileteredPalette);\
+for(unsigned long long int i = 0; i < sizeOfOutputFinal; i++)\
 {\
-CPS output = findBestN(pixelData[i],filteredPalette,sizeOfFileteredPalette);\
-fwrite(&output,sizeof(CPS),1,OUTFILE);\
+    if(outputFinal[i] != outputFinal[i+1] || outputFinal[i+1] != outputFinal[i+2])\
+        fwrite(&outputFinal[i],sizeof(CPS),1,OUTFILE);\
+    else\
+    {\
+        CPS tempOutPut = MAXCPS;\
+        fwrite(&tempOutPut,sizeof(CPS),1,OUTFILE);\
+        CPS numberOfTimesRepeated = 0;\
+        while(outputFinal[i+numberOfTimesRepeated] == outputFinal[i] && numberOfTimesRepeated < MAXCPS)\
+            numberOfTimesRepeated++;\
+        fwrite(&numberOfTimesRepeated,sizeof(CPS),1,OUTFILE);\
+        fwrite(&outputFinal[i],sizeof(CPS),1,OUTFILE);\
+        i += numberOfTimesRepeated;\
+    }\
 }\
 free(outputPixelData);\
-free(filteredPalette);
+free(filteredPalette);\
+free(outputFinal);
 
 
 
@@ -199,7 +215,6 @@ int main(int argc, char ** argv)
                 for(int y = 1; y < height-1;y++)
                 {
                     pixelDataToInterpolate[x+y*width].r = (
-
                     pixelDataToInterpolate[x+y*width].r+pixelDataToInterpolate[x+y*width-1].r+pixelDataToInterpolate[x+y*width+1].r+
                     pixelDataToInterpolate[x+(y+1)*width].r+pixelDataToInterpolate[x+(y+1)*width-1].r+pixelDataToInterpolate[x+(y+1)*width+1].r+
                     pixelDataToInterpolate[x+(y-1)*width].r+pixelDataToInterpolate[x+(y-1)*width-1].r+pixelDataToInterpolate[x+(y-1)*width+1].r
@@ -215,16 +230,16 @@ int main(int argc, char ** argv)
         // 0 - long long, 1 - long, 2 - int, 3 - short, 4 - char
     if(compressionIndex == 4)
     {
-        CPSLOGIC(unsigned char,255)
+        CPSLOGIC(unsigned char,254)
     } else if(compressionIndex == 3)
     {
-        CPSLOGIC(unsigned short,65535)
+        CPSLOGIC(unsigned short,65534)
     } else if(compressionIndex == 2)
     {
-        CPSLOGIC(unsigned int,4294967295 )
+        CPSLOGIC(unsigned int,4294967294 )
     } else if(compressionIndex == 1)
+    
     {
-        // CPSLOGIC(unsigned long long int,18446744073709551615)
     } else if(compressionIndex == 0)
     {
         CPSLOGIC(unsigned char,255)

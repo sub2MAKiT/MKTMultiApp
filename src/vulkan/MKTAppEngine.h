@@ -154,7 +154,7 @@ uint32_t glfwExtensionCount = 0;
 const char** glfwExtensions = NULL;
 
 // VK_INIT
-VkExtent2D _WindowS = {600,800};
+VkExtent2D _WindowS = {600,600};
 int MAX_FRAMES_IN_FLIGHT = 2;
 VkInstance _instance;
 VkPhysicalDevice _chosenGPU = VK_NULL_HANDLE;
