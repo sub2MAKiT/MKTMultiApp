@@ -50,7 +50,7 @@ for(int i = 0; i < sizeOfPalette;i++)\
     }\
 }\
 free(palette);\
-for(unsigned long long int i = 0; i < MAXCPS&&i<sizeOfNewPalette;i++)\
+for(unsigned long long int i = 0; i < MAXCPS/32&&i<sizeOfNewPalette;i++)\
 {\
     unsigned long long int highest = newPalette[i].n;\
     unsigned long long int currentIndex = i;\

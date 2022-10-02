@@ -26,6 +26,19 @@ typedef struct MKTXY {
     MKTGLMDOUBLE y;
 } MKTxy;
 
+typedef struct MKTXYZ {
+    MKTGLMDOUBLE x;
+    MKTGLMDOUBLE y;
+    MKTGLMDOUBLE z;
+} MKTxyz;
+
+typedef struct MKTXYZW {
+    MKTGLMDOUBLE x;
+    MKTGLMDOUBLE y;
+    MKTGLMDOUBLE z;
+    MKTGLMDOUBLE w;
+} MKTxyzw;
+
 typedef struct MKTMATF2 {
     MKTrgba a;
     MKTrgba b;
@@ -64,6 +77,12 @@ typedef struct MKTPiCVertex { // i = 0
     MKTxy tex;
 } PiCVertex;
 
+typedef struct MKTTDVertex { // i = 0
+    MKTxyzw pos;
+    MKTrgba colour;
+    MKTxy tex;
+} TDVertex;
+
 typedef struct MKTRGBAP {
     unsigned char r;
     unsigned char g;
@@ -80,3 +99,13 @@ typedef struct MKTPICDATA {
     IntDex sizeOfIndices;
     unsigned int * indices;
 } MKTPiCdata;
+
+typedef struct MKTTDDATA {
+    IntDex w;
+    IntDex h;
+    MKTrgbaP * pix;
+    IntDex sizeOfVertices;
+    PiCVertex * vertices;
+    IntDex sizeOfIndices;
+    unsigned int * indices;
+} MKTTDdata;

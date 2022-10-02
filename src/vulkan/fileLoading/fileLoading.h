@@ -7,5 +7,6 @@
 #include <fileLoading/Audio.h>
 #include <fileLoading/Info.h>
 #include <fileLoading/ViD.h>
+#include <fileLoading/TD.h>
 
 IntDex loadFile(char * FP, char type);

@@ -108,6 +108,30 @@ typedef struct MKTPIC {
 
 } MKTPiC;
 
+
+typedef struct MKTTD {
+
+    MKTTDdata _dataPiC;
+
+    VkImageView textureImageView;
+    VkImage textureImage;
+    VkDeviceMemory textureImageMemory;
+
+    VkBuffer * uniformBuffers;
+    VkDeviceMemory * uniformBuffersMemory;
+    IntDex sizeOfUniformBuffers;
+
+    VkDescriptorPool descriptorPool;
+    VkDescriptorSet * descriptorSets;
+    IntDex sizeOfDescriptorSets;
+
+    VkBuffer vertexBuffer;
+    VkDeviceMemory vertexBufferMemory;
+    VkBuffer indexBuffer;
+    VkDeviceMemory indexBufferMemory;
+
+} MKTtd;
+
 // FUNCTIONS
 
 // MAIN FUNCTIONS

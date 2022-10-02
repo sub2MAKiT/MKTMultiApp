@@ -19,7 +19,7 @@ IntDex loadFile(char * FP, char type)
     else if(type == MKTFONTMV)
         0;
     else if(type == MKTOBJV)
-        0;
+        _MKT_loadTD(FP);
     else
         0;
 
