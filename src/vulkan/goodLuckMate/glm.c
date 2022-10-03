@@ -6,62 +6,95 @@ VkPipelineVertexInputStateCreateInfo getInputDescription(IntDex i) {
 
     SAFEMALLOC(bindingDescription,(sizeof(VkVertexInputBindingDescription)));
 
-    if(i == 0) // MKTAGVertex
+    switch(i) // MKTAGVertex
     {
-        bindingDescription->binding = 0;
-        bindingDescription->inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+        case 0:
+        {
+            bindingDescription->binding = 0;
+            bindingDescription->inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
-        VkVertexInputAttributeDescription * attributeDescriptions;
+            VkVertexInputAttributeDescription * attributeDescriptions;
 
-        SAFEMALLOC(attributeDescriptions,(sizeof(VkVertexInputAttributeDescription)*2));
+            SAFEMALLOC(attributeDescriptions,(sizeof(VkVertexInputAttributeDescription)*2));
 
-        bindingDescription->stride = sizeof(AGVertex);
+            bindingDescription->stride = sizeof(AGVertex);
 
-        attributeDescriptions[0].binding = 0;
-        attributeDescriptions[0].location = 0;
-        attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
-        attributeDescriptions[0].offset = offsetof(AGVertex, pos);
+            attributeDescriptions[0].binding = 0;
+            attributeDescriptions[0].location = 0;
+            attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
+            attributeDescriptions[0].offset = offsetof(AGVertex, pos);
 
-        attributeDescriptions[1].binding = 0;
-        attributeDescriptions[1].location = 1;
-        attributeDescriptions[1].format = VK_FORMAT_R32G32B32A32_SFLOAT;
-        attributeDescriptions[1].offset = offsetof(AGVertex, colour);
+            attributeDescriptions[1].binding = 0;
+            attributeDescriptions[1].location = 1;
+            attributeDescriptions[1].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+            attributeDescriptions[1].offset = offsetof(AGVertex, colour);
 
-        returnInfo.vertexBindingDescriptionCount = 1;
-        returnInfo.vertexAttributeDescriptionCount = 2;
-        returnInfo.pVertexBindingDescriptions = bindingDescription;
-        returnInfo.pVertexAttributeDescriptions = attributeDescriptions;
-    }
-    else if(i == 1) // MKTPiCVertex
-    {
-        bindingDescription->binding = 0;
-        bindingDescription->stride = sizeof(PiCVertex);
-        bindingDescription->inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+            returnInfo.vertexBindingDescriptionCount = 1;
+            returnInfo.vertexAttributeDescriptionCount = 2;
+            returnInfo.pVertexBindingDescriptions = bindingDescription;
+            returnInfo.pVertexAttributeDescriptions = attributeDescriptions;
+        }
+        case 1: // MKTPiCVertex
+        {
+            bindingDescription->binding = 0;
+            bindingDescription->stride = sizeof(PiCVertex);
+            bindingDescription->inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
-        VkVertexInputAttributeDescription * attributeDescriptions;
+            VkVertexInputAttributeDescription * attributeDescriptions;
 
-        SAFEMALLOC(attributeDescriptions,(sizeof(VkVertexInputAttributeDescription)*3));
+            SAFEMALLOC(attributeDescriptions,(sizeof(VkVertexInputAttributeDescription)*3));
 
-        attributeDescriptions[0].binding = 0;
-        attributeDescriptions[0].location = 0;
-        attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
-        attributeDescriptions[0].offset = offsetof(PiCVertex, pos);
+            attributeDescriptions[0].binding = 0;
+            attributeDescriptions[0].location = 0;
+            attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
+            attributeDescriptions[0].offset = offsetof(PiCVertex, pos);
 
-        attributeDescriptions[1].binding = 0;
-        attributeDescriptions[1].location = 1;
-        attributeDescriptions[1].format = VK_FORMAT_R32G32B32A32_SFLOAT;
-        attributeDescriptions[1].offset = offsetof(PiCVertex, colour);
+            attributeDescriptions[1].binding = 0;
+            attributeDescriptions[1].location = 1;
+            attributeDescriptions[1].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+            attributeDescriptions[1].offset = offsetof(PiCVertex, colour);
 
 
-        attributeDescriptions[2].binding = 0;
-        attributeDescriptions[2].location = 2;
-        attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
-        attributeDescriptions[2].offset = offsetof(PiCVertex, tex);
+            attributeDescriptions[2].binding = 0;
+            attributeDescriptions[2].location = 2;
+            attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
+            attributeDescriptions[2].offset = offsetof(PiCVertex, tex);
 
-        returnInfo.vertexBindingDescriptionCount = 1;
-        returnInfo.vertexAttributeDescriptionCount = 3;
-        returnInfo.pVertexBindingDescriptions = bindingDescription;
-        returnInfo.pVertexAttributeDescriptions = attributeDescriptions;
+            returnInfo.vertexBindingDescriptionCount = 1;
+            returnInfo.vertexAttributeDescriptionCount = 3;
+            returnInfo.pVertexBindingDescriptions = bindingDescription;
+            returnInfo.pVertexAttributeDescriptions = attributeDescriptions;
+        }
+        case 2:
+        {
+            bindingDescription->binding = 0;
+            bindingDescription->stride = sizeof(PiCVertex);
+            bindingDescription->inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+            VkVertexInputAttributeDescription * attributeDescriptions;
+
+            SAFEMALLOC(attributeDescriptions,(sizeof(VkVertexInputAttributeDescription)*3));
+
+            attributeDescriptions[0].binding = 0;
+            attributeDescriptions[0].location = 0;
+            attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
+            attributeDescriptions[0].offset = offsetof(PiCVertex, pos);
+
+            attributeDescriptions[1].binding = 0;
+            attributeDescriptions[1].location = 1;
+            attributeDescriptions[1].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+            attributeDescriptions[1].offset = offsetof(PiCVertex, colour);
+
+            attributeDescriptions[2].binding = 0;
+            attributeDescriptions[2].location = 2;
+            attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
+            attributeDescriptions[2].offset = offsetof(PiCVertex, tex);
+
+            returnInfo.vertexBindingDescriptionCount = 1;
+            returnInfo.vertexAttributeDescriptionCount = 3;
+            returnInfo.pVertexBindingDescriptions = bindingDescription;
+            returnInfo.pVertexAttributeDescriptions = attributeDescriptions;
+        }
     }
 
 

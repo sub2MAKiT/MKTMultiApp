@@ -498,22 +498,6 @@ void _VE_INIT_ImageViews()
 
 }
 
-void _VE_INIT_GraphicPipelines()
-{
-    DEBUG("II init:GraphicPipelines II");
-
-    SAFEMALLOC(_ren_materials,sizeof(MKTmaterial));
-    _ren_sizeOfMaterials = 0;
-
-    _MKT_LOAD_PIPELINE("shaders/AGShader.vert.spv","shaders/AGShader.frag.spv",0); // 0 = MKTAG
-    _MKT_LOAD_PIPELINE("shaders/PiCShader.vert.spv","shaders/PiCShader.frag.spv",1); // 1 = MKTPiC
-
-    // _MKT_LOAD_PIPELINE("shaders/AGShader.vert.spv","shaders/AGShader.frag.spv", 0,0);
-
-    DEBUG("II> init:GraphicPipelines <II");
-    return;
-}
-
 void _VE_INIT_RenderPass()
 {
     DEBUG("II init:RenderPass II");
@@ -678,6 +662,23 @@ void _VE_INIT_Sampler()
     return;
 }
 
+void _VE_INIT_GraphicPipelines()
+{
+    DEBUG("II init:GraphicPipelines II");
+
+    SAFEMALLOC(_ren_materials,sizeof(MKTmaterial));
+    _ren_sizeOfMaterials = 0;
+
+    _MKT_LOAD_PIPELINE("shaders/AGShader.vert.spv","shaders/AGShader.frag.spv",0); // 0 = MKTAG
+    _MKT_LOAD_PIPELINE("shaders/PiCShader.vert.spv","shaders/PiCShader.frag.spv",1); // 1 = MKTPiC
+    _MKT_LOAD_PIPELINE("shaders/BMShader.vert.spv","shaders/BMShader.frag.spv",2); // 2 = MKTbm
+
+    // _MKT_LOAD_PIPELINE("shaders/AGShader.vert.spv","shaders/AGShader.frag.spv", 0,0);
+
+    DEBUG("II> init:GraphicPipelines <II");
+    return;
+}
+
 void _VE_INIT_VE()
 {
     DEBUG("II init:VEvariables II");
@@ -686,7 +687,11 @@ void _VE_INIT_VE()
 
     SAFEMALLOC(_ren_AG,sizeof(MKTag));
 
-    loadFile("../utils/test.MKTP",MKTPICV);
+    // _MKT_genBM(PiCVertex * inVertices,IntDex inSizeOfVertices,unsigned int * inIndices,IntDex inSizeOfIndices);
+
+    loadFile("../utils/test.MKTP");
+
+    // loadFile("../utils/test.MKTP",MKTPICV);
 
     // loadFile("DataFiles/testlogo.MKTRAWPiC",MKTPICV);
 

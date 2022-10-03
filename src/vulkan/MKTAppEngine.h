@@ -65,11 +65,7 @@ typedef struct MKTMATERIAL {
 } MKTmaterial;
 
 typedef struct MKTAG {
-    AGVertex * vertices;
-    IntDex sizeOfVertices;
-
-    IntDex sizeOfIndices;
-    unsigned int * indices;
+    MKTAGdata _dataAG;
 
     VkBuffer * uniformBuffers;
     VkDeviceMemory * uniformBuffersMemory;
@@ -107,6 +103,29 @@ typedef struct MKTPIC {
     VkDeviceMemory indexBufferMemory;
 
 } MKTPiC;
+
+typedef struct MKTBM {
+
+    MKTbmdata _dataPiC;
+
+    VkImageView textureImageView;
+    VkImage textureImage;
+    VkDeviceMemory textureImageMemory;
+
+    VkBuffer * uniformBuffers;
+    VkDeviceMemory * uniformBuffersMemory;
+    IntDex sizeOfUniformBuffers;
+
+    VkDescriptorPool descriptorPool;
+    VkDescriptorSet * descriptorSets;
+    IntDex sizeOfDescriptorSets;
+
+    VkBuffer vertexBuffer;
+    VkDeviceMemory vertexBufferMemory;
+    VkBuffer indexBuffer;
+    VkDeviceMemory indexBufferMemory;
+
+} MKTbm;
 
 
 typedef struct MKTTD {
@@ -227,6 +246,9 @@ IntDex _ren_sizeOfAG;
 MKTPiC * _ren_PiC = NULL;
 IntDex _ren_sizeOfPiC;
 
+MKTbm * _ren_BM = NULL;
+IntDex _ren_sizeOfBM;
+
 
 // validation layers
 #ifdef NDEBUG
@@ -297,6 +319,9 @@ extern IntDex _ren_sizeOfAG;
 
 extern MKTPiC * _ren_PiC;
 extern IntDex _ren_sizeOfPiC;
+
+extern MKTbm * _ren_BM;
+extern IntDex _ren_sizeOfBM;
 
 #endif
 

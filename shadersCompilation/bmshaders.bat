@@ -1,0 +1,2 @@
+C:\VulkanSDK\1.2.198.1\Bin\\glslc.exe .\src\vulkan\shaders\bmShader\bmShader.frag -o .\build\shaders\bmShader.frag.spv
+C:\VulkanSDK\1.2.198.1\Bin\\glslc.exe .\src\vulkan\shaders\bmShader\bmShader.vert -o .\build\shaders\bmShader.vert.spv

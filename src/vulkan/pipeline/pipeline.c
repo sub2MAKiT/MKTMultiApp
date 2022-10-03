@@ -6,7 +6,9 @@ void _MKT_LOAD_DESCRIPTORS(IntDex materialIndex, IntDex glmI)
     VkDescriptorSetLayoutCreateInfo layoutInfo = {};
     VkDescriptorSetLayoutBinding layoutBinding = {};
     VkDescriptorSetLayoutBinding samplerLayoutBinding = {};
-    if(glmI == 0)// MKTAG
+    switch(glmI)// MKTAG
+    {
+    case 0:
     {
         layoutBinding.binding = 0;
         layoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -17,7 +19,7 @@ void _MKT_LOAD_DESCRIPTORS(IntDex materialIndex, IntDex glmI)
         layoutInfo.bindingCount = 1;
         layoutInfo.pBindings = &layoutBinding;
     }
-    else if(glmI == 1)// MKTPiC
+    case 1:// MKTPiC
     {
         layoutBinding.binding = 0;
         layoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -37,6 +39,28 @@ void _MKT_LOAD_DESCRIPTORS(IntDex materialIndex, IntDex glmI)
         layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
         layoutInfo.bindingCount = 2;
         layoutInfo.pBindings = bindings;
+    }
+    case 2:
+    {
+        layoutBinding.binding = 0;
+        layoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        layoutBinding.descriptorCount = 1;
+        layoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+        layoutBinding.pImmutableSamplers = NULL;
+
+        samplerLayoutBinding.binding = 1;
+        samplerLayoutBinding.descriptorCount = 1;
+        samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        samplerLayoutBinding.pImmutableSamplers = NULL;
+        samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+        VkDescriptorSetLayoutBinding * bindings = malloc(sizeof(VkDescriptorSetLayoutBinding)*2);
+        bindings[0] = layoutBinding; 
+        bindings[1] = samplerLayoutBinding;
+        layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+        layoutInfo.bindingCount = 2;
+        layoutInfo.pBindings = bindings;
+    }
     }
     VK_CHECK(vkCreateDescriptorSetLayout(_device, &layoutInfo, NULL, &_ren_materials[materialIndex].descriptorSetLayout));
     return;
@@ -217,9 +241,6 @@ void _MKT_LOAD_PIPELINE(const char * FPV,const char * FPF, IntDex glmI) //AG = 0
 
     vkDestroyShaderModule(_device, fragShaderModule, NULL);
     vkDestroyShaderModule(_device, vertShaderModule, NULL);
-
-
-
 
     free(listV);
     free(listF);

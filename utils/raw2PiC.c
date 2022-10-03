@@ -50,7 +50,7 @@ for(int i = 0; i < sizeOfPalette;i++)\
     }\
 }\
 free(palette);\
-for(unsigned long long int i = 0; i < MAXCPS/32&&i<sizeOfNewPalette;i++)\
+for(unsigned long long int i = 0; i < maxPallette&&i<sizeOfNewPalette;i++)\
 {\
     unsigned long long int highest = newPalette[i].n;\
     unsigned long long int currentIndex = i;\
@@ -173,8 +173,8 @@ static unsigned long long int findBestN(int pixelData, paletteDataS * comp,unsig
 
 int main(int argc, char ** argv)
 {
-    if(argc != 4)
-        printf("Usage:\n./raw2PiC.exe {input} {output} {compression index}\n");
+    if(argc != 5)
+        printf("Usage:\n./raw2PiC.exe {input} {output} {compression index} {max pallette size (if not specified, use 0)}\n");
     else
     {
         FILE * INFILE = fopen(argv[1],"rb");
@@ -225,7 +225,9 @@ int main(int argc, char ** argv)
         }
 
 
-        
+        unsigned long long int maxPallette = 0;
+
+        sscanf(argv[4],"%llu",&maxPallette);
 
         // 0 - long long, 1 - long, 2 - int, 3 - short, 4 - char
     if(compressionIndex == 4)

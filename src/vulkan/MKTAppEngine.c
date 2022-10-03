@@ -106,8 +106,8 @@ void cleanup()
         vkDestroyBuffer(_device, _ren_AG[i].indexBuffer, NULL);
         vkFreeMemory(_device, _ren_AG[i].vertexBufferMemory, NULL);
         vkFreeMemory(_device, _ren_AG[i].indexBufferMemory, NULL);
-        free(_ren_AG[i].vertices);
-        free(_ren_AG[i].indices);
+        free(_ren_AG[i]._dataAG.vertices);
+        free(_ren_AG[i]._dataAG.indices);
     }
 
     for(int i = 0; i < _ren_sizeOfMaterials; i++)

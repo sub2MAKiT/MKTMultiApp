@@ -33,29 +33,29 @@ typedef struct MKTAGtemp {
     unsigned int * indices;
 } MKTagFtemp;
 
-IntDex _MKT_genAG(AGVertex * inVertices,IntDex inSizeOfVertices,unsigned int * inIndices,IntDex inSizeOfIndices)
+IntDex _MKT_genAG(MKTAGdata * input)
 {
     _ren_sizeOfAG++;
     _ren_AG = realloc(_ren_AG,_ren_sizeOfAG*sizeof(MKTag));
 
-    SAFEMALLOC(_ren_AG[CURRENT].vertices,(sizeof(AGVertex)*inSizeOfVertices));
-    SAFEMALLOC(_ren_AG[CURRENT].indices,(sizeof(unsigned int)*inSizeOfIndices));
+    SAFEMALLOC(_ren_AG[CURRENT]._dataAG.vertices,(sizeof(AGVertex)*input->sizeOfVertices));
+    SAFEMALLOC(_ren_AG[CURRENT]._dataAG.indices,(sizeof(unsigned int)*input->sizeOfIndices));
 
     
-    _ren_AG[CURRENT].sizeOfVertices = inSizeOfVertices;
-    _ren_AG[CURRENT].sizeOfIndices = inSizeOfIndices;
+    _ren_AG[CURRENT]._dataAG.sizeOfVertices = input->sizeOfVertices;
+    _ren_AG[CURRENT]._dataAG.sizeOfIndices = input->sizeOfIndices;
 
-    for(IntDex i = 0; i < inSizeOfVertices;i++)
-        _ren_AG[CURRENT].vertices[i] = inVertices[i];
+    for(IntDex i = 0; i < input->sizeOfVertices;i++)
+        _ren_AG[CURRENT]._dataAG.vertices[i] = input->vertices[i];
 
-    for(IntDex i = 0; i < inSizeOfIndices;i++)
-        _ren_AG[CURRENT].indices[i] = inIndices[i];
+    for(IntDex i = 0; i < input->sizeOfIndices;i++)
+        _ren_AG[CURRENT]._dataAG.indices[i] = input->indices[i];
 
-    free(inVertices);
-    free(inIndices);
+    free(input->vertices);
+    free(input->indices);
 
-    createVertexBuffer(sizeof(AGVertex)*_ren_AG[CURRENT].sizeOfVertices, _ren_AG[CURRENT].vertices, &_ren_AG[CURRENT].vertexBuffer,&_ren_AG[CURRENT].vertexBufferMemory);
-    createIndexBuffer(_ren_AG[CURRENT].sizeOfIndices, _ren_AG[CURRENT].indices, &_ren_AG[CURRENT].indexBuffer,&_ren_AG[CURRENT].indexBufferMemory);
+    createVertexBuffer(sizeof(AGVertex)*_ren_AG[CURRENT]._dataAG.sizeOfVertices, _ren_AG[CURRENT]._dataAG.vertices, &_ren_AG[CURRENT].vertexBuffer,&_ren_AG[CURRENT].vertexBufferMemory);
+    createIndexBuffer(_ren_AG[CURRENT]._dataAG.sizeOfIndices, _ren_AG[CURRENT]._dataAG.indices, &_ren_AG[CURRENT].indexBuffer,&_ren_AG[CURRENT].indexBufferMemory);
 
     VkDeviceSize bufferSize = sizeof(AGDescriptor);
 
@@ -123,40 +123,4 @@ IntDex _MKT_genAG(AGVertex * inVertices,IntDex inSizeOfVertices,unsigned int * i
     _VE_RUN_updateDescriptors(&tempDescriptor, sizeof(AGDescriptor), 0, CURRENT);
 
     return CURRENT;
-}
-
-MKTag _MKT_openAG(char * FP)
-{
-    MKTAGdata tempAGData;
-    MKTInfo * tempData;
-    MKTag returnAG;
-    unsigned long long int tempSize = 0;
-    for(int i = 0; i < _MKT_sizeOfFileModules;i++)
-        if(MKTstrcmp(MKTdissectFileType(&tempSize, FP), _MKT_fileModules[i].FileName))
-            tempData = (*_MKT_fileModules[i].load)(FP);
-
-    tempAGData = *(MKTAGdata*)tempData->data;
-
-    if(tempData->ID)
-        MKTerror(tempData->ID);
-
-    if(tempData->type != 1)
-        MKTerror(200);
-
-    free(tempData);
-
-    returnAG.vertices = (AGVertex*)tempAGData.vertices;
-    returnAG.sizeOfVertices = tempAGData.sizeOfVertices;
-    returnAG.sizeOfIndices = tempAGData.sizeOfIndices;
-    returnAG.indices = tempAGData.indices;
-
-    // free(tempData->data);
-
-    return returnAG;
-}
-
-IntDex _MKT_loadAG(char * FP)
-{
-    MKTag loaded = _MKT_openAG(FP);
-    return _MKT_genAG(loaded.vertices,loaded.sizeOfVertices,loaded.indices,loaded.sizeOfIndices);
 }

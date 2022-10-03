@@ -9,7 +9,7 @@
             {\
                 for(unsigned long long int a = i; i-a < indicesData[j+1]; i++)\
                     ((int*)outPut->pix)[i] = palette[indicesData[j+2]];\
-                    j+=2;\
+                j+=2;\
             }
 
 
@@ -75,7 +75,7 @@ MKTInfo * load(char * FP)
 
     output->data = outPut;
     output->sizeOfData = sizeOfFile;
-    output->type = 1;
+    output->type = 2;
 
     free(list);
 

@@ -58,18 +58,10 @@ typedef struct defaultDescriptorAG {
     alignas(16) MKTrgba transformation;
 } AGDescriptor;
 
-
 typedef struct MKTAGVertex { // i = 0
     MKTxy pos;
     MKTrgba colour;
 } AGVertex;
-
-typedef struct MKTAGDATA {
-    IntDex sizeOfVertices;
-    AGVertex * vertices;
-    IntDex sizeOfIndices;
-    unsigned int * indices;
-} MKTAGdata;
 
 typedef struct MKTPiCVertex { // i = 0
     MKTxy pos;
@@ -83,12 +75,21 @@ typedef struct MKTTDVertex { // i = 0
     MKTxy tex;
 } TDVertex;
 
+typedef unsigned char MKTaBM;
+
 typedef struct MKTRGBAP {
     unsigned char r;
     unsigned char g;
     unsigned char b;
     unsigned char a;
 } MKTrgbaP;
+
+typedef struct MKTAGDATA {
+    IntDex sizeOfVertices;
+    AGVertex * vertices;
+    IntDex sizeOfIndices;
+    unsigned int * indices;
+} MKTAGdata;
 
 typedef struct MKTPICDATA {
     IntDex w;
@@ -105,7 +106,17 @@ typedef struct MKTTDDATA {
     IntDex h;
     MKTrgbaP * pix;
     IntDex sizeOfVertices;
-    PiCVertex * vertices;
+    TDVertex * vertices;
     IntDex sizeOfIndices;
     unsigned int * indices;
 } MKTTDdata;
+
+typedef struct MKTBMDATA {
+    IntDex w;
+    IntDex h;
+    MKTaBM * pix;
+    IntDex sizeOfVertices;
+    PiCVertex * vertices;
+    IntDex sizeOfIndices;
+    unsigned int * indices;
+} MKTbmdata;

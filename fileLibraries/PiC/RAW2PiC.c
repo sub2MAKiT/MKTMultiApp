@@ -42,7 +42,7 @@ MKTInfo * load(char * FP)
 
     output->data = outPut;
     output->sizeOfData = sizeOfFile;
-    output->type = 1;
+    output->type = 2;
 
     free(list);
 

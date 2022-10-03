@@ -5,7 +5,7 @@
 #define MKTAUDIOV 2
 #define MKTPICV 3
 #define MKTVIDV 4
-#define MKTFONTPV 5
+#define MKTBMV 5
 #define MKTFONTMV 6
 #define MKTOBJV 7
 

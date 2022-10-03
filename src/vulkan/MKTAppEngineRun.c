@@ -54,6 +54,7 @@ void _VE_RUN_recordCommandBuffer(VkCommandBuffer commandBuffer, unsigned int ima
         //     vkCmdDrawIndexed(commandBuffer, _ren_AG[i].sizeOfIndices, 1, 0, 0, 0);
 
         // }
+        // printf("sizes: %d %d %d\n",_ren_sizeOfPiC,_ren_sizeOfAG,_ren_sizeOfBM);
         for(IntDex i = 0; i < _ren_sizeOfPiC; i++)
         {
             vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _ren_materials[1].graphicsPipeline);
@@ -67,7 +68,19 @@ void _VE_RUN_recordCommandBuffer(VkCommandBuffer commandBuffer, unsigned int ima
             vkCmdDrawIndexed(commandBuffer, _ren_PiC[i]._dataPiC.sizeOfIndices, 1, 0, 0, 0);
 
         }
-        
+        // for(IntDex i = 0; i < _ren_sizeOfBM; i++)
+        // {
+        //     vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _ren_materials[2].graphicsPipeline);
+
+        //     vkCmdBindIndexBuffer(commandBuffer,_ren_BM[i].indexBuffer, 0, VK_INDEX_TYPE_UINT32);
+
+        //     vkCmdBindVertexBuffers(commandBuffer, 0, 1, & _ren_BM[i].vertexBuffer, &tempOffset);
+
+        //     vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _ren_materials[2].pipelineLayout, 0, 1, &_ren_BM[i].descriptorSets[_currentFrame], 0, NULL);
+
+        //     vkCmdDrawIndexed(commandBuffer, _ren_BM[i]._dataPiC.sizeOfIndices, 1, 0, 0, 0);
+
+        // }        
     vkCmdEndRenderPass(commandBuffer);
 
     VK_CHECK(vkEndCommandBuffer(commandBuffer));
