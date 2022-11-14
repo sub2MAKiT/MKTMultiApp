@@ -93,6 +93,28 @@ void cleanup()
         vkFreeMemory(_device, _ren_PiC[i].textureImageMemory, NULL);
     }
 
+    for(unsigned int i = 0; i < _ren_sizeOfBM; i++)
+    {
+        for(int a = 0; a < _ren_BM[i].sizeOfUniformBuffers; a++)
+        {
+            vkDestroyBuffer(_device,  _ren_BM[i].uniformBuffers[a], NULL);
+            vkFreeMemory(_device,  _ren_BM[i].uniformBuffersMemory[a], NULL);
+        }
+
+        vkDestroyDescriptorPool(_device, _ren_BM[i].descriptorPool, NULL);
+        vkDestroyBuffer(_device, _ren_BM[i].vertexBuffer, NULL);
+        vkDestroyBuffer(_device, _ren_BM[i].indexBuffer, NULL);
+        vkFreeMemory(_device, _ren_BM[i].vertexBufferMemory, NULL);
+        vkFreeMemory(_device, _ren_BM[i].indexBufferMemory, NULL);
+        free(_ren_BM[i]._dataPiC.vertices);
+        free(_ren_BM[i]._dataPiC.indices);
+
+
+        vkDestroyImageView(_device, _ren_BM[i].textureImageView, NULL);
+        vkDestroyImage(_device, _ren_BM[i].textureImage, NULL);
+        vkFreeMemory(_device, _ren_BM[i].textureImageMemory, NULL);
+    }
+
     for(IntDex i = 0; i < _ren_sizeOfAG; i++)
     {
         for(int a = 0; a < _ren_AG[i].sizeOfUniformBuffers; a++)

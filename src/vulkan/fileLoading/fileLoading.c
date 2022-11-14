@@ -11,9 +11,11 @@ IntDex loadFile(char * FP)
         if(MKTstrcmp(MKTdissectFileType(&tempSize, FP), _MKT_fileModules[i].FileName))
             tempData = (*_MKT_fileModules[i].load)(FP);
 
+    
     char type = tempData->type;
+    
+    printf("test %d\n",tempData->type);
 
-printf("test %d\n",tempData->type);
 
     IntDex returnValue = 0;
 

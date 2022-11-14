@@ -672,6 +672,7 @@ void _VE_INIT_GraphicPipelines()
     _MKT_LOAD_PIPELINE("shaders/AGShader.vert.spv","shaders/AGShader.frag.spv",0); // 0 = MKTAG
     _MKT_LOAD_PIPELINE("shaders/PiCShader.vert.spv","shaders/PiCShader.frag.spv",1); // 1 = MKTPiC
     _MKT_LOAD_PIPELINE("shaders/BMShader.vert.spv","shaders/BMShader.frag.spv",2); // 2 = MKTbm
+    _MKT_LOAD_PIPELINE("shaders/qdrShader.vert.spv","shaders/qdrShader.frag.spv",2); // 2 = MKTbm
 
     // _MKT_LOAD_PIPELINE("shaders/AGShader.vert.spv","shaders/AGShader.frag.spv", 0,0);
 
@@ -687,9 +688,15 @@ void _VE_INIT_VE()
 
     SAFEMALLOC(_ren_AG,sizeof(MKTag));
 
+    _ren_sizeOfBM = 0;
+
+    SAFEMALLOC(_ren_BM,sizeof(MKTag));
+
     // _MKT_genBM(PiCVertex * inVertices,IntDex inSizeOfVertices,unsigned int * inIndices,IntDex inSizeOfIndices);
 
-    loadFile("../utils/test.MKTP");
+    loadFile("../utils/test.MKTbm");
+
+    // loadFile("../utils/test.MKTP");
 
     // loadFile("../utils/test.MKTP",MKTPICV);
 

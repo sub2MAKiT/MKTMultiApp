@@ -14,7 +14,7 @@ IntDex _MKT_genBM(MKTbmdata * input)
     _ren_BM = realloc(_ren_BM,_ren_sizeOfBM*sizeof(MKTbm));
     // input->w = 4608;
     // input->h = 8;
-    VkDeviceSize imageSize = input->w * input->h * 4;
+    VkDeviceSize imageSize = input->w * input->h;
 
     VkBuffer stagingBuffer;
     VkDeviceMemory stagingBufferMemory;
@@ -26,7 +26,7 @@ IntDex _MKT_genBM(MKTbmdata * input)
     char * tempO = data;
     char * tempI = (char*)input->pix;
 
-    for(int i = 0; i < input->w*input->h*4; i++)
+    for(int i = 0; i < input->w*input->h; i++)
         tempO[i] = tempI[i];
         
     vkUnmapMemory(_device, stagingBufferMemory);
@@ -158,7 +158,7 @@ IntDex _MKT_genBM(MKTbmdata * input)
         free(descriptorWrites);
     }
 
-    AGDescriptor tempDescriptor = {(float)_WindowS.width/_WindowS.height,{0.0,0.0,0.0},{1.0,0.0,1.0,1.0},{2.0,2.0,2.0,1.0}};
+    AGDescriptor tempDescriptor = {(float)_WindowS.width/_WindowS.height,{0.0,0.0,0.0},{1.0,1.0,1.0,1.0},{2.0,2.0,2.0,1.0}};
 
     _VE_RUN_updateDescriptors(&tempDescriptor, sizeof(AGDescriptor), 1, CURRENTP);
 

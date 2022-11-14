@@ -1,0 +1,2 @@
+C:\VulkanSDK\1.2.198.1\Bin\\glslc.exe .\src\vulkan\shaders\qdrShader\qdrShader.frag -o .\build\shaders\qdrShader.frag.spv
+C:\VulkanSDK\1.2.198.1\Bin\\glslc.exe .\src\vulkan\shaders\qdrShader\qdrShader.vert -o .\build\shaders\qdrShader.vert.spv
