@@ -1,0 +1,2 @@
+build.ps1 linguist-vendored=false
+build.sh linguist-vendored=false
