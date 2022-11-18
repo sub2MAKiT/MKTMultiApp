@@ -1,14 +1,11 @@
-SECTION .TEXT
-	GLOBAL _MKTAS_UIFAC
-
 _MKTAS_UIFAC:
     mov rax, rcx
-backLabel:
+backLabel1:
     cmp rcx, 1
-    jne loopAndMul
+    jne loopAndMul1
     ret
 
-loopAndMul:
+loopAndMul1:
     dec rcx
     imul rax, rcx
-    jmp backLabel
+    jmp backLabel1
