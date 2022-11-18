@@ -696,13 +696,18 @@ void _VE_INIT_VE()
 
     loadFile("../utils/test.MKTbm");
 
-    // loadFile("../utils/test.MKTP");
+    loadFile("../utils/test.MKTP");
 
     // loadFile("../utils/test.MKTP",MKTPICV);
 
     // loadFile("DataFiles/testlogo.MKTRAWPiC",MKTPICV);
 
     // loadFile("./DataFiles/shape.MKTAG",MKTAGV);
+
+    IntDex a[1] = {7};
+    printf("a\n");
+    printf("%d %d %d",*a,_MKTAS_STAT(a),*a);
+    printf("a\n");
 
     DEBUG("II> init:VEvariables <II");
     return;

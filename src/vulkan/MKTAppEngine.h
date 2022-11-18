@@ -175,6 +175,8 @@ void _VE_INIT_SyncObjects(); // An init function for creating semaphores and fen
 void _VE_INIT_Sampler(); // An init function for creating semaphores and fences
 void _VE_INIT_VE(); // An init function for VentumEngine variables
 
+void * _MKTGENERALFUNC(IntDex index, void * data);
+
 void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 
 // RUNTIME FUNCTIONS
@@ -324,6 +326,8 @@ extern MKTbm * _ren_BM;
 extern IntDex _ren_sizeOfBM;
 
 #endif
+
+extern unsigned long long _MKTAS_STAT(unsigned long long int * rsi);
 
 /* some helpfull errors to know
 * 1. -1073741819 - The "Dev can't use malloc correctly" error

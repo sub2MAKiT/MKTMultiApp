@@ -4,6 +4,7 @@
 
 void init()
 {
+    DEBUG("III init III");
 
     _VE_INIT_window(); // #0000ff
 
@@ -35,7 +36,6 @@ void init()
 
     _VE_INIT_VE(); // #0000ff
 
-    DEBUG("III init III");
     DEBUG("III> init <III");
     return;
 }
