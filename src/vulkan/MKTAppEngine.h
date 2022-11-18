@@ -328,6 +328,7 @@ extern IntDex _ren_sizeOfBM;
 #endif
 
 extern unsigned long long _MKTAS_STAT(unsigned long long int * rsi);
+extern unsigned long long _MKTAS_UIFAC(unsigned long long int rsi);
 
 /* some helpfull errors to know
 * 1. -1073741819 - The "Dev can't use malloc correctly" error

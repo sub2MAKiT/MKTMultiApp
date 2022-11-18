@@ -704,10 +704,8 @@ void _VE_INIT_VE()
 
     // loadFile("./DataFiles/shape.MKTAG",MKTAGV);
 
-    IntDex a[1] = {7};
-    printf("a\n");
-    printf("%d %d %d",*a,_MKTAS_STAT(a),*a);
-    printf("a\n");
+    IntDex a = 3;
+    printf("%d %d %d\n",a,_MKTAS_UIFAC(a),a);
 
     DEBUG("II> init:VEvariables <II");
     return;
