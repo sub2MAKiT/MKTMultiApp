@@ -48,7 +48,7 @@ if ($math) {
     # nasm -f win64 ./src/math/0.x64.stat.s -o ./linking/0.x64.o
     # nasm -f win64 ./src/math/1.x64.uifac.s -o ./linking/1.x64.o
     # nasm -f win64 ./src/math/2.x64.e.s -o ./linking/2.x64.o
-    nasm -f win64 ./src/math/header.x64.s -o ./linking/header.x64.o
+    nasm $DEBUGG -f win64 ./src/math/header.x64.s -o ./linking/header.x64.o
 }
 if($windows)
 {

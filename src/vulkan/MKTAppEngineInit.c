@@ -380,7 +380,8 @@ void _VE_INIT_LogicalDevice()
     createInfo.pEnabledFeatures = &deviceFeatures;
 
     createInfo.enabledExtensionCount = _deviceExtensions.sizeOfString;
-    createInfo.ppEnabledExtensionNames = _deviceExtensions.pString;
+    createInfo.ppEnabledExtensionNames =  _deviceExtensions.pString;
+
 
     createInfo.queueCreateInfoCount = sizeOfQueueCreateInfos;
     createInfo.pQueueCreateInfos = queueCreateInfos;
@@ -454,7 +455,13 @@ void _VE_INIT_Swapchain()
 
     createInfo.oldSwapchain = VK_NULL_HANDLE;
 
+    // printf("fp: %llx\n",vkCreateSwapchainKHR);
+
+    // printf("\n%x %x\n",(*(VkFramebufferCreateInfo*)&createInfo).renderPass,VK_NULL_HANDLE);
+
+    DEBUG("marker 1");
     VK_CHECK(vkCreateSwapchainKHR(_device, &createInfo, NULL, &_swapChain));
+    DEBUG("marker 2");
 
     vkGetSwapchainImagesKHR(_device, _swapChain, &_imageCount, NULL);
     SAFEMALLOC(_swapChainImages,(sizeof(VkImage)*_imageCount));
@@ -541,6 +548,7 @@ void _VE_INIT_RenderPass()
     renderPassInfo.pDependencies = &dependency;
 
     VK_CHECK(vkCreateRenderPass(_device, &renderPassInfo, NULL, &_renderPass));
+
     DEBUG("II> init:RenderPass <II");
     return;
 }
@@ -704,13 +712,12 @@ void _VE_INIT_VE()
 
     // loadFile("./DataFiles/shape.MKTAG",MKTAGV);
 
-    IntDex a = 3;
-    printf("%f %f %f %f %.27f\n",_MKTAS_CALC_E(1),_MKTAS_CALC_E(2),_MKTAS_CALC_E(3),_MKTAS_CALC_E(5),_MKTAS_CALC_E(26));
+    printf("%f %f %f %f %.27f %f\n",_MKTAS_CALC_E(1),_MKTAS_CALC_E(2),_MKTAS_CALC_E(3),_MKTAS_CALC_E(5),_MKTAS_CALC_E(26),_MKTAS_CALC_EXP(10,2.0));
 
-    for(int i = 1; i <= 26; i++)
-    {
-        printf("%d. %.27f\n",i,_MKTAS_CALC_E(i));
-    }
+    // for(int i = 1; i <= 26; i++)
+    // {
+    //     printf("%d. %.27f\n",i,_MKTAS_CALC_E(i));
+    // }
 
     DEBUG("II> init:VEvariables <II");
     return;

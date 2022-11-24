@@ -32,7 +32,7 @@ MKTInfo * load(char * FP)
     unsigned char compressionIndex = list[0];
     unsigned long long int sizeOfFilteredPalette = *(unsigned long long int*)&list[17];
 
-    printf("palette size: %d\n",sizeOfFilteredPalette);
+    // printf("palette size: %d\n",sizeOfFilteredPalette);
     outPut->w = *(unsigned long long int*)&list[1];
     outPut->h = *(unsigned long long int*)&list[9];
     outPut->pix = malloc(outPut->w*outPut->h*sizeof(MKTrgbaP));

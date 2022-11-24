@@ -256,7 +256,7 @@ IntDex _ren_sizeOfBM;
 #ifdef NDEBUG
     const char enableValidationLayers = 0;
 #else
-    const char enableValidationLayers = 1;
+    const char enableValidationLayers = 0;
 #endif
 MKTVstring validationLayers;
 
@@ -327,9 +327,10 @@ extern IntDex _ren_sizeOfBM;
 
 #endif
 
-extern unsigned long long _MKTAS_STAT(unsigned long long int * rsi);
-extern unsigned long long _MKTAS_UIFAC(unsigned long long int rsi);
-extern double _MKTAS_CALC_E(unsigned long long int rsi);
+extern unsigned long long _MKTAS_STAT(unsigned long long int * rcx);
+extern unsigned long long _MKTAS_UIFAC(unsigned long long int rcx);
+extern double _MKTAS_CALC_E(unsigned long long int rcx);
+extern double _MKTAS_CALC_EXP(unsigned long long int rcx,double xmm0);
 
 /* some helpfull errors to know
 * 1. -1073741819 - The "Dev can't use malloc correctly" error

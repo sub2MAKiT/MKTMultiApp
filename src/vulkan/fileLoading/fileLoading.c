@@ -14,7 +14,7 @@ IntDex loadFile(char * FP)
     
     char type = tempData->type;
     
-    printf("test %d\n",tempData->type);
+    // printf("test %d\n",tempData->type);
 
 
     IntDex returnValue = 0;
