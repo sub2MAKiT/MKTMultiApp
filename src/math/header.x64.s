@@ -4,8 +4,10 @@ SECTION .TEXT
     GLOBAL _MKTAS_UIFAC
     GLOBAL _MKTAS_CALC_E
     GLOBAL _MKTAS_CALC_EXP
+    GLOBAL _MKTAS_CALC_SINH
 
 %include "./src/math/0.x64.stat.s"
 %include "./src/math/1.x64.uifac.s"
 %include "./src/math/2.x64.e.s"
 %include "./src/math/3.x64.exp.s"
+%include "./src/math/4.x64.sinh.s"
