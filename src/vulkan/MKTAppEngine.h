@@ -334,6 +334,7 @@ extern double _MKTAS_CALC_EXP(unsigned long long int rcx,double xmm0);
 extern double _MKTAS_CALC_SINH(unsigned long long int rcx,double xmm0);
 extern double _MKTAS_CALC_COSH(unsigned long long int rcx,double xmm0);
 extern double _MKTAS_CALC_TANH(unsigned long long int rcx,double xmm0);
+extern double _MKTAS_CALC_COS(double xmm0);
 
 /* some helpfull errors to know
 * 1. -1073741819 - The "Dev can't use malloc correctly" error
