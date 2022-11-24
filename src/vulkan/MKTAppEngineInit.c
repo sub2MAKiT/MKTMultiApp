@@ -713,7 +713,7 @@ void _VE_INIT_VE()
     // loadFile("./DataFiles/shape.MKTAG",MKTAGV);
 
     printf("%.27f %f %f %f\n",_MKTAS_CALC_E(26),_MKTAS_CALC_EXP(10,-2.0),_MKTAS_CALC_COSH(10,-2.0),_MKTAS_CALC_COS(2.0));
-    printf("%f\n",_MKTAS_CALC_COS(-2.0));
+    printf("%f %f\n",_MKTAS_CALC_SIN(-2.0),_MKTAS_CALC_COS(-2.0));
 
     // for(int i = 1; i <= 26; i++)
     // {

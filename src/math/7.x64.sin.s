@@ -1,6 +1,6 @@
 section .text
 
-_MKTAS_CALC_COS:
+_MKTAS_CALC_SIN:
     ; xmm0 has the input
     ; xmm0 has the output
     ; In here It might be quicker, if I just hardcode everything and go for the: speed > memory (memory in here will mean around a kilobyto, so I'm good)
