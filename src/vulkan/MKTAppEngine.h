@@ -175,7 +175,7 @@ void _VE_INIT_SyncObjects(); // An init function for creating semaphores and fen
 void _VE_INIT_Sampler(); // An init function for creating semaphores and fences
 void _VE_INIT_VE(); // An init function for VentumEngine variables
 
-void * _MKTGENERALFUNC(IntDex index, void * data);
+unsigned long long int _MKTGENERALFUNC(IntDex index, void * data);
 
 void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 
@@ -336,6 +336,7 @@ extern double _MKTAS_CALC_COSH(unsigned long long int rcx,double xmm0);
 extern double _MKTAS_CALC_TANH(unsigned long long int rcx,double xmm0);
 extern double _MKTAS_CALC_SIN(double xmm0);
 extern double _MKTAS_CALC_COS(double xmm0);
+extern double _MKTAS_CALC_TAN(double xmm0);
 
 /* some helpfull errors to know
 * 1. -1073741819 - The "Dev can't use malloc correctly" error
