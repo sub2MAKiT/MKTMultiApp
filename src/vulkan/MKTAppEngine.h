@@ -8,6 +8,13 @@
 #include <utils/MKTbuffer.h>
 #include <goodLuckMate/glm.h>
 
+// openCL
+#ifdef MAC
+#include <OpenCL/cl.h>
+#else
+#include <CL/cl.h>
+#endif
+
 // MACROS
 
 #define VK_CHECK(x)                                             \
@@ -23,6 +30,40 @@ do                                                              \
 } while (0)
 
 // STRUCTS
+
+// MATH
+
+typedef union AsseMathInput {
+    void * VP;
+    } SIN;
+
+typedef union AsseMathoOutput {
+    unsigned long long ULL;
+    double D;
+} SON;
+
+// OPENCL
+
+typedef struct OpenCLSETUPS {
+    cl_platform_id platform;
+    cl_device_id dev;
+    cl_context context;
+    cl_program program;
+    cl_kernel kernel;
+    cl_command_queue queue;
+    cl_int err;
+    size_t local_size, global_size;
+} OCL;
+
+// typedef struct OpenCLRUNTIMES {
+//     size_t program_size, log_size;
+//     FILE *program_handle;
+//     char *program_buffer, *program_log;
+//     float data[ARRAY_SIZE];
+//     float sum[2], total, actual_sum;
+//     cl_mem input_buffer, sum_buffer;
+//     cl_int num_groups;
+// } OCLR;
 
 // GLM
 
@@ -175,7 +216,9 @@ void _VE_INIT_SyncObjects(); // An init function for creating semaphores and fen
 void _VE_INIT_Sampler(); // An init function for creating semaphores and fences
 void _VE_INIT_VE(); // An init function for VentumEngine variables
 
-unsigned long long int _MKTGENERALFUNC(IntDex index, void * data);
+void _VE_INIT_OPENCL(); // Setup all necessary variables for OPENCL (OCL)
+
+SON _MKTGENERALFUNC(IntDex index, SIN * data);
 
 void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 
@@ -251,6 +294,8 @@ IntDex _ren_sizeOfPiC;
 MKTbm * _ren_BM = NULL;
 IntDex _ren_sizeOfBM;
 
+OCL _OPENCL_DATA;
+
 
 // validation layers
 #ifdef NDEBUG
@@ -324,6 +369,8 @@ extern IntDex _ren_sizeOfPiC;
 
 extern MKTbm * _ren_BM;
 extern IntDex _ren_sizeOfBM;
+
+extern OCL _OPENCL_DATA;
 
 #endif
 

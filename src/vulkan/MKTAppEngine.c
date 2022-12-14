@@ -34,6 +34,8 @@ void init()
 
     _VE_INIT_Sampler(); // #0000ff
 
+    _VE_INIT_OPENCL(); // #0000ff
+
     _VE_INIT_VE(); // #0000ff
 
     DEBUG("III> init <III");
