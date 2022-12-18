@@ -46,14 +46,9 @@ typedef union AsseMathoOutput {
 // OPENCL
 
 typedef struct OpenCLSETUPS {
+    cl_device_id device;
     cl_platform_id platform;
-    cl_device_id dev;
-    cl_context context;
-    cl_program program;
-    cl_kernel kernel;
-    cl_command_queue queue;
     cl_int err;
-    size_t local_size, global_size;
 } OCL;
 
 // typedef struct OpenCLRUNTIMES {
@@ -218,6 +213,7 @@ void _VE_INIT_Sampler(); // An init function for creating semaphores and fences
 void _VE_INIT_VE(); // An init function for VentumEngine variables
 
 void _VE_INIT_OPENCL(); // Setup all necessary variables for OPENCL (OCL)
+void _VE_OPENCL_CREATE_PROGRAM(char * filename);
 
 SON _MKTGENERALFUNC(IntDex index, SIN * data);
 

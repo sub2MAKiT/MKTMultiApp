@@ -700,6 +700,8 @@ void _VE_INIT_VE()
 
     SAFEMALLOC(_ren_BM,sizeof(MKTag));
 
+    _VE_OPENCL_CREATE_PROGRAM("openCL/test.cl");
+
     // _MKT_genBM(PiCVertex * inVertices,IntDex inSizeOfVertices,unsigned int * inIndices,IntDex inSizeOfIndices);
 
     loadFile("../utils/test.MKTbm");
