@@ -3,10 +3,19 @@
 VkPipelineVertexInputStateCreateInfo getInputDescription(IntDex i) {
     VkPipelineVertexInputStateCreateInfo returnInfo = {};
     VkVertexInputBindingDescription * bindingDescription;
-
-    SAFEMALLOC(bindingDescription,(sizeof(VkVertexInputBindingDescription)));
-
-    switch(i) // MKTAGVertex
+    //SAFEMALLOC(bindingDescription,sizeof(VkVertexInputBindingDescription));
+// I tried to do a safemalloc in here, but got a "malloc(): invalid next->prev_inuse (unsorted)"
+// this is a ghost error soo...
+//
+// update, once again, heap corruption
+//
+// for anyone that is looking for the malloc error fixes
+// just look for any undefined behaviour
+// unloaded files, uninitialized variables etc
+//
+ 
+	bindingDescription = malloc(sizeof(VkVertexInputBindingDescription));    
+	switch(i) // MKTAGVertex
     {
         case 0:
         {

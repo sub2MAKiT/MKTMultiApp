@@ -9,6 +9,7 @@
 #include <goodLuckMate/glm.h>
 
 // openCL
+#define CL_TARGET_OPENCL_VERSION 300
 #ifdef MAC
 #include <OpenCL/cl.h>
 #else

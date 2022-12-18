@@ -204,13 +204,13 @@ void fileSOLoading()
 
                 _MKT_fileModules[CURRENTF].load = (MKTInfo*(*)(char * FP))dlsym(fileHmodules[fileShmodules-1], "load");
                 _MKT_fileModules[CURRENTF].init = (char(*)(char))dlsym(fileHmodules[fileShmodules-1], "init");
-                _MKT_fileModules[CURRENTF].type = (*_MKT_fileModules[CURRENTF].init)(
+/*                _MKT_fileModules[CURRENTF].type = (*_MKT_fileModules[CURRENTF].init)(
                     #ifdef MKT_DEBUG
                     0b00000001
                     #else
                     0b00000000
                     #endif
-                    );
+                    );*/
                 }
         }
 
