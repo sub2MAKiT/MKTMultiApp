@@ -1,5 +1,6 @@
-# WIKI
-1. [MKTDLL](./wiki/MKTDLL.md)
+# BUILDING
+
+In order to build the project
 
 # VERSIONS
 
