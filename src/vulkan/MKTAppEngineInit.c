@@ -692,21 +692,29 @@ void _VE_INIT_VE()
 {
     DEBUG("II init:VEvariables II");
 
+    DEBUG("II init:VEvariables II-1");
     _ren_sizeOfAG = 0;
 
+    DEBUG("II init:VEvariables II-2");
     SAFEMALLOC(_ren_AG,sizeof(MKTag));
 
+    DEBUG("II init:VEvariables II-3");
     _ren_sizeOfBM = 0;
 
+    DEBUG("II init:VEvariables II-4");
     SAFEMALLOC(_ren_BM,sizeof(MKTag));
 
-    _VE_OPENCL_CREATE_PROGRAM("openCL/test.cl");
+    // _VE_OPENCL_CREATE_PROGRAM("openCL/test.cl");
 
     // _MKT_genBM(PiCVertex * inVertices,IntDex inSizeOfVertices,unsigned int * inIndices,IntDex inSizeOfIndices);
+    DEBUG("II init:VEvariables II-");
 
     loadFile("../utils/test.MKTbm");
+    loadFile("../utils/tempLogoMain.png");
+    DEBUG("II init:VEvariables II--");
 
-    loadFile("../utils/test.MKTP");
+    // loadFile("../utils/test.MKTP");
+    DEBUG("II init:VEvariables II---");
 
     // loadFile("../utils/test.MKTP",MKTPICV);
 

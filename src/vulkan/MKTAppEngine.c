@@ -34,7 +34,7 @@ void init()
 
     _VE_INIT_Sampler(); // #0000ff
 
-    _VE_INIT_OPENCL(); // #0000ff
+    // _VE_INIT_OPENCL(); // #0000ff "Couldn't identify a platform"
 
     _VE_INIT_VE(); // #0000ff
 
