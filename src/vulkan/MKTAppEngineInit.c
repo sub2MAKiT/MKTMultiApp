@@ -717,13 +717,13 @@ void _VE_INIT_VE()
 
     //printf("%.27f %f %f %f\n",_MKTAS_CALC_E(26),_MKTAS_CALC_EXP(10,-2.0),_MKTAS_CALC_COSH(10,-2.0),_MKTAS_CALC_COS(2.0));
 
-//    SIN input = {};
-//    int * a = malloc(sizeof(int));
-//   a[0] = 100;
-//    input.VP = a;
-//    SON b = {};
-//    b = _MKTGENERALFUNC(0, &input);
-//    printf("test: %lld\n",b.ULL);
+    SIN input = {};
+    int * a = malloc(sizeof(int));
+    a[0] = 100;
+    input.VP = a;
+    SON b = {};
+    b = _MKTGENERALFUNC(0, &input);
+    printf("test: %lld\n",b.ULL);
 
     // for(int i = 1; i <= 26; i++)
     // {
