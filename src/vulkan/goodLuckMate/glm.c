@@ -42,6 +42,7 @@ VkPipelineVertexInputStateCreateInfo getInputDescription(IntDex i) {
             returnInfo.vertexAttributeDescriptionCount = 2;
             returnInfo.pVertexBindingDescriptions = bindingDescription;
             returnInfo.pVertexAttributeDescriptions = attributeDescriptions;
+            break;
         }
         case 1: // MKTPiCVertex
         {
@@ -73,8 +74,9 @@ VkPipelineVertexInputStateCreateInfo getInputDescription(IntDex i) {
             returnInfo.vertexAttributeDescriptionCount = 3;
             returnInfo.pVertexBindingDescriptions = bindingDescription;
             returnInfo.pVertexAttributeDescriptions = attributeDescriptions;
+            break;
         }
-        case 2:
+        case 2: // MKTBM
         {
             bindingDescription->binding = 0;
             bindingDescription->stride = sizeof(PiCVertex);
@@ -103,6 +105,54 @@ VkPipelineVertexInputStateCreateInfo getInputDescription(IntDex i) {
             returnInfo.vertexAttributeDescriptionCount = 3;
             returnInfo.pVertexBindingDescriptions = bindingDescription;
             returnInfo.pVertexAttributeDescriptions = attributeDescriptions;
+            break;
+        }
+        case 3: //MKTQDR
+        {
+            bindingDescription->binding = 0;
+            bindingDescription->inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+            VkVertexInputAttributeDescription * attributeDescriptions;
+
+            SAFEMALLOC(attributeDescriptions,(sizeof(VkVertexInputAttributeDescription)*2));
+
+            bindingDescription->stride = sizeof(AGVertex);
+
+            attributeDescriptions[0].binding = 0;
+            attributeDescriptions[0].location = 0;
+            attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT; // first vertice
+            attributeDescriptions[0].offset = offsetof(QDRVertex, pos1);
+
+            attributeDescriptions[1].binding = 0;
+            attributeDescriptions[1].location = 1;
+            attributeDescriptions[1].format = VK_FORMAT_R32G32_SFLOAT; // second vertice
+            attributeDescriptions[1].offset = offsetof(QDRVertex, pos2);
+
+            attributeDescriptions[2].binding = 0;
+            attributeDescriptions[2].location = 2;
+            attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT; // third vertice
+            attributeDescriptions[2].offset = offsetof(QDRVertex, pos3);
+
+            attributeDescriptions[3].binding = 0;
+            attributeDescriptions[3].location = 3;
+            attributeDescriptions[3].format = VK_FORMAT_R32G32_SFLOAT; // fourth vertice
+            attributeDescriptions[3].offset = offsetof(QDRVertex, pos4);
+
+            attributeDescriptions[4].binding = 0;
+            attributeDescriptions[4].location = 4;
+            attributeDescriptions[4].format = VK_FORMAT_R8_UINT; // option, 0 = line, 1 = quadratic, 2 = qubic
+            attributeDescriptions[4].offset = offsetof(QDRVertex, option);
+
+            attributeDescriptions[5].binding = 0;
+            attributeDescriptions[5].location = 5;
+            attributeDescriptions[5].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+            attributeDescriptions[5].offset = offsetof(QDRVertex, colour);
+
+            returnInfo.vertexBindingDescriptionCount = 1;
+            returnInfo.vertexAttributeDescriptionCount = 2;
+            returnInfo.pVertexBindingDescriptions = bindingDescription;
+            returnInfo.pVertexAttributeDescriptions = attributeDescriptions;
+            break;
         }
     }
 

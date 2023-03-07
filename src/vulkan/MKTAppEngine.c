@@ -45,10 +45,13 @@ void init()
 void run()
 {
     DEBUG("III run III");
+    // glfwSetKeyCallback(_window, key_callback);
 
     while (!glfwWindowShouldClose(_window)) {
         _VE_RUN_drawFrame();
-        glfwPollEvents();
+        DEBUG("test123467");
+        glfwPollEvents(); // #ff0000
+        DEBUG("test1234678");
     }
 
     vkDeviceWaitIdle(_device);
@@ -73,6 +76,27 @@ void cleanup()
 
     vkDestroySampler(_device, _textureSampler, NULL);
 
+    DEBUG("II VK QDR cleanup II");
+
+    for(IntDex i = 0; i < _ren_sizeOfQDR; i++)
+    {
+        for(int a = 0; a < _ren_QDR[i].sizeOfUniformBuffers; a++)
+        {
+            vkDestroyBuffer(_device,  _ren_QDR[i].uniformBuffers[a], NULL);
+            vkFreeMemory(_device,  _ren_QDR[i].uniformBuffersMemory[a], NULL);
+        }
+
+        vkDestroyDescriptorPool(_device, _ren_QDR[i].descriptorPool, NULL);
+        vkDestroyBuffer(_device, _ren_QDR[i].vertexBuffer, NULL);
+        vkDestroyBuffer(_device, _ren_QDR[i].indexBuffer, NULL);
+        vkFreeMemory(_device, _ren_QDR[i].vertexBufferMemory, NULL);
+        vkFreeMemory(_device, _ren_QDR[i].indexBufferMemory, NULL);
+        free(_ren_QDR[i]._dataQDR.vertices);
+        free(_ren_QDR[i]._dataQDR.indices);
+    }
+
+    DEBUG("II VK PiC cleanup II");
+
     for(unsigned int i = 0; i < _ren_sizeOfPiC; i++)
     {
         for(int a = 0; a < _ren_PiC[i].sizeOfUniformBuffers; a++)
@@ -95,6 +119,8 @@ void cleanup()
         vkFreeMemory(_device, _ren_PiC[i].textureImageMemory, NULL);
     }
 
+    DEBUG("II VK BM cleanup II");
+
     for(unsigned int i = 0; i < _ren_sizeOfBM; i++)
     {
         for(int a = 0; a < _ren_BM[i].sizeOfUniformBuffers; a++)
@@ -116,6 +142,8 @@ void cleanup()
         vkDestroyImage(_device, _ren_BM[i].textureImage, NULL);
         vkFreeMemory(_device, _ren_BM[i].textureImageMemory, NULL);
     }
+
+    DEBUG("II VK AG cleanup II");
 
     for(IntDex i = 0; i < _ren_sizeOfAG; i++)
     {

@@ -5,7 +5,7 @@ layout(location = 1) in vec4 inColor;
 layout(location = 2) in vec2 inTexCoord;
 
 layout(binding = 0) uniform ratio {
-    float r;
+    int[2] r;
 	vec3 movement;
     vec4 colourModification;
 	vec4 transformation;

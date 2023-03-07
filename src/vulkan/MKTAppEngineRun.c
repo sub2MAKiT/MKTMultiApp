@@ -81,19 +81,33 @@ void _VE_RUN_recordCommandBuffer(VkCommandBuffer commandBuffer, unsigned int ima
         //     vkCmdDrawIndexed(commandBuffer, _ren_BM[i]._dataPiC.sizeOfIndices, 1, 0, 0, 0);
 
         // }
-        for(IntDex i = 0; i < _ren_sizeOfBM; i++)
-        {
-            vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _ren_materials[3].graphicsPipeline);
+        // for(IntDex i = 0; i < _ren_sizeOfBM; i++)
+        // {
+        //     vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _ren_materials[3].graphicsPipeline);
 
-            vkCmdBindIndexBuffer(commandBuffer,_ren_BM[i].indexBuffer, 0, VK_INDEX_TYPE_UINT32);
+        //     vkCmdBindIndexBuffer(commandBuffer,_ren_BM[i].indexBuffer, 0, VK_INDEX_TYPE_UINT32);
 
-            vkCmdBindVertexBuffers(commandBuffer, 0, 1, & _ren_BM[i].vertexBuffer, &tempOffset);
+        //     vkCmdBindVertexBuffers(commandBuffer, 0, 1, & _ren_BM[i].vertexBuffer, &tempOffset);
 
-            vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _ren_materials[3].pipelineLayout, 0, 1, &_ren_BM[i].descriptorSets[_currentFrame], 0, NULL);
+        //     vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _ren_materials[3].pipelineLayout, 0, 1, &_ren_BM[i].descriptorSets[_currentFrame], 0, NULL);
 
-            vkCmdDrawIndexed(commandBuffer, _ren_BM[i]._dataPiC.sizeOfIndices, 1, 0, 0, 0);
+        //     vkCmdDrawIndexed(commandBuffer, _ren_BM[i]._dataPiC.sizeOfIndices, 1, 0, 0, 0);
 
-        }        
+        // }
+        // for(IntDex i = 0; i < _ren_sizeOfQDR; i++)
+        // {
+        //     vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _ren_materials[3].graphicsPipeline);
+
+        //     vkCmdBindIndexBuffer(commandBuffer,_ren_QDR[i].indexBuffer, 0, VK_INDEX_TYPE_UINT32);
+
+        //     vkCmdBindVertexBuffers(commandBuffer, 0, 1, & _ren_QDR[i].vertexBuffer, &tempOffset);
+
+        //     vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _ren_materials[3].pipelineLayout, 0, 1, &_ren_QDR[i].descriptorSets[_currentFrame], 0, NULL);
+
+        //     vkCmdDrawIndexed(commandBuffer, _ren_QDR[i]._dataQDR.sizeOfIndices, 1, 0, 0, 0);
+
+        // }
+
     vkCmdEndRenderPass(commandBuffer);
 
     VK_CHECK(vkEndCommandBuffer(commandBuffer));
@@ -120,6 +134,7 @@ void _VE_RUN_drawFrame()
 
     vkResetCommandBuffer(_commandBuffers[_currentFrame], /*VkCommandBufferResetFlagBits*/ 0);
     _VE_RUN_recordCommandBuffer(_commandBuffers[_currentFrame], imageIndex);
+    DEBUG("test1234");
 
     VkSubmitInfo submitInfo = {};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -136,6 +151,7 @@ void _VE_RUN_drawFrame()
     VkSemaphore signalSemaphores[1] = {_runtimeKit[_currentFrame].renderFinishedSemaphore};
     submitInfo.signalSemaphoreCount = 1;
     submitInfo.pSignalSemaphores = signalSemaphores;
+    DEBUG("test12345");
 
     VK_CHECK(vkQueueSubmit(_graphicsQueue, 1, &submitInfo, _runtimeKit[_currentFrame].inFlightFence));
     VkPresentInfoKHR presentInfo = {};
@@ -152,6 +168,7 @@ void _VE_RUN_drawFrame()
 
     vkQueuePresentKHR(_presentQueue, &presentInfo);
 
+    DEBUG("test12346");
     _currentFrame = (_currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
     return;
 }
@@ -164,6 +181,15 @@ void _VE_RUN_updateDescriptors(void * data, IntDex dataSize, IntDex type, IntDex
         for(int i = 0; i < _ren_AG[index].sizeOfUniformBuffers;i++)
         {
             vkMapMemory(_device, _ren_AG[index].uniformBuffersMemory[i], 0, dataSize, 0, &Odata);
+            for(IntDex i = 0; i < dataSize;i++)
+                *(char *)(Odata+i) = *(char *)(data+i);
+            vkUnmapMemory(_device, _ren_AG[index].uniformBuffersMemory[i]);
+        }
+    } else if(type == 3)
+    {
+        for(int i = 0; i < _ren_QDR[index].sizeOfUniformBuffers;i++)
+        {
+            vkMapMemory(_device, _ren_QDR[index].uniformBuffersMemory[i], 0, dataSize, 0, &Odata);
             for(IntDex i = 0; i < dataSize;i++)
                 *(char *)(Odata+i) = *(char *)(data+i);
             vkUnmapMemory(_device, _ren_AG[index].uniformBuffersMemory[i]);

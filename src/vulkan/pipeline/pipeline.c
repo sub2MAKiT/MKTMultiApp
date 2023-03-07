@@ -18,6 +18,7 @@ void _MKT_LOAD_DESCRIPTORS(IntDex materialIndex, IntDex glmI)
         layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
         layoutInfo.bindingCount = 1;
         layoutInfo.pBindings = &layoutBinding;
+        break;
     }
     case 1:// MKTPiC
     {
@@ -39,8 +40,9 @@ void _MKT_LOAD_DESCRIPTORS(IntDex materialIndex, IntDex glmI)
         layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
         layoutInfo.bindingCount = 2;
         layoutInfo.pBindings = bindings;
+        break;
     }
-    case 2:
+    case 2: // MKTBM
     {
         layoutBinding.binding = 0;
         layoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -60,6 +62,19 @@ void _MKT_LOAD_DESCRIPTORS(IntDex materialIndex, IntDex glmI)
         layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
         layoutInfo.bindingCount = 2;
         layoutInfo.pBindings = bindings;
+        break;
+    }
+    case 3: // MKTQDR
+    {
+        layoutBinding.binding = 0;
+        layoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        layoutBinding.descriptorCount = 1;
+        layoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+        layoutBinding.pImmutableSamplers = NULL;
+        layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+        layoutInfo.bindingCount = 1;
+        layoutInfo.pBindings = &layoutBinding;
+        break;
     }
     }
     VK_CHECK(vkCreateDescriptorSetLayout(_device, &layoutInfo, NULL, &_ren_materials[materialIndex].descriptorSetLayout));

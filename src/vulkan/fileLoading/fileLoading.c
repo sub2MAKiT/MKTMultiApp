@@ -23,9 +23,9 @@ IntDex loadFile(char * FP)
         0;
     else if(type == MKTAGV) // 1
         _MKT_genAG(tempData->data);
-    else if(type == MKTAUDIOV) // 2
+    else if(type == MKTPICV) // 2
         _MKT_genPiC(tempData->data);
-    else if(type == MKTPICV) // 3
+    else if(type == MKTAUDIOV) // 3
         0;
     else if(type == MKTVIDV) // 4
         0;

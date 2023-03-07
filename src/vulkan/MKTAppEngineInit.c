@@ -680,7 +680,7 @@ void _VE_INIT_GraphicPipelines()
     _MKT_LOAD_PIPELINE("shaders/AGShader.vert.spv","shaders/AGShader.frag.spv",0); // 0 = MKTAG
     _MKT_LOAD_PIPELINE("shaders/PiCShader.vert.spv","shaders/PiCShader.frag.spv",1); // 1 = MKTPiC
     _MKT_LOAD_PIPELINE("shaders/bmShader.vert.spv","shaders/bmShader.frag.spv",2); // 2 = MKTbm
-    _MKT_LOAD_PIPELINE("shaders/qdrShader.vert.spv","shaders/qdrShader.frag.spv",2); // 2 = MKTbm
+    _MKT_LOAD_PIPELINE("shaders/qdrShader.vert.spv","shaders/qdrShader.frag.spv",3); // 3 = MKTqdr
 
     // _MKT_LOAD_PIPELINE("shaders/AGShader.vert.spv","shaders/AGShader.frag.spv", 0,0);
 
@@ -704,17 +704,57 @@ void _VE_INIT_VE()
     DEBUG("II init:VEvariables II-4");
     SAFEMALLOC(_ren_BM,sizeof(MKTag));
 
+    DEBUG("II init:VEvariables II-3");
+    _ren_sizeOfQDR = 0;
+
+    DEBUG("II init:VEvariables II-4");
+    SAFEMALLOC(_ren_QDR,sizeof(MKTqdr));
+
     // _VE_OPENCL_CREATE_PROGRAM("openCL/test.cl");
 
     // _MKT_genBM(PiCVertex * inVertices,IntDex inSizeOfVertices,unsigned int * inIndices,IntDex inSizeOfIndices);
     DEBUG("II init:VEvariables II-");
 
-    loadFile("../utils/test.MKTbm");
+    // loadFile("../utils/test.MKTbm");
     loadFile("../utils/tempLogoMain.png");
     DEBUG("II init:VEvariables II--");
 
     // loadFile("../utils/test.MKTP");
     DEBUG("II init:VEvariables II---");
+
+    IntDex sizeOfVertices;
+    QDRVertex * tver = malloc(sizeof(QDRVertex));
+    IntDex sizeOfIndices;
+    unsigned int * tind = malloc(sizeof(unsigned int));
+
+    MKTxy pos1;
+    MKTxy pos2;
+    MKTxy pos3;
+    MKTxy pos4;
+    char option;
+    MKTrgba colour;
+
+    // tver[0] = (MKTQDRdata){{0.5, 0.5},{0.6, 0.8},{0.3, 0.6},{0.0, 0.0},2,{1.0,1.0,1.0,1.0}};
+    tver[0].pos1.x = 0.5;
+    tver[0].pos1.y = 0.5;
+    tver[0].pos2.x = 0.6;
+    tver[0].pos2.y = 0.8;
+    tver[0].pos3.x = 0.3;
+    tver[0].pos3.y = 0.6;
+    tver[0].pos4.x = 0.0;
+    tver[0].pos4.y = 0.0;
+    tver[0].option = 2;
+    tver[0].colour.r = 1.0;
+    tver[0].colour.g = 1.0;
+    tver[0].colour.b = 1.0;
+    tver[0].colour.a = 1.0;
+    tind[0] = 0;
+
+    MKTQDRdata tinput = {1,tver,1,tind};
+    DEBUG("II init:VEvariables II----");
+    int tempInt = _MKT_genQDR(&tinput);
+    DEBUG("II init:VEvariables II-----");
+
 
     // loadFile("../utils/test.MKTP",MKTPICV);
 
@@ -725,13 +765,13 @@ void _VE_INIT_VE()
 
     //printf("%.27f %f %f %f\n",_MKTAS_CALC_E(26),_MKTAS_CALC_EXP(10,-2.0),_MKTAS_CALC_COSH(10,-2.0),_MKTAS_CALC_COS(2.0));
 
-    SIN input = {};
-    int * a = malloc(sizeof(int));
-    a[0] = 100;
-    input.VP = a;
-    SON b = {};
-    b = _MKTGENERALFUNC(0, &input);
-    printf("test: %lld\n",b.ULL);
+    // SIN input = {};
+    // int * a = malloc(sizeof(int));
+    // a[0] = 100;
+    // input.VP = a;
+    // SON b = {};
+    // b = _MKTGENERALFUNC(0, &input);
+    // printf("test: %lld\n",b.ULL);
 
     // for(int i = 1; i <= 26; i++)
     // {

@@ -2,8 +2,8 @@
 
 #define MKTINFOV 0
 #define MKTAGV 1
-#define MKTAUDIOV 2
-#define MKTPICV 3
+#define MKTPICV 2
+#define MKTAUDIOV 3
 #define MKTVIDV 4
 #define MKTBMV 5
 #define MKTFONTMV 6

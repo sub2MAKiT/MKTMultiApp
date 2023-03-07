@@ -188,6 +188,23 @@ typedef struct MKTTD {
 
 } MKTtd;
 
+typedef struct MKTQDR {
+    MKTQDRdata _dataQDR;
+
+    VkBuffer * uniformBuffers;
+    VkDeviceMemory * uniformBuffersMemory;
+    IntDex sizeOfUniformBuffers;
+
+    VkDescriptorPool descriptorPool;
+    VkDescriptorSet * descriptorSets;
+    IntDex sizeOfDescriptorSets;
+
+    VkBuffer vertexBuffer;
+    VkDeviceMemory vertexBufferMemory;
+    VkBuffer indexBuffer;
+    VkDeviceMemory indexBufferMemory;
+} MKTqdr;
+
 // FUNCTIONS
 
 // MAIN FUNCTIONS
@@ -214,6 +231,8 @@ void _VE_INIT_VE(); // An init function for VentumEngine variables
 
 void _VE_INIT_OPENCL(); // Setup all necessary variables for OPENCL (OCL)
 void _VE_OPENCL_CREATE_PROGRAM(char * filename);
+
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods); // user keyboard input
 
 SON _MKTGENERALFUNC(IntDex index, SIN * data);
 
@@ -291,6 +310,9 @@ IntDex _ren_sizeOfPiC;
 MKTbm * _ren_BM = NULL;
 IntDex _ren_sizeOfBM;
 
+MKTqdr * _ren_QDR = NULL;
+IntDex _ren_sizeOfQDR;
+
 OCL _OPENCL_DATA;
 
 
@@ -367,6 +389,9 @@ extern IntDex _ren_sizeOfPiC;
 extern MKTbm * _ren_BM;
 extern IntDex _ren_sizeOfBM;
 
+extern MKTqdr * _ren_QDR;
+extern IntDex _ren_sizeOfQDR;
+
 extern OCL _OPENCL_DATA;
 
 #endif
@@ -386,4 +411,5 @@ extern double _MKTAS_CALC_TAN(double xmm0);
 * 1. -1073741819 - The "Dev can't use malloc correctly" error
 * 2. -1073740940 - Heap corruption error (fun fact, is almost impossible to debug with gdb)
 * 3. -1073741510 - The physical resources of this disk have been exhausted.
+* 4. -532458155 - 
 */

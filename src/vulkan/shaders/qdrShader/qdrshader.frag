@@ -58,24 +58,25 @@ void main() {
     else if(missed == 2)
         outColor = vec4(0.0,0.0,1.0,1.0);
 
-    if(positions[0].x == positions[2].x)
-    {
-        float a = (positions[2].x - positions[0].x)/(positions[2].y - positions[0].y);
-        float b = -a*positions[0].y+positions[0].x;
+    outColor = vec4(0.5,0.5,0.5,1.0);
+    // if(positions[0].x == positions[2].x)
+    // {
+    //     float a = (positions[2].x - positions[0].x)/(positions[2].y - positions[0].y);
+    //     float b = -a*positions[0].y+positions[0].x;
 
-        if(!((nnewX > x || newX < x) && (nnewY > y || newY < y)) && (missed == 0) && ((a*positions[1].y + b > positions[1].x && x < a*y+b) || (a*positions[1].y + b < positions[1].x && x > a*y+b)))
-            outColor = vec4(0.5,0.5,0.5,1.0);
-        else
-            discard;
-    } else {
+    //     if(!((nnewX > x || newX < x) && (nnewY > y || newY < y)) && (missed == 0) && ((a*positions[1].y + b > positions[1].x && x < a*y+b) || (a*positions[1].y + b < positions[1].x && x > a*y+b)))
+    //         outColor = vec4(0.5,0.5,0.5,1.0);
+    //     else
+    //         discard;
+    // } else {
 
-        float a = (positions[2].y - positions[0].y)/(positions[2].x - positions[0].x);
-        float b = -a*positions[0].x+positions[0].y;
+    //     float a = (positions[2].y - positions[0].y)/(positions[2].x - positions[0].x);
+    //     float b = -a*positions[0].x+positions[0].y;
 
-        if(!((nnewX > x || newX < x) && (nnewY > y || newY < y)) && (missed == 0) && ((a*positions[1].x + b > positions[1].y && y < a*x+b) || (a*positions[1].x + b < positions[1].y && y > a*x+b)))
-            outColor = vec4(0.5,0.5,0.5,1.0);
-        else
-            discard;
+    //     if(!((nnewX > x || newX < x) && (nnewY > y || newY < y)) && (missed == 0) && ((a*positions[1].x + b > positions[1].y && y < a*x+b) || (a*positions[1].x + b < positions[1].y && y > a*x+b)))
+    //         outColor = vec4(0.5,0.5,0.5,1.0);
+    //     else
+    //         discard;
 
-    }
+    // }
 }

@@ -63,11 +63,20 @@ typedef struct MKTAGVertex { // i = 0
     MKTrgba colour;
 } AGVertex;
 
-typedef struct MKTPiCVertex { // i = 0
+typedef struct MKTPiCVertex { // i = 1
     MKTxy pos;
     MKTrgba colour;
     MKTxy tex;
 } PiCVertex;
+
+typedef struct MKTQDRVertex { // i = 3
+    MKTxy pos1;
+    MKTxy pos2;
+    MKTxy pos3;
+    MKTxy pos4;
+    char option;
+    MKTrgba colour;
+} QDRVertex;
 
 typedef struct MKTTDVertex { // i = 0
     MKTxyzw pos;
@@ -90,6 +99,13 @@ typedef struct MKTAGDATA {
     IntDex sizeOfIndices;
     unsigned int * indices;
 } MKTAGdata;
+
+typedef struct MKTQDRDATA {
+    IntDex sizeOfVertices; // totally not a vertex, but oh well, no one will use it anyway
+    QDRVertex * vertices;
+    IntDex sizeOfIndices;
+    unsigned int * indices;
+} MKTQDRdata;
 
 typedef struct MKTPICDATA {
     IntDex w;
