@@ -1,0 +1,346 @@
+2023-03-07T02:49:42.443955Z|cov-build|3312|info|> cov-build 2022.6.0 (build 9501b3bfc3 p-2022.6-push-41)
+2023-03-07T02:49:42.443955Z|cov-build|3312|info|> Coverity Build Capture (64-bit) version 2022.6.0 on Windows 11 (Unknown Edition number 101), 64-bit (build 22000)
+2023-03-07T02:49:42.443955Z|cov-build|3312|info|> Internal version numbers: 9501b3bfc3 p-2022.6-push-41
+2023-03-07T02:49:42.443955Z|cov-build|3312|info|> 
+2023-03-07T02:49:42.443955Z|cov-build|3312|info|> Dumping from hostname : CEREBRUMIGNIS
+2023-03-07T02:49:42.443955Z|cov-build|3312|info|> 
+2023-03-07T02:49:42.443955Z|cov-build|3312|info|> Platform info: Windows 11 (Unknown Edition number 101), 64-bit (build 22000)
+2023-03-07T02:49:42.443955Z|cov-build|3312|info|> 
+2023-03-07T02:49:42.443955Z|cov-build|3312|info|> cov-build command: C:\Users\makit\Desktop\cov-analysis-win64-2022.6.0\bin\cov-build.exe --dir cov-int ./build.ps1 
+2023-03-07T02:49:42.443955Z|cov-build|3312|info|> cov-build expanded command: C:\Users\makit\Desktop\cov-analysis-win64-2022.6.0\bin\cov-build.exe --dir cov-int ./build.ps1 
+2023-03-07T02:49:42.449955Z|cov-build|3312|info|> build command: C:\Users\makit\Desktop\projects\GIT\MKTMultiApp\build.ps1
+2023-03-07T02:49:42.449955Z|cov-build|3312|info|> thunk command: ./build.ps1
+2023-03-07T02:49:42.449955Z|cov-build|3312|info|> 
+2023-03-07T02:49:42.449955Z|cov-build|3312|info|> Set COVERITY_CAPTURE_IGNORE to MSPDBSVR.EXE
+2023-03-07T02:49:42.449955Z|cov-build|3312|info|> Set COVERITY_BUILD_COMMAND to "C:\Users\makit\Desktop\projects\GIT\MKTMultiApp\build.ps1" 
+2023-03-07T02:49:42.449955Z|cov-build|3312|info|> Set COVERITY_ORIG_BUILD_COMMAND to ./build.ps1
+2023-03-07T02:49:42.449955Z|cov-build|3312|info|> Set COVERITY_COV_BUILD_COMMAND to C:\Users\makit\Desktop\cov-analysis-win64-2022.6.0\bin\cov-build.exe --dir cov-int ./build.ps1 
+2023-03-07T02:49:42.449955Z|cov-build|3312|info|> Set MSBUILDDISABLENODEREUSE to 1
+2023-03-07T02:49:42.449955Z|cov-build|3312|info|> Set UseSharedCompilation to false.
+2023-03-07T02:49:42.449955Z|cov-build|3312|info|> Set COVERITY_BIN to C:/Users/makit/Desktop/cov-analysis-win64-2022.6.0/bin
+2023-03-07T02:49:42.449955Z|cov-build|3312|info|> Set COVERITY_SITE_CC to ar;g++;g++-3;g++-4;gcc;gcc-3;gcc-4;ld
+2023-03-07T02:49:42.449955Z|cov-build|3312|info|> Set COVERITY_SITE_CC_CAPTURE_DESCENDANTS to 
+2023-03-07T02:49:42.449955Z|cov-build|3312|info|> Set COVERITY_TEMP to C:/Users/makit/AppData/Local/Temp/cov-makit/477bb7143484706ac933157386fcde00
+2023-03-07T02:49:42.449955Z|cov-build|3312|info|> Set COVERITY_COMMON_TEMP to C:/Users/makit/AppData/Local/Temp
+2023-03-07T02:49:42.449955Z|cov-build|3312|info|> Set COVERITY_IDIR to C:/Users/makit/Desktop/projects/GIT/MKTMultiApp/cov-int
+2023-03-07T02:49:42.449955Z|cov-build|3312|info|> Set COVERITY_OUTPUT to pipe:\\.\pipe\cov-log-aa62d44e71bc582e93e547be468e7076.s
+2023-03-07T02:49:42.449955Z|cov-build|3312|info|> Set COVERITY_LOG to pipe:\\.\pipe\cov-log-aa62d44e71bc582e93e547be468e7076.m
+2023-03-07T02:49:42.449955Z|cov-build|3312|info|> Set COVERITY_OUTPUT_ENCODING to windows-1252
+2023-03-07T02:49:42.449955Z|cov-build|3312|info|> Set COVERITY_SYSTEM_ENCODING to windows-1252
+2023-03-07T02:49:42.449955Z|cov-build|3312|info|> Set COVERITY_EMIT to C:/Users/makit/Desktop/projects/GIT/MKTMultiApp/cov-int/emit
+2023-03-07T02:49:42.449955Z|cov-build|3312|info|> Set COVERITY_USING_CYGWIN to False
+2023-03-07T02:49:42.449955Z|cov-build|3312|info|> 
+2023-03-07T02:49:42.449955Z|cov-build|3312|info|> 
+2023-03-07T02:49:42.449955Z|cov-build|3312|info|> Dumping Environment Variables:
+2023-03-07T02:49:42.449955Z|cov-build|3312|info|> 
+2023-03-07T02:49:42.449955Z|cov-build|3312|info|> ALLUSERSPROFILE=C:\ProgramData
+2023-03-07T02:49:42.449955Z|cov-build|3312|info|> APPDATA=C:\Users\makit\AppData\Roaming
+2023-03-07T02:49:42.449955Z|cov-build|3312|info|> CHROME_CRASHPAD_PIPE_NAME=\\.\pipe\LOCAL\crashpad_2992_UASUTQHZVRCAIGYB
+2023-03-07T02:49:42.449955Z|cov-build|3312|info|> CommonProgramFiles=C:\Program Files\Common Files
+2023-03-07T02:49:42.449955Z|cov-build|3312|info|> CommonProgramFiles(x86)=C:\Program Files (x86)\Common Files
+2023-03-07T02:49:42.449955Z|cov-build|3312|info|> CommonProgramW6432=C:\Program Files\Common Files
+2023-03-07T02:49:42.449955Z|cov-build|3312|info|> COMPUTERNAME=CEREBRUMIGNIS
+2023-03-07T02:49:42.449955Z|cov-build|3312|info|> ComSpec=C:\WINDOWS\system32\cmd.exe
+2023-03-07T02:49:42.449955Z|cov-build|3312|info|> COR_ENABLE_PROFILING=1
+2023-03-07T02:49:42.449955Z|cov-build|3312|info|> COR_PROFILER={533c469a-ff6a-4383-96a2-4542da7745c4}
+2023-03-07T02:49:42.449955Z|cov-build|3312|info|> COVERITY_BIN=C:\Users\makit\Desktop\cov-analysis-win64-2022.6.0\bin
+2023-03-07T02:49:42.449955Z|cov-build|3312|info|> COVERITY_BUILD_COMMAND="C:\Users\makit\Desktop\projects\GIT\MKTMultiApp\build.ps1" 
+2023-03-07T02:49:42.449955Z|cov-build|3312|info|> COVERITY_BUILD_INVOCATION_ID=1
+2023-03-07T02:49:42.449955Z|cov-build|3312|info|> COVERITY_CAPTURE_IGNORE=MSPDBSVR.EXE
+2023-03-07T02:49:42.449955Z|cov-build|3312|info|> COVERITY_COMMON_TEMP=C:\Users\makit\AppData\Local\Temp
+2023-03-07T02:49:42.449955Z|cov-build|3312|info|> COVERITY_COMPILER_PATH_MISMATCH_FILE=C:\Users\makit\Desktop\projects\GIT\MKTMultiApp\cov-int\has_path_mismatches
+2023-03-07T02:49:42.449955Z|cov-build|3312|info|> COVERITY_CONFIG_FILE=C:\Users\makit\Desktop\cov-analysis-win64-2022.6.0\config\coverity_config.xml
+2023-03-07T02:49:42.449955Z|cov-build|3312|info|> COVERITY_COV_BUILD_COMMAND=C:\Users\makit\Desktop\cov-analysis-win64-2022.6.0\bin\cov-build.exe --dir cov-int ./build.ps1 
+2023-03-07T02:49:42.449955Z|cov-build|3312|info|> COVERITY_EMIT=C:\Users\makit\Desktop\projects\GIT\MKTMultiApp\cov-int\emit
+2023-03-07T02:49:42.449955Z|cov-build|3312|info|> COVERITY_ENABLE_JAVA_ANNOTATION_FRAMEWORK_SUPPORT=1
+2023-03-07T02:49:42.449955Z|cov-build|3312|info|> COVERITY_IDIR=C:\Users\makit\Desktop\projects\GIT\MKTMultiApp\cov-int
+2023-03-07T02:49:42.449955Z|cov-build|3312|info|> COVERITY_LOG=pipe:\\.\pipe\cov-log-aa62d44e71bc582e93e547be468e7076.m
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> COVERITY_ORIG_BUILD_COMMAND=./build.ps1
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> COVERITY_ORIG_OUTPUT=C:\Users\makit\Desktop\projects\GIT\MKTMultiApp\cov-int\build-log.txt
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> COVERITY_OUTPUT=pipe:\\.\pipe\cov-log-aa62d44e71bc582e93e547be468e7076.s
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> COVERITY_OUTPUT_ENCODING=windows-1252
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> COVERITY_PATHLESS_CONFIGS_FILE=C:\Users\makit\Desktop\projects\GIT\MKTMultiApp\cov-int\has_pathless_configs
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> COVERITY_PREV_XML_CATALOG_FILES=
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> COVERITY_REWRITE_FROM=
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> COVERITY_REWRITE_TO=
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> COVERITY_SITE_CC=ar;g++;g++-3;g++-4;gcc;gcc-3;gcc-4;ld
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> COVERITY_SITE_CC_CAPTURE_DESCENDANTS=
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> COVERITY_SYSTEM_ENCODING=windows-1252
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> COVERITY_TEMP=C:\Users\makit\AppData\Local\Temp\cov-makit\477bb7143484706ac933157386fcde00
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> COVERITY_TOP_CONFIG=C:\Users\makit\AppData\Local\Temp\cov-makit\477bb7143484706ac933157386fcde00\cov-configure\coverity_config.xml
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> COVERITY_USING_CYGWIN=False
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> CUDA_PATH=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> CUDA_PATH_V11_8=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> DriverData=C:\Windows\System32\Drivers\DriverData
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> FPS_BROWSER_APP_PROFILE_STRING=Internet Explorer
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> FPS_BROWSER_USER_PROFILE_STRING=Default
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> HOMEDRIVE=C:
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> HOMEPATH=\Users\makit
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> INTEL_DEV_REDIST=C:\Program Files (x86)\Common Files\Intel\Shared Libraries\
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> LOCALAPPDATA=C:\Users\makit\AppData\Local
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> LOGONSERVER=\\CEREBRUMIGNIS
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> MIC_LD_LIBRARY_PATH=C:\Program Files (x86)\Common Files\Intel\Shared Libraries\compiler\lib\mic
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> MSBUILDDISABLENODEREUSE=1
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> NUMBER_OF_PROCESSORS=24
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> NVTOOLSEXT_PATH=C:\Program Files\NVIDIA Corporation\NvToolsExt\
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> OneDrive=C:\Users\makit\OneDrive
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> OneDriveConsumer=C:\Users\makit\OneDrive
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> ORIGINAL_XDG_CURRENT_DESKTOP=undefined
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> OS=Windows_NT
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> Path=C:\Program Files\PowerShell\7;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8\bin;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8\libnvvp;C:\Program Files (x86)\Common Files\Intel\Shared Libraries\redist\intel64\compiler;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\VulkanSDK\1.3.216.0\Bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\Program Files\Git\cmd;C:\Program Files\GitHub CLI\;C:\Program Files\nodejs\;C:\sdk\CMake\bin;C:\Program Files\NVIDIA Corporation\Nsight Compute 2022.3.0\;C:\Program Files\dotnet\;C:\Program Files\PowerShell\7\;C:\Users\makit\AppData\Local\Programs\Python\Python310\Scripts\;C:\Users\makit\AppData\Local\Programs\Python\Python310\;C:\Users\makit\AppData\Local\Microsoft\WindowsApps;C:\Users\makit\AppData\Local\Programs\Microsoft VS Code\bin;C:\msys64\mingw64\bin;C:\Program Files (x86)\Nmap;C:\Users\makit\anaconda3\condabin;C:\Users\makit\AppData\Roaming\npm;C:\Users\makit\AppData\Local\Programs\MiKTeX\miktex\bin\x64\;C:\Users\makit\AppData\Local\Programs\MiKTeX\miktex\bin\x64;D:\programs\ffmpeg-n4.4-latest-win64-gpl-4.4\bin;C:\sdk\vcpkg;C:\sdk\nasm;C:\sdk\jdk-19.0.1\bin;C:\Program Files (x86)\Vim\vim90;C:\Program Files\LLVM\bin
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> PATHEXT=.COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC;.CPL
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> POWERSHELL_DISTRIBUTION_CHANNEL=MSI:Windows 10 Home
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> PROCESSOR_ARCHITECTURE=AMD64
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> PROCESSOR_IDENTIFIER=AMD64 Family 25 Model 33 Stepping 0, AuthenticAMD
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> PROCESSOR_LEVEL=25
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> PROCESSOR_REVISION=2100
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> ProgramData=C:\ProgramData
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> ProgramFiles=C:\Program Files
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> ProgramFiles(x86)=C:\Program Files (x86)
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> ProgramW6432=C:\Program Files
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> PROMPT=$P$G
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> PSModulePath=C:\Users\makit\Documents\PowerShell\Modules;C:\Program Files\PowerShell\Modules;c:\program files\powershell\7\Modules;C:\Program Files\WindowsPowerShell\Modules;C:\WINDOWS\system32\WindowsPowerShell\v1.0\Modules
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> PUBLIC=C:\Users\Public
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> SystemDrive=C:
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> SystemRoot=C:\WINDOWS
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> TEMP=C:\Users\makit\AppData\Local\Temp
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> TMP=C:\Users\makit\AppData\Local\Temp
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> USERDOMAIN=CEREBRUMIGNIS
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> USERDOMAIN_ROAMINGPROFILE=CEREBRUMIGNIS
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> USERNAME=makit
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> USERPROFILE=C:\Users\makit
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> UseSharedCompilation=false
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> VK_SDK_PATH=C:\VulkanSDK\1.3.216.0
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> VULKAN_SDK=C:\VulkanSDK\1.3.216.0
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> windir=C:\WINDOWS
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> WSLENV=WT_SESSION::WT_PROFILE_ID
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> WT_PROFILE_ID={574e775e-4f2a-5b96-ac1e-a2962a402336}
+2023-03-07T02:49:42.450957Z|cov-build|3312|info|> WT_SESSION=cccad97c-e5e6-49f8-9a37-b251c565d949
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|> TERM_PROGRAM=vscode
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|> TERM_PROGRAM_VERSION=1.76.0
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|> LANG=en_US.UTF-8
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|> COLORTERM=truecolor
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|> GIT_ASKPASS=c:\Users\makit\AppData\Local\Programs\Microsoft VS Code\resources\app\extensions\git\dist\askpass.sh
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|> VSCODE_GIT_ASKPASS_NODE=C:\Users\makit\AppData\Local\Programs\Microsoft VS Code\Code.exe
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|> VSCODE_GIT_ASKPASS_EXTRA_ARGS=--ms-enable-electron-run-as-node
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|> VSCODE_GIT_ASKPASS_MAIN=c:\Users\makit\AppData\Local\Programs\Microsoft VS Code\resources\app\extensions\git\dist\askpass-main.js
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|> VSCODE_GIT_IPC_HANDLE=\\.\pipe\vscode-git-da9c336cee-sock
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|> VSCODE_INJECTION=1
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|> 
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|> 
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|> Dumping configuration:
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|> 
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|> User/default configuration:
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|> 
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|> Configuration read from: command-line
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|> Node: coverity
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|>   Node: config
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|>     Node: include Value: C:\Users\makit\Desktop\cov-analysis-win64-2022.6.0\config\coverity_config.xml
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|>   Node: config
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|>     Node: prevent
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|>       Node: dir Value: C:\Users\makit\Desktop\projects\GIT\MKTMultiApp\cov-int
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|> 
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|> Configuration read from: C:\Users\makit\Desktop\cov-analysis-win64-2022.6.0\config\coverity_config.xml
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|> Node: coverity
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|>   Node: cit_version Value: 1
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|>   Node: config
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|>     Node: include Value: C:\Users\makit\Desktop\cov-analysis-win64-2022.6.0\config\template-gcc-config-0\coverity_config.xml
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|>     Node: include Value: C:\Users\makit\Desktop\cov-analysis-win64-2022.6.0\config\template-g++-config-0\coverity_config.xml
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|>     Node: include Value: C:\Users\makit\Desktop\cov-analysis-win64-2022.6.0\config\template-gcc-config-1\coverity_config.xml
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|>     Node: include Value: C:\Users\makit\Desktop\cov-analysis-win64-2022.6.0\config\template-gcc-config-2\coverity_config.xml
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|>     Node: include Value: C:\Users\makit\Desktop\cov-analysis-win64-2022.6.0\config\template-g++-config-1\coverity_config.xml
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|>     Node: include Value: C:\Users\makit\Desktop\cov-analysis-win64-2022.6.0\config\template-g++-config-2\coverity_config.xml
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|>     Node: include Value: C:\Users\makit\Desktop\cov-analysis-win64-2022.6.0\config\template-ld-config-0\coverity_config.xml
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|>     Node: include Value: C:\Users\makit\Desktop\cov-analysis-win64-2022.6.0\config\template-ar-config-0\coverity_config.xml
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|> 
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|> Configuration read from: C:\Users\makit\Desktop\cov-analysis-win64-2022.6.0\config\template-gcc-config-0\coverity_config.xml
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|> Node: coverity
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|>   Node: cit_version Value: 1
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|>   Node: config
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|>     Node: build
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|>       Node: compiler
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|>         Node: template_compiler Value: true
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|>         Node: comp_name Value: gcc
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|>         Node: comp_translator Value: gcc
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|>         Node: comp_lang Value: C
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|>         Node: comp_generic Value: gnu
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|>       Node: options
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|>         Node: id Value: gcc-gcc-.*
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|>         Node: opt_preinclude_file Value: C:\Users\makit\Desktop\cov-analysis-win64-2022.6.0\config\template-gcc-config-0/../user_nodefs.h
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|>         Node: begin_command_line_config
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|>       Node: options
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|>         Node: id Value: g++-gcc-.*
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|>         Node: opt_preinclude_file Value: C:\Users\makit\Desktop\cov-analysis-win64-2022.6.0\config\template-gcc-config-0/../user_nodefs.h
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|>         Node: begin_command_line_config
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|>       Node: options
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|>         Node: id Value: g++cc-gcc-.*
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|>         Node: opt_preinclude_file Value: C:\Users\makit\Desktop\cov-analysis-win64-2022.6.0\config\template-gcc-config-0/../user_nodefs.h
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|>         Node: begin_command_line_config
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|>   Node: md5 Value: f9687def489d7080611c957e4baa9367
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|> 
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|> Configuration read from: C:\Users\makit\Desktop\cov-analysis-win64-2022.6.0\config\template-g++-config-0\coverity_config.xml
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|> Node: coverity
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|>   Node: cit_version Value: 1
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|>   Node: config
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|>     Node: build
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|>       Node: compiler
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|>         Node: template_compiler Value: true
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|>         Node: comp_name Value: g++
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|>         Node: comp_translator Value: g++
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|>         Node: comp_lang Value: C++
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|>         Node: comp_generic Value: gnu
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|>       Node: options
+2023-03-07T02:49:42.451958Z|cov-build|3312|info|>         Node: id Value: g++-g++-.*
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>         Node: opt_preinclude_file Value: C:\Users\makit\Desktop\cov-analysis-win64-2022.6.0\config\template-g++-config-0/../user_nodefs.h
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>         Node: begin_command_line_config
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>       Node: options
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>         Node: id Value: g++cc-g++-.*
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>         Node: opt_preinclude_file Value: C:\Users\makit\Desktop\cov-analysis-win64-2022.6.0\config\template-g++-config-0/../user_nodefs.h
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>         Node: begin_command_line_config
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>   Node: md5 Value: c28c5312f5cafb3461550021d5db74e3
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|> 
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|> Configuration read from: C:\Users\makit\Desktop\cov-analysis-win64-2022.6.0\config\template-gcc-config-1\coverity_config.xml
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|> Node: coverity
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>   Node: cit_version Value: 1
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>   Node: config
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>     Node: build
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>       Node: compiler
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>         Node: template_compiler Value: true
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>         Node: comp_name Value: gcc-3
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>         Node: comp_translator Value: gcc
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>         Node: comp_lang Value: C
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>         Node: comp_generic Value: gnu
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>       Node: options
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>         Node: id Value: gcc-gcc-3-.*
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>         Node: opt_preinclude_file Value: C:\Users\makit\Desktop\cov-analysis-win64-2022.6.0\config\template-gcc-config-1/../user_nodefs.h
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>         Node: begin_command_line_config
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>       Node: options
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>         Node: id Value: g++-gcc-3-.*
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>         Node: opt_preinclude_file Value: C:\Users\makit\Desktop\cov-analysis-win64-2022.6.0\config\template-gcc-config-1/../user_nodefs.h
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>         Node: begin_command_line_config
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>       Node: options
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>         Node: id Value: g++cc-gcc-3-.*
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>         Node: opt_preinclude_file Value: C:\Users\makit\Desktop\cov-analysis-win64-2022.6.0\config\template-gcc-config-1/../user_nodefs.h
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>         Node: begin_command_line_config
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>   Node: md5 Value: 4fe1cec9e33a94bdf5953221658c9630
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|> 
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|> Configuration read from: C:\Users\makit\Desktop\cov-analysis-win64-2022.6.0\config\template-gcc-config-2\coverity_config.xml
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|> Node: coverity
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>   Node: cit_version Value: 1
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>   Node: config
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>     Node: build
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>       Node: compiler
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>         Node: template_compiler Value: true
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>         Node: comp_name Value: gcc-4
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>         Node: comp_translator Value: gcc
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>         Node: comp_lang Value: C
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>         Node: comp_generic Value: gnu
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>       Node: options
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>         Node: id Value: gcc-gcc-4-.*
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>         Node: opt_preinclude_file Value: C:\Users\makit\Desktop\cov-analysis-win64-2022.6.0\config\template-gcc-config-2/../user_nodefs.h
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>         Node: begin_command_line_config
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>       Node: options
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>         Node: id Value: g++-gcc-4-.*
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>         Node: opt_preinclude_file Value: C:\Users\makit\Desktop\cov-analysis-win64-2022.6.0\config\template-gcc-config-2/../user_nodefs.h
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>         Node: begin_command_line_config
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>       Node: options
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>         Node: id Value: g++cc-gcc-4-.*
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>         Node: opt_preinclude_file Value: C:\Users\makit\Desktop\cov-analysis-win64-2022.6.0\config\template-gcc-config-2/../user_nodefs.h
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>         Node: begin_command_line_config
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>   Node: md5 Value: cfc2e26e8563cdd158837aa17fb165e1
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|> 
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|> Configuration read from: C:\Users\makit\Desktop\cov-analysis-win64-2022.6.0\config\template-g++-config-1\coverity_config.xml
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|> Node: coverity
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>   Node: cit_version Value: 1
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>   Node: config
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>     Node: build
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>       Node: compiler
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>         Node: template_compiler Value: true
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>         Node: comp_name Value: g++-3
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>         Node: comp_translator Value: g++
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>         Node: comp_lang Value: C++
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>         Node: comp_generic Value: gnu
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>       Node: options
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>         Node: id Value: g++-g++-3-.*
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>         Node: opt_preinclude_file Value: C:\Users\makit\Desktop\cov-analysis-win64-2022.6.0\config\template-g++-config-1/../user_nodefs.h
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>         Node: begin_command_line_config
+2023-03-07T02:49:42.452958Z|cov-build|3312|info|>       Node: options
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>         Node: id Value: g++cc-g++-3-.*
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>         Node: opt_preinclude_file Value: C:\Users\makit\Desktop\cov-analysis-win64-2022.6.0\config\template-g++-config-1/../user_nodefs.h
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>         Node: begin_command_line_config
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>   Node: md5 Value: 86bad61f28143003bb013ba270e01f67
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|> 
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|> Configuration read from: C:\Users\makit\Desktop\cov-analysis-win64-2022.6.0\config\template-g++-config-2\coverity_config.xml
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|> Node: coverity
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>   Node: cit_version Value: 1
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>   Node: config
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>     Node: build
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>       Node: compiler
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>         Node: template_compiler Value: true
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>         Node: comp_name Value: g++-4
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>         Node: comp_translator Value: g++
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>         Node: comp_lang Value: C++
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>         Node: comp_generic Value: gnu
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>       Node: options
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>         Node: id Value: g++-g++-4-.*
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>         Node: opt_preinclude_file Value: C:\Users\makit\Desktop\cov-analysis-win64-2022.6.0\config\template-g++-config-2/../user_nodefs.h
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>         Node: begin_command_line_config
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>       Node: options
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>         Node: id Value: g++cc-g++-4-.*
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>         Node: opt_preinclude_file Value: C:\Users\makit\Desktop\cov-analysis-win64-2022.6.0\config\template-g++-config-2/../user_nodefs.h
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>         Node: begin_command_line_config
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>   Node: md5 Value: 5686a79f6a497bd3e8c8d54b9391432d
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|> 
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|> Configuration read from: C:\Users\makit\Desktop\cov-analysis-win64-2022.6.0\config\template-ld-config-0\coverity_config.xml
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|> Node: coverity
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>   Node: cit_version Value: 1
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>   Node: config
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>     Node: build
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>       Node: compiler
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>         Node: template_compiler Value: true
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>         Node: comp_name Value: ld
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>         Node: comp_translator Value: ld
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>         Node: comp_lang Value: C++
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>         Node: comp_generic Value: ld
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>       Node: options
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>         Node: id Value: ld-ld-.*
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>         Node: opt_preinclude_file Value: C:\Users\makit\Desktop\cov-analysis-win64-2022.6.0\config\template-ld-config-0/../user_nodefs.h
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>         Node: begin_command_line_config
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>   Node: md5 Value: b7c847d801b0294a4f0f52192f7f3e16
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|> 
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|> Configuration read from: C:\Users\makit\Desktop\cov-analysis-win64-2022.6.0\config\template-ar-config-0\coverity_config.xml
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|> Node: coverity
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>   Node: cit_version Value: 1
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>   Node: config
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>     Node: build
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>       Node: compiler
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>         Node: template_compiler Value: true
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>         Node: comp_name Value: ar
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>         Node: comp_translator Value: ar
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>         Node: comp_lang Value: C++
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>         Node: comp_generic Value: ar
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>       Node: options
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>         Node: id Value: ar-ar-.*
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>         Node: opt_preinclude_file Value: C:\Users\makit\Desktop\cov-analysis-win64-2022.6.0\config\template-ar-config-0/../user_nodefs.h
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>         Node: begin_command_line_config
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|>   Node: md5 Value: a125f1c14acadfc9d06e8f9e711705ce
+2023-03-07T02:49:42.453957Z|cov-build|3312|info|> 
+2023-03-07T02:49:42.474956Z|cov-internal-capture|30496|info|> Running build command: "C:\Users\makit\Desktop\projects\GIT\MKTMultiApp\build.ps1" 
+2023-03-07T02:49:42.474956Z|cov-internal-capture|30496|info|> Launching in directory C:/Users/makit/Desktop/projects/GIT/MKTMultiApp
+2023-03-07T02:49:42.480957Z|cov-internal-capture|30496|error|> 
+2023-03-07T02:49:42.480957Z|cov-internal-capture|30496|error|> [ERROR] Could not start build command ./build.ps1. Try running cov-build using the following command line: 
+2023-03-07T02:49:42.480957Z|cov-internal-capture|30496|error|>          C:\Users\makit\Desktop\cov-analysis-win64-2022.6.0\bin\cov-build.exe --dir cov-int cmd.exe /c ./build.ps1
+2023-03-07T02:49:42.480957Z|cov-internal-capture|30496|error|> 
+2023-03-07T02:49:42.481955Z|cov-internal-capture|30496|error|> [NOTE] If you know the shell or interpreter this build command requires and it's not the one suggested above, please replace "cmd.exe /c" with the appropriate shell/interpreter invocation.
+2023-03-07T02:49:42.481955Z|cov-internal-capture|30496|error|> 
+2023-03-07T02:49:42.484958Z|cov-build|3312|info|> Invoking cov-security-da with commands: C:/Users/makit/Desktop/cov-analysis-win64-2022.6.0/bin/cov-security-da.exe --dir C:/Users/makit/Desktop/projects/GIT/MKTMultiApp/cov-int
+2023-03-07T02:49:42.570099Z|cov-build|3312|info|> Dynamic analyzer took 78 ms
+2023-03-07T02:49:42.570099Z|cov-build|3312|info|> Build time (cov-build overall): 00:00:00.716960
+2023-03-07T02:49:42.570099Z|cov-build|3312|info|> 
+2023-03-07T02:49:42.571100Z|cov-build|3312|info|> [WARNING] Build command ./build.ps1 exited with code 1. Please verify that the build completed successfully.
+2023-03-07T02:49:42.572100Z|cov-build|3312|info|> [WARNING] No files were emitted. This may be due to a problem with your configuration
+2023-03-07T02:49:42.572100Z|cov-build|3312|info|> or because no files were actually compiled by your build command.
+2023-03-07T02:49:42.572100Z|cov-build|3312|info|> Please make sure you have configured the compilers actually used in the compilation.
+2023-03-07T02:49:42.572100Z|cov-build|3312|info|>  For more details, please look at: 
+2023-03-07T02:49:42.573099Z|cov-build|3312|info|>     C:/Users/makit/Desktop/projects/GIT/MKTMultiApp/cov-int/build-log.txt
+2023-03-07T02:49:42.659099Z|cov-build|3312|info|> 

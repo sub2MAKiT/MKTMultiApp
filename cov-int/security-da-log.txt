@@ -1,0 +1,4 @@
+C:/Users/makit/Desktop/cov-analysis-win64-2022.6.0/bin/cov-security-da.exe --dir C:/Users/makit/Desktop/projects/GIT/MKTMultiApp/cov-int 
+cov-security-da version 2022.6.0 on Windows 11 (Unknown Edition number 101), 64-bit (build 22000)
+Internal version numbers: 9501b3bfc3 p-2022.6-push-41
+

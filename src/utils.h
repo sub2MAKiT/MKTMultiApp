@@ -24,7 +24,7 @@ printf("\033[%d;40m[%d]" x "\033[0;40m\n",(int)((_step % 6) + 1 + MKTfloor((floa
 0
 #endif
 
-#define MKT_R_DEBUG
+// #define MKT_R_DEBUG
 
 #ifdef MKT_R_DEBUG
 #define RDEBUG(x)              \

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE coverity SYSTEM "config.dtd">
+<coverity>
+
+<metrics>
+    <metric>
+        <name>time</name>
+        <value>1</value>
+    </metric>
+    <metric>
+        <name>args</name>
+        <value>C:\Users\makit\Desktop\cov-analysis-win64-2022.6.0\bin\cov-build.exe --dir cov-int ./build.ps1</value>
+    </metric>
+    <metric>
+        <name>host</name>
+        <value>CEREBRUMIGNIS</value>
+    </metric>
+    <metric>
+        <name>short-platform</name>
+        <value>win64</value>
+    </metric>
+    <metric>
+        <name>platform</name>
+        <value>Windows 11 (Unknown Edition number 101), 64-bit (build 22000)</value>
+    </metric>
+    <metric>
+        <name>ident</name>
+        <value>2022.6.0 (build 9501b3bfc3 p-2022.6-push-41)</value>
+    </metric>
+    <metric>
+        <name>user</name>
+        <value>makit</value>
+    </metric>
+    <metric>
+        <name>cwd</name>
+        <value>C:\Users\makit\Desktop\projects\GIT\MKTMultiApp</value>
+    </metric>
+    <metric>
+        <name>config</name>
+        <value>C:\Users\makit\Desktop\cov-analysis-win64-2022.6.0\config\coverity_config.xml</value>
+    </metric>
+    <metric>
+        <name>intermediatedir</name>
+        <value>C:\Users\makit\Desktop\projects\GIT\MKTMultiApp\cov-int</value>
+    </metric>
+    <metric>
+        <name>outputdir</name>
+        <value>C:\Users\makit\Desktop\projects\GIT\MKTMultiApp\cov-int\output</value>
+    </metric>
+    <metric>
+        <name>emitdir</name>
+        <value>C:\Users\makit\Desktop\projects\GIT\MKTMultiApp\cov-int\emit</value>
+    </metric>
+    <metric>
+        <name>force</name>
+        <value>no</value>
+    </metric>
+    <metric>
+        <name>cygwin</name>
+        <value>no</value>
+    </metric>
+    <metric>
+        <name>failures</name>
+        <value>0</value>
+    </metric>
+    <metric>
+        <name>successes</name>
+        <value>0</value>
+    </metric>
+    <metric>
+        <name>recoverable-errors</name>
+        <value>0</value>
+    </metric>
+    <metric>
+        <name>dotnet-webapps-detected</name>
+        <value>0</value>
+    </metric>
+    <metric>
+        <name>dotnet-webapp-successes</name>
+        <value>0</value>
+    </metric>
+    <metric>
+        <name>dotnet-webapp-compilation-secs</name>
+        <value>0</value>
+    </metric>
+    <metric>
+        <name>buildcmd</name>
+        <value>./build.ps1</value>
+    </metric>
+</metrics>
+</coverity>
