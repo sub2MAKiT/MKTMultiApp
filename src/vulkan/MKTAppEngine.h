@@ -412,4 +412,5 @@ extern double _MKTAS_CALC_TAN(double xmm0);
 * 2. -1073740940 - Heap corruption error (fun fact, is almost impossible to debug with gdb)
 * 3. -1073741510 - The physical resources of this disk have been exhausted.
 * 4. -532458155 - 
+* 5. -1073740771 - 
 */

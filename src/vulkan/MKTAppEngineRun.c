@@ -134,7 +134,11 @@ void _VE_RUN_drawFrame()
 
     vkResetCommandBuffer(_commandBuffers[_currentFrame], /*VkCommandBufferResetFlagBits*/ 0);
     _VE_RUN_recordCommandBuffer(_commandBuffers[_currentFrame], imageIndex);
-    DEBUG("test1234");
+    
+    RDEBUG("test1234");
+
+
+
 
     VkSubmitInfo submitInfo = {};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -151,7 +155,7 @@ void _VE_RUN_drawFrame()
     VkSemaphore signalSemaphores[1] = {_runtimeKit[_currentFrame].renderFinishedSemaphore};
     submitInfo.signalSemaphoreCount = 1;
     submitInfo.pSignalSemaphores = signalSemaphores;
-    DEBUG("test12345");
+    RDEBUG("test12345");
 
     VK_CHECK(vkQueueSubmit(_graphicsQueue, 1, &submitInfo, _runtimeKit[_currentFrame].inFlightFence));
     VkPresentInfoKHR presentInfo = {};
@@ -168,7 +172,7 @@ void _VE_RUN_drawFrame()
 
     vkQueuePresentKHR(_presentQueue, &presentInfo);
 
-    DEBUG("test12346");
+    RDEBUG("test12346");
     _currentFrame = (_currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
     return;
 }

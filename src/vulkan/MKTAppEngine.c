@@ -45,13 +45,13 @@ void init()
 void run()
 {
     DEBUG("III run III");
-    // glfwSetKeyCallback(_window, key_callback);
+    glfwSetKeyCallback(_window, key_callback);
 
     while (!glfwWindowShouldClose(_window)) {
         _VE_RUN_drawFrame();
-        DEBUG("test123467");
+        RDEBUG("test123467");
         glfwPollEvents(); // #ff0000
-        DEBUG("test1234678");
+        RDEBUG("test1234678");
     }
 
     vkDeviceWaitIdle(_device);
@@ -68,7 +68,8 @@ void cleanup()
 
 
     // MKTreturnDelQueue();  temporary disabled
-
+// future MAKiT here, it's permanent
+//(Unless I'll make a video about it or get a very good deal)
 
     MKTreturnError("./errors.log");
 
@@ -161,7 +162,7 @@ void cleanup()
         free(_ren_AG[i]._dataAG.vertices);
         free(_ren_AG[i]._dataAG.indices);
     }
-
+    DEBUG("II VK materials cleanup II");
     for(int i = 0; i < _ren_sizeOfMaterials; i++)
     {
         vkDestroyDescriptorSetLayout(_device, _ren_materials[i].descriptorSetLayout, NULL);
@@ -169,35 +170,48 @@ void cleanup()
         vkDestroyPipelineLayout(_device,_ren_materials[i].pipelineLayout,NULL);
     }
 
+    DEBUG("II VK device cleanup II");
     vkDestroyCommandPool(_device, _commandPool, NULL);
 
+    DEBUG("II VK runtimeKit cleanup II");
     for (size_t i = 0; i < _sizeOfRuntimeKit; i++) {
         vkDestroySemaphore(_device, _runtimeKit[i].imageAvailableSemaphore, NULL);
         vkDestroySemaphore(_device, _runtimeKit[i].renderFinishedSemaphore, NULL);
         vkDestroyFence(_device, _runtimeKit[i].inFlightFence, NULL);
     }
 
+    DEBUG("II VK swapchainFrameBuffers cleanup II");
     for (IntDex i = 0; i < _sizeOfSwapChainFramebuffers;i++) {
         vkDestroyFramebuffer(_device, _swapChainFramebuffers[i], NULL);
     }
 
+    DEBUG("II VK RenderPass cleanup II");
     vkDestroyRenderPass(_device, _renderPass, NULL);
 
+    DEBUG("II VK SwapchainImageViews cleanup II");
     for (IntDex i = 0; i < _sizeOfSwapChainImageViews; i++) {
         vkDestroyImageView(_device, _swapChainImageViews[i], NULL);
     }
 
+    DEBUG("II VK Swapchain cleanup II");
     vkDestroySwapchainKHR(_device, _swapChain, NULL);
 
+    DEBUG("II VK device cleanup II");
     vkDestroyDevice(_device, NULL);
 
+    DEBUG("II VK Surface cleanup II");
     vkDestroySurfaceKHR(_instance, _surface, NULL);
 
+    DEBUG("II VK Instance cleanup II");
     vkDestroyInstance(_instance, NULL);
 
+    DEBUG("II VK GLFWWindow cleanup II");
     glfwDestroyWindow(_window);
 
+    DEBUG("II VK Glfw cleanup II");
     glfwTerminate();
+    
+    DEBUG("II VK Freeing cleanup II");
 
     free(_ren_materials);
 
