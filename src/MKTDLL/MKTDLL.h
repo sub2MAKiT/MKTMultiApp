@@ -81,7 +81,7 @@ void * loadSharedObjects();
 #elif _WIN32
 // for windows
 void getEntryAddress(FUNHANDLE libraryToLoad,MKTmodule * Module);
-char * windowsDLLLoading();
+void windowsDLLLoading();
 void windowsFileDLLLoading();
 
 #define loadLibaries windowsFileDLLLoading(); windowsDLLLoading(); SAFEMALLOC(_MKT_modules,sizeof(MKTmodule)*Shmodules);for(int i = 0; i < Shmodules; i++) getEntryAddress(hmodules[i],&_MKT_modules[i]);_MKT_sizeOfModules = Shmodules;initi tempInit = {10,10};for(int i = 0; i < _MKT_sizeOfModules;i++) (*_MKT_modules[i].init)(tempInit);

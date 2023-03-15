@@ -45,7 +45,7 @@ void init()
 void run()
 {
     DEBUG("III run III");
-    glfwSetKeyCallback(_window, key_callback);
+    // glfwSetKeyCallback(_window, key_callback);
 
     while (!glfwWindowShouldClose(_window)) {
         _VE_RUN_drawFrame();

@@ -87,18 +87,18 @@ void _MKT_LOAD_PIPELINE(const char * FPV,const char * FPF, IntDex glmI) //AG = 0
     _ren_materials = realloc(_ren_materials,_ren_sizeOfMaterials*sizeof(MKTmaterial));
     IntDex materialIndex = _ren_sizeOfMaterials-1;
     FILE *MKTFILEV = fopen(FPV,"rb");
-    char *listV;
-    long sizeOfFileV;
+    char *listV = NULL;
+    long sizeOfFileV = 0;
     if(MKTFILEV != NULL)
     {
-    fseek(MKTFILEV, 0L, SEEK_END);
-    sizeOfFileV = ftell(MKTFILEV);
-    rewind(MKTFILEV);
-    listV = (char*)malloc(sizeOfFileV);
-    if(listV == NULL)
-        MKTerror(3);
-    fread( listV,1, sizeOfFileV, MKTFILEV );
-    fclose( MKTFILEV );
+        fseek(MKTFILEV, 0L, SEEK_END);
+        sizeOfFileV = ftell(MKTFILEV);
+        rewind(MKTFILEV);
+        listV = (char*)malloc(sizeOfFileV);
+        if(listV == NULL)
+            MKTerror(3);
+        fread( listV,1, sizeOfFileV, MKTFILEV );
+        fclose( MKTFILEV );
     } else {
         MKTerror(2);
     }
@@ -253,6 +253,10 @@ void _MKT_LOAD_PIPELINE(const char * FPV,const char * FPF, IntDex glmI) //AG = 0
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 
     VK_CHECK(vkCreateGraphicsPipelines(_device, VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &_ren_materials[materialIndex].graphicsPipeline));
+
+
+    free(((VkPipelineVertexInputStateCreateInfo)(*pipelineInfo.pVertexInputState)).pVertexBindingDescriptions); // #ff0000
+
 
     vkDestroyShaderModule(_device, fragShaderModule, NULL);
     vkDestroyShaderModule(_device, vertShaderModule, NULL);

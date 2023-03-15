@@ -5,11 +5,11 @@
 <metrics>
     <metric>
         <name>time</name>
-        <value>1</value>
+        <value>77</value>
     </metric>
     <metric>
         <name>args</name>
-        <value>C:\Users\makit\Desktop\cov-analysis-win64-2022.6.0\bin\cov-build.exe --dir cov-int ./build.ps1</value>
+        <value>C:\Users\makit\Desktop\cov-analysis-win64-2022.6.0\bin\cov-build.exe --dir cov-int .\buildForTools.bat</value>
     </metric>
     <metric>
         <name>host</name>
@@ -65,11 +65,11 @@
     </metric>
     <metric>
         <name>successes</name>
-        <value>0</value>
+        <value>24</value>
     </metric>
     <metric>
         <name>recoverable-errors</name>
-        <value>0</value>
+        <value>18</value>
     </metric>
     <metric>
         <name>dotnet-webapps-detected</name>
@@ -85,7 +85,7 @@
     </metric>
     <metric>
         <name>buildcmd</name>
-        <value>./build.ps1</value>
+        <value>.\buildForTools.bat</value>
     </metric>
 </metrics>
 </coverity>

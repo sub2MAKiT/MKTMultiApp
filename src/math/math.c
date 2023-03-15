@@ -2,11 +2,15 @@
 
 SON _MKTGENERALFUNC(IntDex index, SIN * data)
 {
+    SON emptyReturn = {};
     switch(index)
     {
         case 0:
+        {
         return (SON)_MKTAS_STAT(data->VP);
+        }
     }
+    return emptyReturn;
 }
 
 // extern unsigned long long _MKTAS_STAT(unsigned long long int * rcx);

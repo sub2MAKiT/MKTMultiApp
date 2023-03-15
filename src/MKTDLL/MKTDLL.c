@@ -70,13 +70,14 @@ void windowsFileDLLLoading()
                 }
         }
 
+    free(charArray);
     } else
         MKTerror(2);
 
     return;
 }
 
-char * windowsDLLLoading()
+void windowsDLLLoading()
 {
     char librariesPath[15] = "./lib/windows/";
     hmodules = (HMODULE*)malloc(sizeof(HMODULE));
@@ -114,6 +115,8 @@ char * windowsDLLLoading()
 
                 FFP = (char*)realloc(FFP,sizeOfFP);
 
+                printf("\n\nthree things: %d %d %s\n\n",sizeOfFP,librariesPathLength, FFP);
+
                 for(int a = 0; a < 4;a++)
                     FFP[librariesPathLength+sizeOfFP-4+a] = extension[a];
                 
@@ -125,10 +128,12 @@ char * windowsDLLLoading()
                 DEBUG("loaded");
                 if (hLib == NULL) { // not 100% sure if this errorHandling works, so :D
                     DEBUG("error");
-                    sizeOfNotLoaded += librariesPathLength+sizeOfFP;
-                    notLoaded = (char*)realloc(notLoaded,sizeOfNotLoaded);
-                    for(int a = 0; a < sizeOfFP; a++)
-                        notLoaded[sizeOfNotLoaded-(librariesPathLength+sizeOfFP)+a-1] = FFP[a];
+                    // sizeOfNotLoaded += librariesPathLength+sizeOfFP;
+                    // notLoaded = (char*)realloc(notLoaded,sizeOfNotLoaded);
+                    // for(int a = 0; a < sizeOfFP; a++)
+                    //     notLoaded[sizeOfNotLoaded-(librariesPathLength+sizeOfFP)+a-1] = FFP[a];
+                    printf("not loaded the library: %s\n",FFP);
+                    free(FFP);
                 } else {
                     Shmodules++;
                     hmodules = (FUNHANDLE*)realloc(hmodules,sizeof(FUNHANDLE) * Shmodules);
@@ -136,10 +141,11 @@ char * windowsDLLLoading()
                 }
             }
         }
+        free(charArray);
     } else {
         printf("\nfile libraryList not found");
     }
-    return notLoaded;
+    return;
 }
 
 void getEntryAddress(FUNHANDLE libraryToLoad, MKTmodule * Module)
@@ -214,6 +220,7 @@ void fileSOLoading()
                 }
         }
 
+        free(charArray);
     } else
         MKTerror(2);
 
@@ -286,6 +293,7 @@ void * loadSharedObjects()
                 }
             }
         }
+        free(charArray);
     } else {
         printf("\nfile libraryList not found");
     }

@@ -2,3 +2,5 @@
 /surgery
 *.o
 /build
+/cov-int/*
+./cov-int/*.txt

@@ -55,7 +55,7 @@ typedef struct TEMPSwapChainSupportDetails {
 } SwapChainSupportDetails;
 
 SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device) {
-    SwapChainSupportDetails details;
+    SwapChainSupportDetails details = {};
 
     vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, _surface, &details.capabilities);
 
@@ -83,7 +83,7 @@ SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device) {
 }
 
 QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device) {
-    QueueFamilyIndices indices;
+    QueueFamilyIndices indices = {0,0,0,0};
     indices.real = 0;
     indices.preal = 0;
     
